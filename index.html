@@ -2243,7 +2243,7 @@ startMission=function(m){const M=MIS[m],ck=S.ck;
   o.querySelector('#cky').onclick=()=>{o.remove();R={m,i:ck.i,pts:ck.pts,pool:shuffle(M.pool==='all'?ALLQ():Q[M.pool]),qi:0,help:{dica:false,fam:false},body:shuffle(BODY),stats:[]};setScene(M.sc);hud();SFX.go&&SFX.go();runStep()};return}
  go()};
 runStep=function(){curQ=null;if(!R)return;const M=MIS[R.m];if(R.i>=M.steps.length)return missionDone();const s=M.steps[R.i];hush();
- const go=()=>STEPS[s](once(()=>{nextTurn();R.i++;S.ck={m:R.m,i:R.i,pts:R.pts};save();runStep()}));window.__retry=()=>{window.__freeze=false;window.__slow=0;go()};go()};
+ const go=()=>STEPS[s](once(()=>{nextTurn();R.i++;S.ck={m:R.m,i:R.i,pts:R.pts,steps:MIS[R.m].steps.slice()};save();runStep()}));window.__retry=()=>{window.__freeze=false;window.__slow=0;go()};go()};
 const _results=results;
 results=function(st,G,pts,title,extra,done){const lost=G.lives!==undefined&&G.lives<=0;if(R){R.stats=R.stats||[];R.stats.push({lost,full:!lost&&G.lives>=3,s3:starN(pts/25)===3})}
  if(lost)title='O VILÃO VENCEU ESSA... MAS NÃO A GUERRA!';_results(st,G,pts,title,extra,done);setTimeout(()=>{try{const r=st.cv.getBoundingClientRect();window.scrollBy({top:r.top-Math.max(4,(innerHeight-r.height)/2),behavior:'smooth'})}catch(e){}},120);
@@ -2282,6 +2282,24 @@ new MutationObserver(ms=>{ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.querySelec
 <script>
 /* bloqueia o toque longo do celular (menu de link/imagem) nos botões de controle */
 ['touchstart','touchmove','touchend'].forEach(t=>document.addEventListener(t,e=>{const b=e.target.closest&&e.target.closest('.vpad button');if(!b)return;e.preventDefault();if(t!=='touchmove'){const ev=new PointerEvent(t==='touchstart'?'pointerdown':'pointerup',{bubbles:true});b.dispatchEvent(ev)}},{passive:false,capture:true}));
+</script>
+<script>
+/* REJOGABILIDADE: a partir da 2ª vez, cada missão sorteia minijogos diferentes e embaralha a ordem */
+const DEFSTEPS=MIS.map(m=>m.steps.slice());
+const GPOOL=['flappy','sonic','catchGame','platform','pacman','sorter','trilha','doodle','jetpack','dash','crossy','pesca','slicer','sling','breakout','runner','city'];
+const GRUPO={sonic:'corrida',runner:'corrida',city:'corrida',platform:'plataforma',trilha:'plataforma',flappy:'voo',jetpack:'voo'};
+const FIXOS=['order','train','invent'];
+function playsGet(){try{return JSON.parse(localStorage.getItem('ecoia_plays'))||{n:[0,0,0,0,0,0],last:[]}}catch(e){return{n:[0,0,0,0,0,0],last:[]}}}
+function playsSet(p){try{localStorage.setItem('ecoia_plays',JSON.stringify(p))}catch(e){}}
+function pickSteps(m){const P=playsGet(),n=P.n[m]||0;P.n[m]=n+1;let steps;
+ if(n===0)steps=DEFSTEPS[m].slice();
+ else{const keep=DEFSTEPS[m].filter(s=>FIXOS.includes(s)),last=P.last[m]||DEFSTEPS[m],usados=new Set(MIS.flatMap((x,i)=>i!==m&&P.n[i]===P.n[m]&&P.last[i]?P.last[i]:[]));
+  let cand=shuffle(GPOOL.filter(g=>!last.includes(g)&&!usados.has(g)));if(cand.length<3-keep.length)cand=shuffle(GPOOL.filter(g=>!last.includes(g)));
+  const pick=[],gs=new Set();for(const g of cand.concat(shuffle(GPOOL.filter(x=>!usados.has(x))),shuffle(GPOOL))){if(pick.length>=3-keep.length)break;if(pick.includes(g)||keep.includes(g))continue;const gr=GRUPO[g];if(gr&&gs.has(gr))continue;pick.push(g);if(gr)gs.add(gr)}
+  steps=shuffle(keep.concat(pick)).concat(['boss'])}
+ P.last[m]=steps;playsSet(P);return steps}
+const _smR=startMission;
+startMission=function(m){const ck=S.ck;if(ck&&ck.m===m&&ck.i>0&&ck.steps)MIS[m].steps=ck.steps.slice();else MIS[m].steps=pickSteps(m);_smR(m)};
 </script>
 </body>
 </html>
