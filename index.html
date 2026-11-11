@@ -2374,12 +2374,13 @@ function simPanel(){var L=S.sim.slice().sort(function(a,b){return a.date<b.date?
 var G0=(function(){return this})();
 function withBlank(names,fn){var o={};names.forEach(function(n){o[n]=G0[n];G0[n]=function(){return ''}});try{return fn()}finally{names.forEach(function(n){G0[n]=o[n]})}}
 var Vpainel33=V.painel;
-V.painel=function(){var h=withBlank(['cardPie','cardQ','incCard','lsCard','erCharts'],function(){return Vpainel33()});
+V.painel=function(){var h=withBlank(['cardPie','cardQ','cardDaily','hoursChart','incCard','lsCard','erCharts'],function(){return Vpainel33()});
  h=h.replace('<h2 style="margin:22px 2px 10px">Edital e leitura</h2>','').replace(/<section class="dc"><div class="dch-h"><div><h3>Caderno de erros<\/h3>[\s\S]*?<\/section>/,'').replace(/<section class="dc dc-chart"><\/section>/g,'');
  h=h.replace(/(<b>Base[^<]*30 min\)[^<]*<\/b>[\s\S]*?<span class="dmin">[\s\S]*?<\/svg> )\d+m/g,'$130m');
  var mais=function(t,lb){return '<p class="vmais"><button class="btn g" onclick="go(\''+t+'\')">'+lb+' →</button></p>'};
  var g='<h2 class="pgh">📊 Resumo em gráficos</h2>';
  g+=psec('q','Questões','<div class="card dcw">'+eqSec()+'</div>'+mais('qst','Ver detalhes das questões'));
+ g+=psec('est','Estudo',cardDaily()+mais('estr','Ver a evolução'));
  g+=psec('ed','Edital',jaEst()+incCard1()+mais('edital','Ver o edital por matéria'));
  var P=pieParts();g+=psec('ls','Lei seca',(P[1]?'<div class="card dcw">'+P[1]+'</div>':'')+mais('lei','Ver a lei seca por matéria'));
  g+=psec('sim','Simulados',simEvoOnly()+mais('sim','Ver o diagnóstico'));
@@ -2405,18 +2406,20 @@ function mline3d(SR,labs,o){var W=520,H=230,L=46,B=24,T=24,n=labs.length,bw=(W-L
   P.forEach(function(p,k){s+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="'+(sr.tot?5:4)+'" fill="'+c+'" stroke="#fff" stroke-width="1.5"/>';if(k==P.length-1)s+='<text x="'+(p[0]+8)+'" y="'+(p[1]+4)+'" style="font-size:11px;font-weight:700;fill:'+c+'">'+Math.round(p[2])+'%</text>'})});
  return s+'</svg>'}
 function evoCard2(){var t0=today(),W=evW,nb=W==7?7:W==30?10:13,sz=Math.ceil(W/nb),labs=[],B=[];for(var i=nb-1;i>=0;i--){var b=addD(t0,-i*sz);B.push([addD(b,-(sz-1)),b]);labs.push(dm2(b))}
- var cur=winQ(addD(t0,-(W-1)),t0),prv=winQ(addD(t0,-(2*W-1)),addD(t0,-W));
+ var cur=winQ(addD(t0,-(W-1)),t0),prv=winQ(addD(t0,-(2*W-1)),addD(t0,-W)),meta=metaPct();
  var dl=function(x,y,f,pct){if(x==null||y==null||(!pct&&!y))return '<span class="mu">sem período anterior</span>';var d=x-y;if(pct)d=Math.round(d*100);var up=d>=0;return '<b class="'+(up?'up':'dn')+'">'+(up?'↑ +':'↓ −')+f(Math.abs(d))+'</b> <span class="mu">vs antes</span>'};
- var SR=[{k:'_t',n:'Total',c:'#212529',tot:1,v:B.map(function(p){var w=winQ(p[0],p[1]);return w.q?w.r*100:null})}];
- S.subs.forEach(function(s){var v=B.map(function(p){var w=winQ(p[0],p[1],s.id);return w.q?w.r*100:null});if(v.some(function(x){return x!=null}))SR.push({k:s.id,n:SN(s),c:sCol(s.id),v:v})});
- var tr=function(v){var f=null,l=null;v.forEach(function(x){if(x!=null){if(f==null)f=x;l=x}});return f==null||l==f?'':l>f?'<b class="up">↑</b>':'<b class="dn">↓</b>'};
+ var cell=function(p0,p1,sid){var w=winQ(p0,p1,sid);return w.q?{p:w.r,q:w.q}:null};
+ var R4=[{n:'Total',c:'#212529',tot:1,v:B.map(function(p){return cell(p[0],p[1])})}];
+ S.subs.forEach(function(s){var v=B.map(function(p){return cell(p[0],p[1],s.id)});if(v.some(function(x){return x}))R4.push({n:SN(s),c:sCol(s.id),v:v})});
  var h='<div class="card"><h2>Evolução do aproveitamento por matéria</h2><div class="seg" style="margin-bottom:10px">'+[7,30,90].map(function(w){return '<button class="'+(evW==w?'on':'')+'" onclick="evW='+w+';R()">'+w+' dias</button>'}).join('')+'</div>';
  h+='<div class="qk"><div><span>Horas</span><b>'+fm(cur.min)+'</b><small style="display:block">'+dl(cur.min,prv.min,function(x){return fm(x)})+'</small></div><div><span>Questões</span><b>'+cur.q+'</b><small style="display:block">'+dl(cur.q,prv.q,function(x){return x})+'</small></div><div><span>Rendimento</span><b style="color:'+colMeta(cur.r)+'">'+(cur.r==null?'–':Math.round(cur.r*100)+'%')+'</b><small style="display:block">'+dl(cur.r,prv.r,function(x){return x+'%'},1)+'</small></div></div>';
- if(SR[0].v.every(function(x){return x==null}))return h+'<p class="mu">Registre questões para ver a evolução.</p></div>';
- var st=0;while(st<labs.length-4&&SR[0].v[st]==null)st++;if(st){labs=labs.slice(st);SR.forEach(function(r){r.v=r.v.slice(st)})}
- h+=mline3d(SR.filter(function(s){return !EVH[s.k]}),labs,{goal:Math.round(metaPct()*100)});
- h+='<div class="dleg evl">'+SR.map(function(s){return '<button type="button" class="ql'+(EVH[s.k]?' off':'')+'" onclick="evH(\''+s.k+'\')"><i style="background:'+s.c+'"></i>'+e(s.n)+' '+tr(s.v)+'</button>'}).join('')+'</div>';
- return h+'<p class="mu">% de acerto por período de '+sz+' dia'+(sz>1?'s':'')+'. A linha preta é o total. Toque no nome para mostrar ou esconder a matéria. Períodos sem questões ficam sem ponto.</p></div>'}
+ if(!R4[0].v.some(function(x){return x}))return h+'<p class="mu">Registre questões para ver a evolução.</p></div>';
+ var st=0;while(st<labs.length-4&&!R4[0].v[st])st++;labs=labs.slice(st);R4.forEach(function(r){r.v=r.v.slice(st)});
+ h+='<h4 style="margin:14px 0 4px">Acerto total em cada período</h4>'+line3d(R4[0].v.map(function(x){return x?x.p*100:null}),labs,{t:'Acerto total',max:100,goal:Math.round(meta*100),cm:1,f:function(x){return Math.round(x)+'%'}});
+ var trd=function(v){var f=null,l=null;v.forEach(function(x){if(x){if(f==null)f=x.p;l=x.p}});if(f==null||l==null||v.filter(function(x){return x}).length<2)return '<span class="mu">–</span>';var d=Math.round((l-f)*100);return d==0?'<span class="mu">→ 0</span>':'<b class="'+(d>0?'up':'dn')+'">'+(d>0?'↑ +':'↓ −')+Math.abs(d)+'%</b>'};
+ h+='<h4 style="margin:16px 0 6px">Acerto por matéria em cada período</h4><div class="tw"><table class="evm"><tr><th>Matéria</th>'+labs.map(function(l){return '<th>'+e(l)+'</th>'}).join('')+'<th>Tendência</th></tr>'+
+  R4.map(function(r){return '<tr'+(r.tot?' class="evt"':'')+'><td><i class="evd" style="background:'+r.c+'"></i>'+e(r.n)+'</td>'+r.v.map(function(x){return x?'<td><span class="evc3" style="background:'+colMeta(x.p)+'" title="'+x.q+' questões">'+Math.round(x.p*100)+'%</span></td>':'<td><span class="evc3 ev0">–</span></td>'}).join('')+'<td>'+trd(r.v)+'</td></tr>'}).join('')+'</table></div>';
+ return h+'<p class="mu">Cada período tem '+sz+' dia'+(sz>1?'s':'')+'. Verde: bateu a meta de '+Math.round(meta*100)+'%; amarelo: até 10% abaixo; vermelho: abaixo disso; "–": sem questões no período. Tendência: diferença entre o primeiro e o último período com questões. Passe o dedo ou o mouse sobre o quadradinho para ver quantas questões.</p></div>'}
 // ---- abas com os detalhes (sem repetir o que está no Painel)
 TABS=(function(o){if(o.evo)return o;var n={};Object.keys(o).forEach(function(k){n[k]=o[k];if(k=='rev')n.evo='Evolução'});return n})(TABS);
 V.estr=(function(b){return function(){var h=b();return h.replace(/<div class="card"><h2>Evolução<\/h2>[\s\S]*?<\/svg><\/div>/,function(){return evoCard2()})}})(V.estr);
@@ -2444,12 +2447,11 @@ document.head.appendChild(st)}catch(x){}})();
 cardDisc=(function(b){return function(){return b().replace(/towers-gw64/,'')}})(cardDisc);
 
 // ---- Painel: estudo por dia ao lado de Próximos estudos; Questões de hoje embaixo de Precisa de atenção
-hoursChart=function(){return cardDaily().replace('</div></div><div class="qtw">','</div></div><div class="qtw">')+''};
 function qHoje(){var t=today(),qd=0;S.logs.forEach(function(l){if(l.date==t)qd+=(l.ac||0)+(l.er||0)+(l.br||0)});S.sim.forEach(function(m){if(m.date==t)m.rows.forEach(function(x){qd+=x.ac+x.er+x.br})});var mt=qMeta(),Q=qtPend().filter(function(x){return !x.done}),p=Math.min(1,qd/Math.max(1,mt));
  return '<section class="dc qhj"><div class="dch-h"><div><h3>Questões de hoje</h3><p class="dsub"><b>'+qd+'</b> de '+mt+' · meta do dia'+(qd>=mt?' ✓':'')+'</p></div><button class="btn" onclick="go(\'qst\')">Lançar questões</button></div><div class="qhb"><i style="width:'+Math.round(p*100)+'%;background:'+(qd>=mt?'#2f9e44':'#e8a317')+'"></i></div>'+
   (Q.length?'<p class="dsub" style="margin:10px 0 4px">10 questões pendentes:</p>'+Q.slice(0,3).map(function(x){return '<div class="qhr"><span>'+e(x.t.n.slice(0,60))+' <small class="mu">· '+e(SN(x.s))+'</small></span><b>'+x.p+'/'+x.n+'</b></div>'}).join('')+(Q.length>3?'<p class="mu" style="margin:4px 0 0">e mais '+(Q.length-3)+'.</p>':''):'<p class="dsub" style="margin:10px 0 0">Nenhum tema com questões pendentes.</p>')+'</section>'}
-V.painel=(function(b){return function(){var h=b(),i=h.indexOf('<section class="dc"><div class="dat-h">');if(i>=0){var j=h.indexOf('</section></div><div class="dg2">',i);if(j>=0)return h.slice(0,i)+'<div class="dcolr">'+h.slice(i,j)+'</section>'+qHoje()+'</div></div><div class="dg2">'+h.slice(j+'</section></div><div class="dg2">'.length)}
- var k=h.indexOf('</div><div class="dg2">');return k<0?h:h.slice(0,k)+qHoje()+h.slice(k)}})(V.painel);
+V.painel=(function(b){return function(){var h=b(),a='<div class="dg2"><section class="dc"><h3>Próximos estudos',i=h.indexOf(a);if(i>=0){var j=h.indexOf('</section>',i);if(j>=0){j+='</section>'.length;return h.slice(0,j)+qHoje()+h.slice(j)}}
+ var k=h.indexOf('</div><div class="dg2">');return k<0?h+qHoje():h.slice(0,k)+qHoje()+h.slice(k)}})(V.painel);
 // ---- Equilíbrio por matéria: radar como antes, em verde
 eqSec=(function(b){return function(){var h=b(),meta=metaPct(),PP=QIA=='sem'?withLogs(S.logs.filter(function(l){return !isIA(l)}),projOf):projOf(),by=PP.by;
  var P=QORD.map(function(k){var o=by[k],n=o?o.a+o.r+o.b:0,s=sub(k);return{l:s?SN(s):k,v:n>=5?o.a/n:null,n:n}});
@@ -2467,6 +2469,7 @@ V.plano=(function(b){return function(){return radFix(b())}})(V.plano);
 V.painel=(function(b){return function(){return radFix(b())}})(V.painel);
 merge=(function(b){return function(a,c){var r=b(a,c),A=a.rad||{},B=c.rad||{},o={};Object.keys(A).concat(Object.keys(B)).forEach(function(i){var x=A[i],y=B[i];o[i]=!x?y:!y?x:((x.u||0)>=(y.u||0)?x:y)});r.rad=o;return r}})(merge);
 (function(){try{var st=document.createElement('style');st.textContent='.radb{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:6px;width:100%}.radb .btn{padding:4px 10px;font-size:12px}';document.head.appendChild(st)}catch(x){}})();
+(function(){try{var st=document.createElement('style');st.textContent='.evm{border-collapse:separate;border-spacing:3px;min-width:0}.evm td:last-child{white-space:nowrap;font-size:12px}.evm th{font-size:11px;font-weight:600;color:var(--mu);text-align:center;padding:2px}.evm th:first-child,.evm td:first-child{text-align:left;white-space:nowrap;font-size:13px}.evm td{text-align:center;padding:0}.evm .evt td:first-child{font-weight:700}.evd{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:middle}.evc3{display:inline-block;min-width:38px;padding:5px 3px;border-radius:7px;color:#fff;font-weight:700;font-size:11.5px;box-shadow:0 3px 0 rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.35)}.evc3.ev0{background:#e9ecef;color:#868e96;box-shadow:none}';document.head.appendChild(st)}catch(x){}})();
 
 mig4();R();tmInit();cloud();
 </script>
