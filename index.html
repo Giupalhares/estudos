@@ -1733,7 +1733,7 @@ merge=(function(b){return function(a,c){var r=b(a,c),mm=function(k){var A=a[k]||
  var I={};(a.atr||[]).concat(c.atr||[]).forEach(function(x){if(!x)return;var y=I[x.id];if(!y||(x.u||0)>(y.u||0))I[x.id]=x});r.atr=Object.keys(I).map(function(k){return I[k]});
  var ma=a.mig4,mc=c.mig4;r.mig4=!ma?mc:!mc?ma:((ma.u||0)>=(mc.u||0)?ma:mc);return r}})(merge);
 // ===== mod28: gráficos 3D (pizzas e torres), KPIs, Edital com Estudar, Registrar completo, questões de fora, banca, tipo de estudo =====
-var BANCAS=['FGV','Cebraspe','FCC','Vunesp','Instituto AOCP','IBFC','Outra','Autoral/IA'],ORIG=['','TEC Concursos','QConcursos','Gran','Estratégia','ChatGPT','Claude','Livro/PDF','Outro'],TIPOS=['','Videoaula','PDF/livro','Lei seca','Questões','Revisão','Resumo/mapa'];
+var BANCAS=['FGV','Fumarc','Cebraspe','Vunesp','FCC','Fundep','IDECAN','Instituto AOCP','IBFC','Consulplan','Ibade','Instituto Acesso','Selecon','Cesgranrio','Quadrix','Nucepe','Outra','Autoral','IA'],ORIG=['','TEC Concursos','QConcursos','Gran','Estratégia','ChatGPT','Claude','Gemini','Outra IA','Livro/PDF','Professor/cursinho','Outro'],TIPOS=['','Teoria','Videoaula','PDF/livro','Lei seca','Questões','Revisão','Resumo/mapa'];
 function metaPct(){return (S.qmeta||70)/100}
 function shade(hex,a){var h=String(hex||'#888').replace('#','');if(h.length==3)h=h.split('').map(function(c){return c+c}).join('');var n=parseInt(h,16),r=n>>16&255,g=n>>8&255,b=n&255,f=function(c){return Math.max(0,Math.min(255,Math.round(a<0?c*(1+a):c+(255-c)*a)))};return 'rgb('+f(r)+','+f(g)+','+f(b)+')'}
 function shortL(s){s=String(s);return s.length>11?s.slice(0,10)+'.':s}
@@ -1892,7 +1892,7 @@ cardCtl=(function(b){return function(){var h=b(),t=today(),since=ctW=='all'?'000
  S.logs.forEach(function(l){if(l.date<since||l.date>t||(ctS&&l.sid!=ctS))return;var k=l.bc||'FGV';if((l.ac||0)+(l.er||0)+(l.br||0)){var o=B[k]=B[k]||{a:0,r:0};o.a+=l.ac||0;o.r+=(l.er||0)+(l.br||0)}var tp=l.ts||(l.lsi!=null?'Lei seca':'Não informado');TS[tp]=(TS[tp]||0)+l.min});
  S.sim.forEach(function(m){if(m.date<since)return;m.rows.forEach(function(x){if(ctS&&x.sid!=ctS)return;var o=B.FGV=B.FGV||{a:0,r:0};o.a+=x.ac;o.r+=x.er+x.br})});
  var G=Object.keys(B).map(function(k){var o=B[k],n=o.a+o.r,p=n?o.a/n:null;return{l:k,v:p,c:colMeta(p),top:p==null?'':Math.round(p*100)+'%',tc:colMeta(p),sub:n+' q'}});
- var TC={'Videoaula':'#4263eb','PDF/livro':'#20b486','Lei seca':'#546e7a','Questões':'#e8a317','Revisão':'#7b3fb3','Resumo/mapa':'#d6336c','Não informado':'#ced4da'},parts=Object.keys(TS).map(function(k){return{v:TS[k],c:TC[k]||'#adb5bd',l:k}}),tm=0;parts.forEach(function(p){tm+=p.v});
+ var TC={'Teoria':'#1c7ed6','Videoaula':'#4263eb','PDF/livro':'#20b486','Lei seca':'#546e7a','Questões':'#e8a317','Revisão':'#7b3fb3','Resumo/mapa':'#d6336c','Não informado':'#ced4da'},parts=Object.keys(TS).map(function(k){return{v:TS[k],c:TC[k]||'#adb5bd',l:k}}),tm=0;parts.forEach(function(p){tm+=p.v});
  var x='<div class="dg2b"><div><h4 style="margin:12px 0 6px">Acerto por banca</h4>'+(G.length?towers(G,{max:1,meta:metaPct(),gw:70,h:200}):'<p class="mu">Sem questões no período.</p>')+'</div><div><h4 style="margin:12px 0 6px">Como você estudou (tempo)</h4>'+(tm?'<div class="pie1">'+donut(parts.map(function(p){return{v:p.v,c:p.c,l:p.l}}),150,24,fm(tm),'no período')+'<div class="pleg">'+parts.sort(function(a,b){return b.v-a.v}).map(function(p){return '<span><i style="background:'+p.c+'"></i>'+e(p.l)+' <b>'+fm(p.v)+'</b> <small class="mu">'+Math.round(p.v/tm*100)+'%</small></span>'}).join('')+'</div></div>':'<p class="mu">Sem registros no período.</p>')+'</div></div>';
  return h.replace(/<\/div>$/,x+'</div>')}})(cardCtl);
 // projeção: peso menor para questões de outras bancas
@@ -2004,7 +2004,7 @@ function wkSum(a){var b2=addD(a,6),o={min:0,qa:0,qr:0,tc:0,by:{},bq:{}},meta=(S.
  S.subs.forEach(function(s){s.tp.forEach(function(x,i){if(leaf(s,i)&&x.d&&x.dt>=a&&x.dt<=b2)o.tc++})});var rv=(S.rvd||[]).filter(function(x){return x.d>=a&&x.d<=b2});o.rv=rv.length;o.rvp=rv.filter(function(x){return x.d<=x.due}).length;o.meta=meta;return o}
 function fwCard(){var a=addD(wkStart(),-7),key=a;if(S.fw&&S.fw[key]&&S.fw[key].x)return '';if(!S.logs.some(function(l){return l.date<wkStart()}))return '';
  var o=wkSum(a),p=wkSum(addD(a,-7)),acc=o.qa+o.qr?o.qa/(o.qa+o.qr):null,pacc=p.qa+p.qr?p.qa/(p.qa+p.qr):null,arr=function(x,y,f){return y==null||x==null?'':x>=y?' <span class="up">↑</span>':' <span class="dn">↓</span>'};
- var worst=null,wd=0;Object.keys(o.bq).forEach(function(sid){var q=o.bq[sid],n=q.a+q.r;if(n<5)return;var pr=0,pn=0;for(var k=1;k<=4;k++){var s2=wkSum(addD(a,-7*k)).bq[sid];if(s2){pr+=s2.a;pn+=s2.a+s2.r}}if(pn<5)return;var d=q.a/n-pr/pn;if(d<wd){wd=d;worst=sid}});
+ var worst=null,wd=0,best=null,bd=0;Object.keys(o.bq).forEach(function(sid){var q=o.bq[sid],n=q.a+q.r;if(n<5)return;var pr=0,pn=0;for(var k=1;k<=4;k++){var s2=wkSum(addD(a,-7*k)).bq[sid];if(s2){pr+=s2.a;pn+=s2.a+s2.r}}if(pn<5)return;var d=q.a/n-pr/pn;if(d<wd){wd=d;worst=sid}if(d>bd){bd=d;best=sid}});
  var A=[],rvA=rvAtr().length;if(rvA>5)A.push(rvA+' revisões atrasadas: use “Espalhar nos próximos 7 dias” na aba Atraso.');
  if(o.min<o.meta*.8)A.push('Horas abaixo da meta ('+fm(o.min)+' de '+fm(o.meta)+'): faltaram '+fm(Math.round((o.meta-o.min)/7))+' por dia.');
  var tot=0;Object.keys(QW8).forEach(function(k){tot+=QW8[k]});var tm=o.min||1,gap=null,gv=0;Object.keys(QW8).forEach(function(sid){if(!mwOf(sid))return;var sh=(o.by[sid]||0)/tm,w=QW8[sid]/tot;if(w-sh>gv&&sh<w/2){gv=w-sh;gap=sid}});
@@ -2014,7 +2014,7 @@ function fwCard(){var a=addD(wkStart(),-7),key=a;if(S.fw&&S.fw[key]&&S.fw[key].x
  if(!A.length)A.push('Semana equilibrada. Mantenha o ritmo e faça as revisões no dia.');
  S.fwh=S.fwh||{};if(!S.fwh[key])S.fwh[key]={min:o.min,qa:o.qa,qr:o.qr,tc:o.tc,rv:o.rv,rvp:o.rvp,u:Date.now()};
  return '<section class="dc fw"><div class="dch-h"><div><h3>Fechamento da semana</h3><p class="dsub">'+a.split('-').reverse().slice(0,2).join('/')+' a '+addD(a,6).split('-').reverse().slice(0,2).join('/')+'</p></div><button class="btn g" onclick="S.fw=S.fw||{};S.fw[\''+key+'\']={x:1,u:Date.now()};save();R()">Entendi</button></div>'+
-  '<div class="qk"><div><span>Horas</span><b>'+fm(o.min)+arr(o.min,p.min)+'</b><small class="mu" style="display:block">meta '+fm(o.meta)+'</small></div><div><span>Temas concluídos</span><b>'+o.tc+arr(o.tc,p.tc)+'</b></div><div><span>Questões</span><b>'+(o.qa+o.qr)+arr(o.qa+o.qr,p.qa+p.qr)+'</b><small class="mu" style="display:block">acerto '+(acc==null?'–':Math.round(acc*100)+'%')+'</small></div><div><span>Revisões no prazo</span><b>'+(o.rv?Math.round(o.rvp/o.rv*100)+'%':'–')+'</b><small class="mu" style="display:block">'+o.rv+' feitas</small></div>'+(worst?'<div class="qe"><span>Mais caiu</span><b style="font-size:16px">'+e(SN(sub(worst)))+'</b></div>':'')+'</div>'+
+  '<div class="qk"><div><span>Horas</span><b>'+fm(o.min)+arr(o.min,p.min)+'</b><small class="mu" style="display:block">meta '+fm(o.meta)+'</small></div><div><span>Temas concluídos</span><b>'+o.tc+arr(o.tc,p.tc)+'</b></div><div><span>Questões</span><b>'+(o.qa+o.qr)+arr(o.qa+o.qr,p.qa+p.qr)+'</b><small class="mu" style="display:block">acerto '+(acc==null?'–':Math.round(acc*100)+'%')+'</small></div><div><span>Revisões no prazo</span><b>'+(o.rv?Math.round(o.rvp/o.rv*100)+'%':'–')+'</b><small class="mu" style="display:block">'+o.rv+' feitas</small></div>'+(worst||best?'<div><span>Rendimento</span>'+(best?'<b style="font-size:15px;color:#2f9e44;display:block">+'+Math.round(bd*100)+'% '+e(SN(sub(best)))+'</b>':'')+(worst?'<b style="font-size:15px;color:#e03131;display:block">−'+Math.round(-wd*100)+'% '+e(SN(sub(worst)))+'</b>':'')+'<small class="mu" style="display:block">pontos de acerto vs. 4 semanas</small></div>':'')+'</div>'+
   '<h4 style="margin:12px 0 6px">3 ações para esta semana</h4><ol class="fwa">'+A.slice(0,3).map(function(x){return '<li>'+e(x)+'</li>'}).join('')+'</ol></section>'}
 V.painel=(function(b){return function(){var h=b(),c=fwCard();if(!c)return h;var i=h.indexOf('<div class="kpis');return i<0?c+h:h.slice(0,i)+c+h.slice(i)}})(V.painel);
 // ---- exportar para Excel
@@ -2204,6 +2204,134 @@ V.reg=(function(b){return function(){var h=b();return h.indexOf('<div class="car
 // sincronização dos comentários
 merge=(function(b){return function(a,c){var r=b(a,c),A=a.qcm||{},B=c.qcm||{},o={};Object.keys(A).concat(Object.keys(B)).forEach(function(i){var x=A[i],y=B[i];o[i]=!x?y:!y?x:((x.u||0)>=(y.u||0)?x:y)});r.qcm=o;return r}})(merge);
 (function(){try{var st=document.createElement('style');st.textContent='.qcm{margin-top:8px}.qcm summary{cursor:pointer;font-weight:600}.qcmt,.ernt{white-space:pre-line}.ernt{max-height:7.5em;overflow:hidden;cursor:pointer}.ernt.open{max-height:none}.pq .qfe .exo button{min-height:0}.pq .seg button{padding:6px 10px}';document.head.appendChild(st)}catch(x){}})();
+
+// ===== mod32: aba Questões, bancas e IA, equilíbrio 3D, cronômetro com tipo de estudo, ajustes de tamanho =====
+// ---- bancas e IA
+function isIA(l){if(!l)return false;return l.bc=='IA'||l.bc=='Autoral/IA'||/ChatGPT|Claude|Gemini|\bIA\b/i.test(l.org||'')}
+(function(){var m=function(x){if(x&&x.bc=='Autoral/IA')x.bc='IA'};try{(S.logs||[]).forEach(m);(S.er||[]).forEach(m);(S.qb||[]).forEach(m)}catch(x){}})();
+var QIA='com';try{QIA=localStorage.getItem('ce.qia')||'com'}catch(x){}
+function qiaSet(v){QIA=v;try{localStorage.setItem('ce.qia',v)}catch(x){}R()}
+function qiaSeg(){return '<div class="seg qia">'+[['com','Com IA'],['sem','Sem IA']].map(function(x){return '<button class="'+(QIA==x[0]?'on':'')+'" onclick="qiaSet(\''+x[0]+'\')">'+x[1]+'</button>'}).join('')+'</div>'}
+function noIA(fn){return function(){if(QIA!='sem')return fn.apply(this,arguments);var L=S.logs;S.logs=L.filter(function(l){return !isIA(l)});try{return fn.apply(this,arguments)}finally{S.logs=L}}}
+function withLogs(L,fn){var o=S.logs;S.logs=L;try{return fn()}finally{S.logs=o}}
+// ---- projeção (com e sem IA)
+function projOf(){var by=perfAll(60),c=qcfg(),tot=0,exp=0,ga=0,gn=0,has=0;Object.keys(by).forEach(function(k){var o=by[k];ga+=o.a;gn+=o.a+o.r+o.b});var gp=gn?ga/gn:null;
+ QORD.forEach(function(k){var o=by[k],n=o?o.a+o.r+o.b:0,v=n>=5?o.a/n:null,d=c.d[k]||0;tot+=d;if(v!=null){has++;exp+=d*v}else if(gp!=null)exp+=d*gp});return{by:by,tot:tot,exp:exp,gn:gn,has:has}}
+// ---- Equilíbrio por matéria: torres 3D com meta
+function eqSec(){var meta=metaPct(),P=QIA=='sem'?withLogs(S.logs.filter(function(l){return !isIA(l)}),projOf):projOf(),C=withLogs(S.logs.filter(function(l){return !isIA(l)}),projOf),A=projOf(),by=P.by;
+ var G=QORD.map(function(k){var o=by[k],n=o?o.a+o.r+o.b:0,v=n>=5?o.a/n:null,s=sub(k),gap=v==null?null:Math.round((meta-v)*100);
+  return{l:s?SN(s):k,v:v,c:colMeta(v),top:v==null?'–':Math.round(v*100)+'%',tc:colMeta(v),sub:v==null?(n?n+' q (poucas)':'sem questões'):gap>0?'falta '+gap+' pts':'✓ meta',tip:(s?s.name:k)+': '+(v==null?'menos de 5 questões':Math.round(v*100)+'% em '+n+' questões')}});
+ var ok=G.filter(function(g){return g.v!=null&&g.v>=meta}).length,bad=G.filter(function(g){return g.v!=null&&g.v<meta}).sort(function(a,b){return a.v-b.v}),nd=G.filter(function(g){return g.v==null}).length;
+ var h='<section class="dc eq"><div class="dch-h"><div><h3>Equilíbrio por matéria</h3><p class="dsub">Acerto nas questões dos últimos 60 dias, matéria por matéria, contra a sua meta</p></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'+qiaSeg()+'<label class="mu" style="white-space:nowrap">Meta <input type="number" min="30" max="100" value="'+Math.round(meta*100)+'" style="width:64px" onchange="qmetaSet(this.value)">%</label></div></div>';
+ h+='<p class="ctp">'+(ok?'<b class="up">'+ok+' na meta</b>':'Nenhuma matéria na meta ainda')+(bad.length?' · <b class="dn">'+bad.length+' abaixo</b>: comece por <b>'+e(bad[0].l)+'</b> ('+bad[0].top+')':'')+(nd?' · <span class="mu">'+nd+' sem dados (menos de 5 questões)</span>':'')+'</p>';
+ var GD=G.filter(function(g){return g.v!=null});if(GD.length)h+=towers(GD,{max:1,meta:meta,gw:GD.length<=4?90:66,h:210,fit:1,bot:44});if(nd)h+='<p class="mu">Sem dados ainda: '+G.filter(function(g){return g.v==null}).map(function(g){return e(g.l)}).join(', ')+'.</p>';
+ h+='<p class="mu">Cada torre é uma matéria, na ordem do peso na prova. A linha tracejada é a sua meta. Verde: bateu; amarelo: perto (até 10 pontos abaixo); vermelho: abaixo. Embaixo, quantos pontos faltam. Matérias aparecem quando tiverem 5 questões.</p>';
+ if(A.gn){var pj=Math.round(P.exp),pp=P.tot?P.exp/P.tot:0,pa=Math.round(A.exp),ps=Math.round(C.exp),dif=pa-ps;
+  h+='<div class="qk" style="margin-top:6px"><div><span>Projeção na prova</span><b>'+pa+'/'+A.tot+'</b><small class="mu" style="display:block">sem IA: '+(C.gn?ps+'/'+C.tot:'–')+'</small></div><div class="'+(pp>=meta?'qa':'qe')+'"><span>Aproveitamento'+(QIA=='sem'?' (sem IA)':'')+'</span><b>'+Math.round(pp*100)+'%</b></div><div><span>Faltam p/ meta</span><b>'+Math.max(0,Math.ceil(meta*P.tot-P.exp))+'</b></div></div>';
+  if(C.gn&&dif>=4)h+='<p class="ctp">⚠️ Com as questões de IA a projeção sobe '+dif+' questões. As de IA podem estar mais fáceis que a FGV: confira o "Sem IA".</p>';
+  h+='<p class="mu">Projeção = questões de cada matéria na prova (a divisão em Simulados) × o seu aproveitamento nela'+(P.has<QORD.length?'; matérias sem dados usam a sua média geral':'')+'. É uma estimativa, não a nota de corte.</p>'}
+ else h+='<p class="mu">Resolva questões para ver o equilíbrio e a projeção.</p>';
+ return h+'</section>'}
+cardBank=(function(b){return function(){var h=b();h=h.replace(/<section class="dc"><div class="dch-h"><div><h3>Treino do dia<\/h3>[\s\S]*?<\/section>/,'');return h.replace(/<section class="dc"><div class="dch-h"><div><h3>Equilíbrio por matéria<\/h3>[\s\S]*?<\/section>/,function(){return eqSec()})}})(cardBank);
+calCard=noIA(calCard);cardDisc=noIA(cardDisc);
+calCard=(function(b){return function(){return b().replace('<div class="seg">','<div style="display:flex;gap:6px;flex-wrap:wrap">'+qiaSeg()+'<div class="seg">').replace(/(<div class="seg">[\s\S]*?<\/div>)(<\/div>)/,'$1</div>$2')}})(calCard);
+cardDisc=(function(b){return function(){return b().replace('<p class="mu">Últimos 30 dias.','<div style="margin:4px 0 8px">'+qiaSeg()+'</div><p class="mu">Últimos 30 dias.')}})(cardDisc);
+// ---- gráficos menores
+cardRendSem=(function(b){return function(W,labs){return b(W,labs).replace(/<div class="qtw"><svg style="width:100%;height:auto"/,'<div class="qtw sm"><svg style="width:100%;height:auto"')}})(cardRendSem);
+cardSimEvo=(function(b){return function(L,tot){return b(L,tot).replace(/<div class="qtw"><svg style="width:100%;height:auto"/,'<div class="qtw sm"><svg style="width:100%;height:auto"')}})(cardSimEvo);
+// ---- cronômetro: tipo de estudo no topo e zerar tudo
+var TEO=['Teoria','Videoaula','PDF/livro','Resumo/mapa'];
+function tsOf(){return TM.ts||(TM.tid&&TM.tid.charAt(0)=='L'?'Lei seca':'')}
+function tsSet(v){TM.ts=v;tmSv();R()}
+function tsBar(fl){var cv=tsOf(),fam=TEO.indexOf(cv)>=0?'Teoria':cv,h='<div class="tsb'+(fl?' fl':'')+'"><span class="cwl">Tipo de estudo:</span><div class="seg">'+['Teoria','Lei seca','Questões','Revisão'].map(function(x){return '<button type="button" class="'+(fam==x?'on':'')+'" onclick="tsSet(\''+x+'\')">'+x+'</button>'}).join('')+'</div>';
+ if(fam=='Teoria'&&!fl)h+='<div class="chips tsc">'+TEO.map(function(x){return '<button type="button" class="'+(cv==x?'on':'')+'" onclick="tsSet(\''+x+'\')">'+(x=='Teoria'?'Geral':x)+'</button>'}).join('')+'</div>';
+ return h+'</div>'}
+cronCard=(function(b){return function(fl){var h=b(fl);if(fl&&TM.mini)return h;h=h.replace(/<div><label>Tipo de estudo<\/label><select[\s\S]*?<\/select><\/div>/,'');h=h.replace('<div class="cwz"><button onclick="tmReset()" disabled>','<div class="cwz"><button onclick="tmReset()">');var i=-1;['<div class="cwp">','<div class="cwg">','<div class="cwbt">'].forEach(function(a){if(i<0)i=h.indexOf(a)});return i<0?h:h.slice(0,i)+tsBar(fl)+h.slice(i)}})(cronCard);
+estudar=(function(b){return function(sid,tid){var r=b.apply(this,arguments);if(!TM.ts){TM.ts=tid&&String(tid).charAt(0)=='L'?'Lei seca':'Teoria';tmSv()}return r}})(estudar);
+tmReset=(function(b){return function(){['sid','tid','ts','bc','fin','pr','ac','er','pg','au','man'].forEach(function(k){delete TM[k]});if(typeof RGF!='undefined')RGF='';return b.apply(this,arguments)}})(tmReset);
+// ---- aba Questões
+TABS=(function(o){var n={};Object.keys(o).forEach(function(k){n[k]=o[k];if(k=='reg')n.qst='Questões'});return n})(TABS);
+var LQM='c';try{LQM=localStorage.getItem('ce.lqm')||'c'}catch(x){}
+function lqmSet(v){LQM=v;try{localStorage.setItem('ce.lqm',v)}catch(x){}R()}
+function lqSeg(){return '<div class="seg" style="margin:4px 0 10px">'+[['c','Colar as questões'],['r','Só o resultado']].map(function(x){return '<button class="'+(LQM==x[0]?'on':'')+'" onclick="lqmSet(\''+x[0]+'\')">'+x[1]+'</button>'}).join('')+'</div>'}
+var PQG=0;function pqgSet(v){PQG=v;if(PQ){PQ.g=v;pqSv()}R()}
+function lqCard(){if(LQM=='r')return qfCard().replace('<div class="card qf"><h2>Questões de fora</h2><p class="mu">Questões que você fez em sites, IAs ou livros. Entram nos gráficos de questões, no acerto por banca e, os erros, no Caderno de erros com revisões.</p>','<div class="card qf"><h2>Lançar questões</h2>'+lqSeg()+'<p class="mu">Para lançar rápido só os números de uma lista que você fez num site, IA ou livro.</p>');
+ var g=PQ?!!PQ.g:!!PQG,h=pqCard().replace('<div class="card pq"><h2>Colar questões resolvidas</h2>','<div class="card pq qf"><h2>Lançar questões</h2>'+lqSeg()+'<div class="seg" style="margin:0 0 10px">'+[[0,'Já resolvi'],[1,'Só guardar no banco']].map(function(x){return '<button class="'+((g?1:0)==x[0]?'on':'')+'" onclick="pqgSet('+x[0]+')">'+x[1]+'</button>'}).join('')+'</div>');
+ if(g)h=h.replace(/<p class="mu">Copie as questões[\s\S]*?<\/p>/,'<p class="mu">Para guardar questões que você ainda vai resolver: elas entram no banco e caem nas suas provas montadas. Nada vai para os gráficos agora. Precisa do gabarito.</p>');
+ return h}
+pqLer=(function(b){return function(){var k=(document.getElementById('pq_k')||{}).value||'';b();if(PQ){PQ.g=PQG;PQ.k=k||(QFP?QFP.k:'')||'tema';if(QFP&&!PQ.t){PQ.s=QFP.sid;PQ.t=QFP.tid}pqSv();R()}}})(pqLer);
+pqBI=(function(b){return function(i){var h=b(i),q=PQ.L[i];if(PQ.g){h=h.replace(/<div class="mu" style="margin-top:6px">Toque na que você marcou:<\/div>/,'').replace(/<div><label>Resultado<\/label>[\s\S]*?<\/div><\/div><\/div>/,'</div>').replace(/<div class="sqk">[\s\S]*?<\/div>/,'').replace(/<label>Motivo do erro<\/label><select[\s\S]*?<\/select>/,'')}
+ var bcs=q.bc||PQ.b||'FGV';h=h.replace('<b>Questão ','<b><span class="bcq">'+e(bcs)+'</span> Questão ');return h}})(pqBI);
+pqCard=(function(b){return function(){var h=b();if(!PQ){var k=QFP?QFP.k:'tema';h=h.replace('<label>Questões</label>','<div class="f"><div><label>Para</label><select id="pq_k"><option value="tema"'+(k=='tema'?' selected':'')+'>Tema estudado</option><option value="rev"'+(k=='rev'?' selected':'')+'>Revisão</option><option value="livre"'+(k=='livre'?' selected':'')+'>Treino livre</option></select></div></div><label>Questões</label>');if(QFP){h=h.replace('<select id="pq_s"','<div class="qfp">'+(QFP.k=='rev'?'Revisão':'10 questões')+': <b>'+e((findT(QFP.tid)||{t:{n:''}}).t.n)+'</b></div><select id="pq_s"').replace('value="'+QFP.sid+'"','value="'+QFP.sid+'" selected')}}
+ else if(PQ.g)h=h.replace(/<div class="f"><div><label>Minutos gastos<\/label>[\s\S]*?<\/div><\/div>/,'').replace('<p id="pqtot"></p>','').replace('>Salvar questões<','>Guardar no banco<');return h}})(pqCard);
+pqSave=(function(b){return function(){if(!PQ)return;if(PQ.g)return pqGuardar();
+ var bcs={};PQ.L.forEach(function(q){if(q.r)bcs[q.bc||PQ.b||'FGV']=1});var multi=Object.keys(bcs).length>1,tid=PQ.t,r0=tid&&findT(tid),studied0=r0&&r0.t.d,k=PQ.k||'livre',n0=S.logs.length,ne0=S.er.length,L0=PQ.L.slice(),pmin=PQ.min||0,b0=PQ.b;
+ PQ.L.forEach(function(q){if(q.bc)q._bc=q.bc});
+ if(!multi){var only=Object.keys(bcs)[0];if(only)PQ.b=only}
+ b();if(S.logs.length<=n0)return;var lg=S.logs[S.logs.length-1];lg.qk=k;
+ S.er.slice(ne0).forEach(function(x,j){});
+ if(multi){var by={};L0.forEach(function(q){if(!q.r)return;var bc=q._bc||b0||'FGV',o=by[bc]=by[bc]||{ac:0,er:0,dv:0,ch:0};if(q.r=='ok'){o.ac++;if(q.c=='dv')o.dv++;if(q.c=='ch')o.ch++}else o.er++});S.logs.pop();var first=1;
+  Object.keys(by).forEach(function(bc){var o=by[bc],x={};for(var p in lg)x[p]=lg[p];x.id=uid();x.bc=bc;x.ac=o.ac;x.er=o.er;x.dv=o.dv;x.ch=o.ch;x.min=first?pmin:0;first=0;S.logs.push(x)});
+  var wr=L0.filter(function(q){return q.r=='er'});S.er.slice(ne0).forEach(function(x,j){if(wr[j])x.bc=wr[j]._bc||x.bc})}
+ if(k=='rev'&&tid&&r0)rvFromQ(tid,S.logs[S.logs.length-1]);
+ if(tid&&r0&&!studied0){S.bump=S.bump||{};if(lg.er)S.bump[tid]={u:Date.now(),x:1}}
+ QFP=null;save();R()}})(pqSave);
+function pqGuardar(){var add=[],sk=0,d=today(),now=Date.now(),src=[PQ.o||'Minhas questões',PQ.b,PQ.a].filter(Boolean).join(' · ');S.qcm=S.qcm||{};
+ PQ.L.forEach(function(q){if(!(q.e&&q.o.length>=2&&q.g)){sk++;return}var id='u'+uid()+uid(),bc=q.bc||PQ.b||'FGV';add.push({id:id,s:PQ.s,t:PQ.t?[PQ.t]:[],g:q.g,e:q.e,o:q.o,src:src+(q.n?', questão '+q.n:''),bc:bc,dt:d,n:q.n||0});if(q.cm)S.qcm[id]={t:q.cm.slice(0,8000),u:now}});
+ if(!add.length){toast('Nenhuma questão com gabarito para guardar. Escolha o gabarito de cada uma.');return}
+ if(sk&&!cf2('pqgsk',sk+' questões sem gabarito ficarão de fora. Toque de novo para guardar assim.'))return;
+ qbPush(add);PQ=null;pqSv();R();toast(add.length+' questões guardadas no banco. Elas vão cair nas suas provas montadas.')}
+var Vqst=function(){var t=today(),qd=0;S.logs.forEach(function(l){if(l.date==t)qd+=(l.ac||0)+(l.er||0)+(l.br||0)});S.sim.forEach(function(m){if(m.date==t)m.rows.forEach(function(x){qd+=x.ac+x.er+x.br})});var mt=qMeta(),Q=qtPend().filter(function(x){return !x.done});
+ var h='<div class="card qhd"><div class="qk"><div class="'+(qd>=mt?'qa':'')+'"><span>Hoje</span><b>'+qd+' de '+mt+'</b><small class="mu" style="display:block">meta do dia</small></div><div><span>Temas com 10 pendentes</span><b>'+Q.length+'</b></div><div><span>No banco (suas)</span><b>'+(S.qb||[]).length+'</b></div></div><div class="bar" style="margin-top:8px"><i style="width:'+Math.min(100,qd/Math.max(1,mt)*100)+'%"></i></div></div>';
+ if(Q.length)h+='<div class="card"><h2>10 questões dos temas estudados</h2><ul class="dtl">'+Q.map(qtTaskH).join('')+'</ul></div>';
+ h+=lqCard();
+ var nerr=QBI?qbErrIds().length:0;if(!QBI)qbLoad().then(function(){if(tab=='qst')R()});
+ QBTAB=QBTAB=='one2'?'one2':'closed';var ab=qbAddCard().replace(/<div class="seg" style="margin:10px 0">[\s\S]*?<\/div>/,'').replace('Alimentar o banco de questões','Banco de questões: digitar uma questão');
+ h+=ab;h+='<div class="card"><h2>Refazer e treinar</h2><p style="display:flex;gap:8px;flex-wrap:wrap">'+(nerr?'<button class="btn" onclick="qbErradas()">Refazer erradas, dúvidas e chutes ('+nerr+')</button>':'<span class="mu">Sem questões para refazer no banco.</span>')+'<button class="btn g" onclick="go(\'sim\')">Montar prova</button></p></div>';
+ h+='<h2 style="margin:18px 2px 10px">Desempenho nas questões</h2>'+cardBank();
+ return h};
+V.qst=function(){return Vqst()};
+qfOpen=function(tid,kind){var r=findT(tid);QFP={sid:r?r.s.id:'',tid:tid,k:kind||'tema'};cur=QFP.sid;if(PQ&&!PQ.t){PQ.s=QFP.sid;PQ.t=tid;PQ.k=QFP.k;pqSv()}go('qst');setTimeout(function(){var el=document.querySelector('.qf');if(el&&el.scrollIntoView)el.scrollIntoView({block:'start'})},60)};
+// Registrar e Simulados sem as partes de questões
+V.reg=(function(b){return function(){var a=qfCard,c=pqCard,h;qfCard=function(){return ''};pqCard=function(){return ''};try{h=b()}finally{qfCard=a;pqCard=c}return h.replace(/(<div class="card"><h2>Últimos registros<\/h2>)/,'<div class="card"><p style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin:0"><span class="mu">Questões (de sites, IAs, livros) agora se lançam na aba Questões.</span><button class="btn g" onclick="go(\'qst\')">Abrir Questões</button></p></div>$1')}})(V.reg);
+V.sim=(function(b){return function(){var a=qbAddCard,h;qbAddCard=function(){return ''};try{h=b()}finally{qbAddCard=a}return h}})(V.sim);
+// rodapé do fechamento: rótulo claro
+(function(){try{var st=document.createElement('style');st.textContent=
+'.frase{margin:10px 0 12px;padding:14px 16px 14px 44px;position:relative;font-style:italic;font-size:17px;line-height:1.45;color:var(--tx);background:linear-gradient(135deg,#fff8e1,#e6f4f1);border-left:5px solid #e8a317;border-radius:14px;max-width:none;box-shadow:0 2px 8px rgba(0,0,0,.06)}.frase:before{content:"✨";position:absolute;left:14px;top:12px;font-style:normal;font-size:20px;color:#b8860b}.frase.bib:before{content:"✝"}.frase span{display:block;margin-top:6px;font-size:13px;font-style:normal;font-weight:600;color:#8a6d1a}'+
+'@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .frase{background:linear-gradient(135deg,#2b2510,#132a27)}:root:not([data-theme="light"]) .frase span{color:#e0b84a}}:root[data-theme="dark"] .frase{background:linear-gradient(135deg,#2b2510,#132a27)}:root[data-theme="dark"] .frase span{color:#e0b84a}'+
+'.qtw svg[style*="width:100%"]{display:block;margin:0 auto}.qtw.sm svg{max-width:520px;max-height:190px;display:block;margin:0 auto}.eq .qtw svg{max-width:640px;display:block;margin:0 auto}.tsb{margin:10px 0 4px}.tsb .seg{flex-wrap:wrap}.tsb.fl .seg button{padding:5px 8px;font-size:13px}.tsc{margin-top:6px}.bcq{display:inline-block;font-size:11px;padding:1px 6px;border-radius:8px;background:var(--ac2,#e6f4f1);margin-right:4px;font-weight:600}.qia button{padding:5px 10px;font-size:13px}.qhd .bar{height:10px}.dcw{padding:0;overflow:hidden}.dcw>.dc{margin:0;border:0;box-shadow:none}';
+document.head.appendChild(st)}catch(x){}})();
+
+// ---- Edital: pizza do edital estudado (total e por matéria) no topo
+
+frase=(function(b){return function(){var h=b();return /\d+[.:]\d+/.test(h.replace(/<[^>]+>/g,''))?h.replace('<p class="frase">','<p class="frase bib">'):h}})(frase);
+// ---- Edital por incidência e por matéria: cartões separados com gráficos
+var ICO={4:'#d32f2f',3:'#ee7d12',2:'#f2c200',1:'#2e9e5b',0:'#868e96'};
+function incCard1(){var c=incCnt(S.subs),T=0,D=0,np=0;c.forEach(function(o){T+=o.t;D+=o.d});S.subs.forEach(function(s){s.tp.forEach(function(t){if(t.pv&&t.pv.length)np++})});
+ var parts=[4,3,2,1,0].filter(function(k){return c[k].t}).map(function(k){return{v:c[k].d,c:ICO[k],l:INC[k]+' concluídos'}});parts.push({v:T-D,c:'#dee2e6',l:'Falta'});
+ var G=[4,3,2,1,0].filter(function(k){return c[k].t}).map(function(k){var o=c[k],p=o.d/o.t;return{l:INC[k],v:p,c:ICO[k],top:Math.round(p*100)+'%',tc:ICO[k],sub:o.d+'/'+o.t,tip:INC[k]+': '+o.d+' de '+o.t}});
+ return '<div class="card"><h2>Edital por incidência</h2><p class="ctp">% concluído em cada nível de incidência <span class="mu">(total do edital: '+(T?Math.round(D/T*100):0)+'%, '+D+' de '+T+' assuntos)</span></p>'+towers(G,{max:Math.max(.1,Math.max.apply(null,G.map(function(g){return g.v}))*1.25),gw:72,h:190,fit:1})+'<p class="mu">Escala ajustada ao seu avanço; o número em cima é o % real. 🎯 '+np+' assuntos do edital já apareceram nas provas analisadas: priorize o vermelho e o laranja.</p></div>'}
+function incCard2(){var K=[4,3,2,1,0],c=incCnt(S.subs),K3=[4,3,2],G=S.subs.map(function(s){var x=incCnt([s]),v={},ht=0,hd=0;K3.forEach(function(k){v['i'+k]=x[k].t?Math.round(x[k].d/x[k].t*100):0;ht+=x[k].t;hd+=x[k].d});return{l:SN(s),v:v,top:ht?Math.round(hd/ht*100)+'%':'–',tc:'var(--tx)'}});
+ var keys=K3.map(function(k){return{k:'i'+k,l:INC[k],c:ICO[k]}});
+ var h='<div class="card"><h2>Por matéria e incidência (% concluído)</h2><p class="mu">Quanto de cada matéria você já concluiu, separado por incidência. Barras coloridas: vermelho altíssima, laranja alta, amarelo média, verde baixa.</p>';
+ var row=function(nm,x,b){var t=0,d=0;x.forEach(function(o){t+=o.t;d+=o.d});return '<tr'+(b?' style="font-weight:600"':'')+'><td>'+nm+'</td>'+pcell(d,t,'t')+K.map(function(k){return pcell(x[k].d,x[k].t,k)}).join('')+'</tr>'};
+ h+='<div class="tw"><table><tr><th>Matéria</th><th>Total</th>'+K.map(function(k){return '<th><span class="tag i'+k+'" style="cursor:default;min-width:0;padding:2px 8px">'+(k?INC[k]:'Sem inc.')+'</span></th>'}).join('')+'</tr>';
+ S.subs.forEach(function(s){h+=row(e(s.name),incCnt([s]),0)});return h+row('Total do edital',c,1)+'</table></div></div>'}
+incCard=function(){return incCard1()+incCard2()};
+V.painel=(function(b){return function(){return b().replace('<h2 style="margin:22px 2px 10px">Edital e leitura</h2>','').replace('<div class="card"><h2>Lei seca lida</h2>','<h2 style="margin:22px 2px 10px">Leitura da lei seca</h2><div class="card"><h2>Lei seca lida</h2>')}})(V.painel);
+function pieParts(){var h=cardPie(),k=h.indexOf('<section class="dc"><div class="dch-h"><div><h3>Lei seca e jurisprudência');return k<0?[h,'']:[h.slice(0,k),h.slice(k)]}
+V.edital=(function(b){return function(){var h=b();if(evT)return h;var P=pieParts();return '<div class="card dcw">'+P[0]+'</div>'+incCard1()+incCard2()+h}})(V.edital);
+V.lei=(function(b){return function(){var P=pieParts();return (P[1]?'<div class="card dcw">'+P[1]+'</div>':'')+lsCard()+b()}})(V.lei);
+
+// sem duplicar: equilíbrio, projeção e calibração ficam só na aba Questões
+cardBank=(function(b){return function(){return tab=='painel'?'':b()}})(cardBank);
+// sem duplicar: conteúdo estudado e incidência ficam só na aba Edital
+V.painel=(function(b){return function(){var a=cardPie,c=incCard,d=erCharts,f=lsCard,h;cardPie=function(){return ''};incCard=function(){return ''};erCharts=function(){return ''};lsCard=function(){return ''};try{h=b()}finally{cardPie=a;incCard=c;erCharts=d;lsCard=f}h=h.replace('<h2 style="margin:22px 2px 10px">Leitura da lei seca</h2>','');return h}})(V.painel);
+// gráficos ajustáveis sem ampliar além do tamanho natural (letras não ficam gigantes no PC)
+towers=(function(b){return function(G,o){return b(G,o).replace(/<svg style="width:100%;height:auto" viewBox="0 0 ([\d.]+) /,function(m,w){return '<svg style="width:100%;max-width:'+Math.round(+w*1.15)+'px;height:auto" viewBox="0 0 '+w+' '})}})(towers);
+V.lei=(function(b){return function(){return b().replace(/<button class="btn g" onclick="go\('lei'\)">Abrir<\/button>/,'')}})(V.lei);
+// sem duplicar: as pizzas por matéria ficam em Edital > Conteúdo estudado
+V.evo=(function(b){return function(){var c=cardCov,h;cardCov=function(){return ''};try{h=b()}finally{cardCov=c}return h}})(V.evo);
 
 mig4();R();tmInit();cloud();
 </script>
