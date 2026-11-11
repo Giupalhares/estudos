@@ -2490,6 +2490,38 @@ restOk=(function(b){return function(){if(!PEND)return;var T={};(S.tomb||[]).forE
  var U=S.u=S.u||{};Object.keys(U).forEach(function(k){U[k]=now});S.subs.forEach(function(s){s.tp.forEach(function(t){if(t.d)U[t.id]=now})});Object.keys(S.ls||{}).forEach(function(i){U['L'+i]=now});
  ['tr','qh','pp','lpp','qt','bump','skp','rvp','rvh','fw','fwh','qcm','rad','simSkip'].forEach(function(k){var o=S[k];if(o&&typeof o=='object'&&!Array.isArray(o))Object.keys(o).forEach(function(i){if(o[i]&&typeof o[i]=='object')o[i].u=now})});
  S.at=now;save();R();if(n)toast('Backup restaurado ('+n+' itens que tinham sido apagados em outro aparelho voltaram).')}})(restOk);
+// cronômetro compacto + Zerar sem salvar
+function tmZerar(){if(!cf2('tmz','Toque de novo em “Zerar” para descartar este estudo sem salvar.'))return;tmReset();toast('Cronômetro zerado. Nada foi salvo.')}
+cronCard=(function(b){return function(fl){var h=b(fl);if(fl)return h;
+ h=h.replace('<div class="cw">','<div class="cw cwc">');
+ h=h.replace(/<label class="cwl">Matéria:<\/label>(<select[\s\S]*?<\/select>)<label class="cwl">Assunto:<\/label>(<select[\s\S]*?<\/select>)/,function(m,a,c){return '<div class="cwms"><div><label class="cwl">Matéria</label>'+a+'</div><div><label class="cwl">Assunto</label>'+c+'</div></div>'});
+ h=h.replace('<label>Vídeo-aulas</label>','<label>Aulas</label>').replace('<label>Questões certas</label>','<label>Certas</label>').replace('<label>Questões erradas</label>','<label>Erradas</label>');
+ h=h.replace('<textarea style="min-height:56px"','<textarea rows="1" style="min-height:34px"').replace('Onde parei (anotação para a próxima vez):','Onde parei:');
+ h=h.replace(/<div class="cwz">[\s\S]*?<\/div>/,'');
+ var a1=h.indexOf('<div class="f fin2">'),a2=h.indexOf('<div class="cwbt">');if(a1>=0&&a2>a1)h=h.slice(0,a1)+'<div class="cwfx">'+h.slice(a1,a2)+'</div>'+h.slice(a2);
+ var has=TM.acc>0||TM.run||TM.sid;
+ h=h.replace(/(<div class="cwbt">[\s\S]*?)(<\/div>)/,function(m,a,c){return a+'<button class="big zr" onclick="tmZerar()"'+(has?'':' disabled')+' title="Descarta sem salvar">Zerar</button>'+c});
+ var i=h.indexOf('<fieldset class="cwpo">');if(i<0)i=h.indexOf('<p class="mu" style="margin-top:8px">Ao escolher');
+ if(i>=0){var j=h.lastIndexOf('</div>');h=h.slice(0,i)+'<details class="cwmore"><summary>Pomodoro e ajuda</summary>'+h.slice(i,j)+'</details>'+h.slice(j)}
+ return h}})(cronCard);
+(function(){try{var c=document.createElement('style');c.textContent=
+'.cwc{padding-bottom:10px}.cwc .cwt{margin-bottom:6px;padding:5px 10px 5px 14px}.cwc .cwr{margin:0;gap:16px}.cwc .cwr label{font-size:14px}'+
+'.cwc .cwd{font-size:38px;margin:0 0 4px;line-height:1}.cwc .cwl{margin:4px 0 2px;font-size:13px}'+
+'.cwms{display:grid;grid-template-columns:1fr 1fr;gap:8px}.cwms select{width:100%;padding:6px 8px;font-size:14px}'+
+'@media(max-width:600px){.cwms{grid-template-columns:1fr;gap:0}}'+
+'.cwc .tsb{margin:6px 0 2px}.cwc .tsb .seg button{padding:5px 9px;font-size:13px}.cwc .tsb .cwl{display:none}'+
+'.cwc .cwp{margin-top:6px;padding:5px 8px;font-size:12.5px;line-height:1.35}.cwc .cwp div,.cwc .cwp .mu{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}'+
+'.cwc .cwg{grid-template-columns:repeat(4,1fr);gap:6px;margin-top:6px}.cwc .cwg label{font-size:12px;margin:0}.cwc .cwg input{padding:5px 6px;width:100%}'+
+'.cwc textarea{padding:6px 8px}.cwc .fin2{margin-top:4px}.cwc .fin2 label{font-size:12px}.cwc .fin2 select{padding:5px 8px}'+
+'.cwc .fin{margin:6px 0;padding:6px 8px}.cwc .fin>span{font-size:12px;margin-bottom:4px}.cwc .fin .seg button{padding:5px 10px;font-size:13px}.cwc .fin p,.cwc .fin .mu{font-size:12px;margin:4px 0 0}'+
+'.cwc .cwbt{grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}.cwc .cwbt .big{padding:8px 4px;font-size:15px}'+
+'.cwc .cwbt .big.zr:not(:disabled){border-color:#e03131;color:#e03131}'+
+'.cwc .tsb{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.cwc .tsb .chips{margin:0}.cwc .tsb .chips button{padding:4px 9px;font-size:12.5px}'+
+'.cwc .fin>span{display:inline-block;margin-right:8px}.cwc .fin .seg{display:inline-flex}'+
+'.cwfx{display:grid;grid-template-columns:1fr 1.4fr;gap:8px;align-items:end}.cwfx .fin2{margin:0}.cwfx .fin{margin:0}'+
+'@media(max-width:600px){.cwfx{grid-template-columns:1fr;gap:4px}}.cwc .cwt>span:first-child{white-space:nowrap}'+
+'.cwmore{margin-top:8px;font-size:13px}.cwmore summary{cursor:pointer;color:var(--mu)}.cwmore .cwpo{margin-top:6px}';
+document.head.appendChild(c)}catch(x){}})();
 
 mig4();R();tmInit();cloud();
 </script>
