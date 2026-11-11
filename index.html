@@ -2378,13 +2378,15 @@ V.painel=function(){var h=withBlank(['cardPie','cardQ','cardDaily','hoursChart',
  h=h.replace('<h2 style="margin:22px 2px 10px">Edital e leitura</h2>','').replace(/<section class="dc"><div class="dch-h"><div><h3>Caderno de erros<\/h3>[\s\S]*?<\/section>/,'').replace(/<section class="dc dc-chart"><\/section>/g,'');
  h=h.replace(/(<b>Base[^<]*30 min\)[^<]*<\/b>[\s\S]*?<span class="dmin">[\s\S]*?<\/svg> )\d+m/g,'$130m');
  var mais=function(t,lb){return '<p class="vmais"><button class="btn g" onclick="go(\''+t+'\')">'+lb+' →</button></p>'};
- var g='<h2 class="pgh">📊 Resumo em gráficos</h2>';
- g+=psec('q','Questões','<div class="card dcw">'+eqSec()+'</div>'+mais('qst','Ver detalhes das questões'));
- g+=psec('est','Estudo',cardDaily()+mais('estr','Ver a evolução'));
- g+=psec('ed','Edital',jaEst()+incCard1()+mais('edital','Ver o edital por matéria'));
- var P=pieParts();g+=psec('ls','Lei seca',(P[1]?'<div class="card dcw">'+P[1]+'</div>':'')+mais('lei','Ver a lei seca por matéria'));
- g+=psec('sim','Simulados',simEvoOnly()+mais('sim','Ver o diagnóstico'));
- g+=psec('er','Caderno de erros',S.er.length?'<div class="card"><h2>Onde você mais erra ('+S.er.length+' erros)</h2>'+erCharts(S.er)+'</div>'+mais('erros','Abrir o caderno'):'<div class="card"><p class="mu">Nenhum erro registrado ainda.</p></div>');
+ var g='<h2 class="pgh">📊 Gráficos</h2>';
+ g+=psec('q','Questões',cardQ());
+ var EP=evoParts();
+ g+=psec('est','Estudo',cardDaily()+EP.est);
+ g+=psec('evo','Evolução',evoCard2()+EP.evo);
+ var P=pieParts();g+=psec('ed','Edital e lei seca',jaEst()+'<div class="card dcw">'+P[0]+'</div>'+incCard1()+incCard2()+(P[1]?'<div class="card dcw">'+P[1]+'</div>':'')+lsCard());
+ g+=psec('sim','Simulados',simAll());
+ g+=psec('er','Caderno de erros',S.er.length?'<div class="card"><h2>Onde você mais erra ('+S.er.length+' erros)</h2>'+erCharts(S.er)+'<p><button class="btn g" onclick="go(\'erros\')">Abrir o caderno</button></p></div>':'<div class="card"><p class="mu">Nenhum erro registrado ainda.</p></div>');
+ g+=psec('ctl','Controle geral',cardCtl());
  return h+g};
 function simEvoOnly(){var L=S.sim.slice().sort(function(a,b){return a.date<b.date?-1:1});if(!L.length)return '<div class="card"><p class="mu">Quando você fizer um simulado ou uma prova montada, a evolução das notas aparece aqui.</p></div>';var tot=function(m){var a=0,r=0,b=0;m.rows.forEach(function(x){a+=x.ac;r+=x.er;b+=x.br});return{a:a,r:r,t:a+r+b}};return cardSimEvo(L,tot).replace(/<h4 style="margin:14px 0 6px">Por matéria nos simulados<\/h4>[\s\S]*$/,'</div>')}
 // ---- só o que já foi estudado: total e por matéria
@@ -2421,14 +2423,13 @@ function evoCard2(){var t0=today(),W=evW,nb=W==7?7:W==30?10:13,sz=Math.ceil(W/nb
   R4.map(function(r){return '<tr'+(r.tot?' class="evt"':'')+'><td><i class="evd" style="background:'+r.c+'"></i>'+e(r.n)+'</td>'+r.v.map(function(x){return x?'<td><span class="evc3" style="background:'+colMeta(x.p)+'" title="'+x.q+' questões">'+Math.round(x.p*100)+'%</span></td>':'<td><span class="evc3 ev0">–</span></td>'}).join('')+'<td>'+trd(r.v)+'</td></tr>'}).join('')+'</table></div>';
  return h+'<p class="mu">Cada período tem '+sz+' dia'+(sz>1?'s':'')+'. Verde: bateu a meta de '+Math.round(meta*100)+'%; amarelo: até 10% abaixo; vermelho: abaixo disso; "–": sem questões no período. Tendência: diferença entre o primeiro e o último período com questões. Passe o dedo ou o mouse sobre o quadradinho para ver quantas questões.</p></div>'}
 // ---- abas com os detalhes (sem repetir o que está no Painel)
-TABS=(function(o){if(o.evo)return o;var n={};Object.keys(o).forEach(function(k){n[k]=o[k];if(k=='rev')n.evo='Evolução'});return n})(TABS);
-V.estr=(function(b){return function(){var h=b();return h.replace(/<div class="card"><h2>Evolução<\/h2>[\s\S]*?<\/svg><\/div>/,function(){return evoCard2()})}})(V.estr);
-V.evo=(function(b){return function(){return withBlank(['cardEvo'],function(){return b()})}})(V.evo);
-V.sim=(function(b){return function(){return withBlank(['cardSimEvo'],function(){return b()})}})(V.sim);
+// ---- abas sem gráficos: todos ficam no Painel
+TABS=(function(o){var n={};Object.keys(o).forEach(function(k){if(k!='evo')n[k]=o[k]});return n})(TABS);
+if(tab=='evo')tab='painel';
+V.estr=(function(b){return function(){var h=withBlank(['cardDisc'],function(){return b()});return h.replace(/<div class="card"><h2>Evolução<\/h2>[\s\S]*?<\/svg><\/div>/,'')}})(V.estr);
+V.sim=(function(b){return function(){return withBlank(['cardSimEvo','diagCharts'],function(){return b()})}})(V.sim);
 V.erros=(function(b){return function(){return b().replace(/<div class="card"><h2>Onde você mais erra \(\d+ erros\)<\/h2>[\s\S]*?<\/div>(?=<div class="card"><h2>Lista)/,'')}})(V.erros);
-V.edital=(function(b){return function(){var h=b();if(evT)return h;var P=pieParts();return '<div class="card dcw">'+P[0]+'</div>'+incCard2()+h}})(V.edital);
-V.lei=(function(b){return function(){return lsCard()+b()}})(V.lei);
-Vqst=(function(b){return function(){return b()+'<h2 style="margin:18px 2px 10px">Desempenho nas questões</h2>'+withBlank(['eqSec'],function(){return cardQ()})}})(Vqst);
+function simAll(){var L=S.sim.slice().sort(function(a,b){return a.date<b.date?-1:1});if(!L.length)return '<div class="card"><p class="mu">Quando você fizer um simulado ou uma prova montada, a evolução das notas e o diagnóstico aparecem aqui.</p></div>';var tot=function(m){var a=0,r=0,b=0;m.rows.forEach(function(x){a+=x.ac;r+=x.er;b+=x.br});return{a:a,r:r,t:a+r+b}};var d=diagCharts();return cardSimEvo(L,tot)+(d?'<div class="card"><h2>Diagnóstico dos simulados</h2>'+d+'</div>':'')}
 // ---- questões: 4 botões sempre visíveis
 function pq4(i,v){if(!PQ||!PQ.L[i])return;var q=PQ.L[i];if(v=='er'){q.r='er';q.c=''}else{q.r='ok';q.c=v;if(q.m&&!q.g)q.g=q.m}pqSv();pqRB(i)}
 pqBI=(function(b){return function(i){var h=b(i),q=PQ.L[i];if(PQ.g)return h;h=h.replace(/<div><label>Resultado<\/label>[\s\S]*?<\/div><\/div><\/div>/,'</div>').replace(/<div class="sqk">[\s\S]*?<\/div>/,'');
@@ -2449,8 +2450,8 @@ cardDisc=(function(b){return function(){return b().replace(/towers-gw64/,'')}})(
 // ---- Painel: estudo por dia ao lado de Próximos estudos; Questões de hoje embaixo de Precisa de atenção
 function qHoje(){var t=today(),qd=0;S.logs.forEach(function(l){if(l.date==t)qd+=(l.ac||0)+(l.er||0)+(l.br||0)});S.sim.forEach(function(m){if(m.date==t)m.rows.forEach(function(x){qd+=x.ac+x.er+x.br})});var mt=qMeta(),Q=qtPend().filter(function(x){return !x.done}),p=Math.min(1,qd/Math.max(1,mt));
  return '<section class="dc qhj"><div class="dch-h"><div><h3>Questões de hoje</h3><p class="dsub"><b>'+qd+'</b> de '+mt+' · meta do dia'+(qd>=mt?' ✓':'')+'</p></div><button class="btn" onclick="go(\'qst\')">Lançar questões</button></div><div class="qhb"><i style="width:'+Math.round(p*100)+'%;background:'+(qd>=mt?'#2f9e44':'#e8a317')+'"></i></div>'+
-  (Q.length?'<p class="dsub" style="margin:10px 0 4px">10 questões pendentes:</p>'+Q.slice(0,3).map(function(x){return '<div class="qhr"><span>'+e(x.t.n.slice(0,60))+' <small class="mu">· '+e(SN(x.s))+'</small></span><b>'+x.p+'/'+x.n+'</b></div>'}).join('')+(Q.length>3?'<p class="mu" style="margin:4px 0 0">e mais '+(Q.length-3)+'.</p>':''):'<p class="dsub" style="margin:10px 0 0">Nenhum tema com questões pendentes.</p>')+'</section>'}
-V.painel=(function(b){return function(){var h=b(),a='<div class="dg2"><section class="dc"><h3>Próximos estudos',i=h.indexOf(a);if(i>=0){var j=h.indexOf('</section>',i);if(j>=0){j+='</section>'.length;return h.slice(0,j)+qHoje()+h.slice(j)}}
+  (Q.length?'<p class="dsub" style="margin:10px 0 4px">10 questões pendentes:</p>'+Q.map(function(x){return '<div class="qhr"><span>'+e(x.t.n)+' <small class="mu">· '+e(SN(x.s))+'</small></span><b>'+x.p+'/'+x.n+'</b></div>'}).join(''):'<p class="dsub" style="margin:10px 0 0">Nenhum tema com questões pendentes.</p>')+'</section>'}
+V.painel=(function(b){return function(){var h=b(),a='<div class="dg2"><section class="dc"><h3>Próximos estudos',i=h.indexOf(a);if(i>=0){var j=h.indexOf('</section>',i);if(j>=0){j+='</section>'.length;return h.slice(0,j)+'<div class="dcolr">'+qHoje()+rvCard('0000')+'</div>'+h.slice(j)}}
  var k=h.indexOf('</div><div class="dg2">');return k<0?h+qHoje():h.slice(0,k)+qHoje()+h.slice(k)}})(V.painel);
 // ---- Equilíbrio por matéria: radar como antes, em verde
 eqSec=(function(b){return function(){var h=b(),meta=metaPct(),PP=QIA=='sem'?withLogs(S.logs.filter(function(l){return !isIA(l)}),projOf):projOf(),by=PP.by;
@@ -2470,6 +2471,16 @@ V.painel=(function(b){return function(){return radFix(b())}})(V.painel);
 merge=(function(b){return function(a,c){var r=b(a,c),A=a.rad||{},B=c.rad||{},o={};Object.keys(A).concat(Object.keys(B)).forEach(function(i){var x=A[i],y=B[i];o[i]=!x?y:!y?x:((x.u||0)>=(y.u||0)?x:y)});r.rad=o;return r}})(merge);
 (function(){try{var st=document.createElement('style');st.textContent='.radb{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:6px;width:100%}.radb .btn{padding:4px 10px;font-size:12px}';document.head.appendChild(st)}catch(x){}})();
 (function(){try{var st=document.createElement('style');st.textContent='.evm{border-collapse:separate;border-spacing:3px;min-width:0}.evm td:last-child{white-space:nowrap;font-size:12px}.evm th{font-size:11px;font-weight:600;color:var(--mu);text-align:center;padding:2px}.evm th:first-child,.evm td:first-child{text-align:left;white-space:nowrap;font-size:13px}.evm td{text-align:center;padding:0}.evm .evt td:first-child{font-weight:700}.evd{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:middle}.evc3{display:inline-block;min-width:38px;padding:5px 3px;border-radius:7px;color:#fff;font-weight:700;font-size:11.5px;box-shadow:0 3px 0 rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.35)}.evc3.ev0{background:#e9ecef;color:#868e96;box-shadow:none}';document.head.appendChild(st)}catch(x){}})();
+
+// ---- Estudo (tempo) e Evolução (resultado) em seções separadas
+function evoParts(){var h=withBlank(['cardCtl','cardEvo'],function(){return V.evo()}),P=h.split(/(?=<div class="card)|(?=<h2 style="margin)/),o={est:'',evo:''},vs='';
+ var d=cardDisc(),k=d.indexOf('<h4 style="margin:14px 0 6px">Horas nos últimos 30 dias</h4>');
+ P.forEach(function(x){if(/^<h2 style="margin[^>]*>(Desempenho)<\/h2>\s*$/.test(x))return;if(/Volume semanal/.test(x)&&x.length<2500&&!/Horas por semana/.test(x)){vs=x;return}
+  if(/<h2>Horas planejadas x realizadas/.test(x))o.est+=x;else if(/<h2>Horas por semana/.test(x)||/<h2>Questões por semana/.test(x))o.est+=(vs?vs:'')+x,vs='';else if(/<h2>Rendimento por semana/.test(x)||/<h2>Mapa de calor/.test(x))o.evo+=x;else o.evo+=x});
+ if(k>0){var dd=d.slice(0,k).replace('Pizzas: aproveitamento nas questões (cor pela meta). Torres: horas de estudo por matéria.','Aproveitamento nas questões de cada matéria (cor pela meta).')+'</div>',hh='<div class="card"><h2>Horas por matéria (últimos 30 dias)</h2>'+d.slice(k+'<h4 style="margin:14px 0 6px">Horas nos últimos 30 dias</h4>'.length);o.est+=hh;o.evo=dd+o.evo}else o.evo=d+o.evo;
+ return o}
+V.rev=(function(b){return function(){return withBlank(['rvCard'],function(){return b()})}})(V.rev);
+(function(){try{var st=document.createElement('style');st.textContent='.dcolr .pieg{display:block!important}.dcolr .pieg>div{width:100%!important;max-width:none!important}.dcolr .pie1{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.dcolr .card{margin:0}';document.head.appendChild(st)}catch(x){}})();
 
 mig4();R();tmInit();cloud();
 </script>
