@@ -2481,6 +2481,15 @@ function evoParts(){var h=withBlank(['cardCtl','cardEvo'],function(){return V.ev
  return o}
 V.rev=(function(b){return function(){return withBlank(['rvCard'],function(){return b()})}})(V.rev);
 (function(){try{var st=document.createElement('style');st.textContent='.dcolr .pieg{display:block!important}.dcolr .pieg>div{width:100%!important;max-width:none!important}.dcolr .pie1{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.dcolr .card{margin:0}';document.head.appendChild(st)}catch(x){}})();
+// ---- restaurar backup mesmo depois de um "Apagar tudo" em algum aparelho:
+// as lápides (tomb) da nuvem apagariam de novo os itens restaurados; damos novos ids a eles e
+// marcamos os dados restaurados como os mais recentes, para a sincronização não desfazer a restauração
+restOk=(function(b){return function(){if(!PEND)return;var T={};(S.tomb||[]).forEach(function(id){T[id]=1});b();if(PEND)return;
+ var now=Date.now(),n=0,ren=function(x){if(x&&T[x.id]){var id=x.id+'R';while(T[id])id+='R';x.id=id;n++}};['logs','er','sim','dsc','rvd'].forEach(function(k){(S[k]||[]).forEach(ren)});
+ S.tomb=(S.tomb||[]).concat(Object.keys(T)).filter(function(v,i,a){return a.indexOf(v)==i});
+ var U=S.u=S.u||{};Object.keys(U).forEach(function(k){U[k]=now});S.subs.forEach(function(s){s.tp.forEach(function(t){if(t.d)U[t.id]=now})});Object.keys(S.ls||{}).forEach(function(i){U['L'+i]=now});
+ ['tr','qh','pp','lpp','qt','bump','skp','rvp','rvh','fw','fwh','qcm','rad','simSkip'].forEach(function(k){var o=S[k];if(o&&typeof o=='object'&&!Array.isArray(o))Object.keys(o).forEach(function(i){if(o[i]&&typeof o[i]=='object')o[i].u=now})});
+ S.at=now;save();R();if(n)toast('Backup restaurado ('+n+' itens que tinham sido apagados em outro aparelho voltaram).')}})(restOk);
 
 mig4();R();tmInit();cloud();
 </script>
