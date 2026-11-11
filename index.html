@@ -2329,21 +2329,22 @@ V.evo=(function(b){return function(){var c=cardCov,h;cardCov=function(){return '
 
 // ===== mod33: todos os gráficos no Painel (em seções), tudo em 3D, Evolução em linha 3D, 4 botões nas questões, guardadas =====
 // ---- linha 3D (fita) e barras 3D genéricas
-function line3d(v,labs,o){o=o||{};var W=o.W||480,H=o.H||200,L=52,B=24,T=26,n=v.length,mx=Math.max(o.max||0,o.goal||0,Math.max.apply(null,v.map(function(x){return x||0})),1),bw=(W-L)/n,y=function(x){return T+(H-T-B)*(1-x/mx)},d=7,col=o.c||'#0e7c86',P=[];
+function line3d(v,labs,o){o=o||{};var W=o.W||480,H=o.H||200,L=52,B=24,T=26,n=v.length,mx=Math.max(o.max||0,o.goal||0,Math.max.apply(null,v.map(function(x){return x||0})),1),bw=(W-L)/n,y=function(x){return T+(H-T-B)*(1-x/mx)},d=7,col=o.c||'#2f9e44',P=[];
  var s='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;max-width:600px;height:auto;display:block;margin:0 auto" role="img" aria-label="'+e(o.t||'')+'"><defs><filter id="lsh'+n+'" x="-5%" y="-5%" width="110%" height="130%"><feDropShadow dx="0" dy="4" stdDeviation="3" flood-opacity=".25"/></filter></defs>';
  s+='<line x1="'+L+'" x2="'+W+'" y1="'+y(0)+'" y2="'+y(0)+'" class="gl"/><text x="'+(L-6)+'" y="'+(y(0)+4)+'" text-anchor="end" class="ax">'+o.f(0)+'</text><text x="'+(L-6)+'" y="'+(y(mx)+4)+'" text-anchor="end" class="ax">'+o.f(mx)+'</text>';
  if(o.goal)s+='<line x1="'+L+'" x2="'+W+'" y1="'+y(o.goal)+'" y2="'+y(o.goal)+'" stroke="#e8a317" stroke-width="2" stroke-dasharray="6 4"/><text x="'+(L+4)+'" y="'+(y(o.goal)-5)+'" text-anchor="start" class="ax" style="fill:#b8860b;font-size:10px">meta '+o.f(o.goal)+'</text>';
- v.forEach(function(x,i){var cx=L+bw*i+bw/2;if(x!=null)P.push([cx,y(x),x]);s+='<text x="'+cx+'" y="'+(H-6)+'" text-anchor="middle" class="ax">'+e(labs[i])+'</text>'});
+ v.forEach(function(x,i){var cx=L+bw*i+bw/2;if(x!=null)P.push([cx,y(x),x]);if(n<=8||(n-1-i)%2==0)s+='<text x="'+cx+'" y="'+(H-6)+'" text-anchor="middle" class="ax">'+e(labs[i])+'</text>'});
  for(var i=1;i<P.length;i++){var a=P[i-1],b=P[i];s+='<polygon points="'+a[0]+','+a[1]+' '+b[0]+','+b[1]+' '+(b[0]+d)+','+(b[1]-d)+' '+(a[0]+d)+','+(a[1]-d)+'" fill="'+shade(col,.45)+'" opacity=".85"/>'}
  if(P.length>1)s+='<polyline points="'+P.map(function(p){return (p[0]+d)+','+(p[1]-d)}).join(' ')+'" fill="none" stroke="'+shade(col,.25)+'" stroke-width="2"/><polyline points="'+P.map(function(p){return p[0]+','+p[1]}).join(' ')+'" fill="none" stroke="'+col+'" stroke-width="3.5" stroke-linejoin="round" filter="url(#lsh'+n+')"/>';
  P.forEach(function(p){var c=o.cm?colMeta(p[2]/100):col;s+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="5.5" fill="'+c+'" stroke="#fff" stroke-width="2"/><text x="'+p[0]+'" y="'+(p[1]-13)+'" text-anchor="middle" style="font-size:12px;font-weight:700;fill:'+c+'">'+o.f(p[2])+'</text>'});
  return s+'</svg>'}
-function bars3d(v,labs,o){o=o||{};var W=480,H=200,L=52,B=24,T=26,n=v.length,mx=Math.max(o.max||0,o.goal||0,Math.max.apply(null,v.map(function(x){return x||0})),1),bw=(W-L)/n,y=function(x){return T+(H-T-B)*(1-x/mx)},col=o.c||'#0e7c86';
+function bars3d(v,labs,o){o=o||{};var W=480,H=200,L=52,B=24,T=26,n=v.length,mx=Math.max(o.max||0,o.goal||0,Math.max.apply(null,v.map(function(x){return x||0})),1),bw=(W-L)/n,y=function(x){return T+(H-T-B)*(1-x/mx)},col=o.c||'#2f9e44';
  var s='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;max-width:600px;height:auto;display:block;margin:0 auto" role="img" aria-label="'+e(o.t||'')+'"><line x1="'+L+'" x2="'+W+'" y1="'+y(0)+'" y2="'+y(0)+'" class="gl"/><text x="'+(L-6)+'" y="'+(y(0)+4)+'" text-anchor="end" class="ax">'+o.f(0)+'</text><text x="'+(L-6)+'" y="'+(y(mx)+4)+'" text-anchor="end" class="ax">'+o.f(mx)+'</text>';
- v.forEach(function(x,i){var bw2=Math.min(46,bw*.58),cx=L+bw*i+(bw-bw2)/2-3;if(x){s+=bar3d(cx,y(x),bw2,y(0)-y(x),col,labs[i]+': '+o.f(x))+'<text x="'+(cx+bw2/2)+'" y="'+(y(x)-12)+'" text-anchor="middle" style="font-size:11px;font-weight:700;fill:var(--tx)">'+o.f(x)+'</text>'}s+='<text x="'+(cx+bw2/2)+'" y="'+(H-6)+'" text-anchor="middle" class="ax">'+e(labs[i])+'</text>'});
+ v.forEach(function(x,i){var bw2=Math.min(46,bw*.58),cx=L+bw*i+(bw-bw2)/2-3;if(x){s+=bar3d(cx,y(x),bw2,y(0)-y(x),col,labs[i]+': '+o.f(x))+'<text x="'+(cx+bw2/2)+'" y="'+(y(x)-12)+'" text-anchor="middle" style="font-size:11px;font-weight:700;fill:var(--tx)">'+o.f(x)+'</text>'}if(n<=8||(n-1-i)%2==0)s+='<text x="'+(cx+bw2/2)+'" y="'+(H-6)+'" text-anchor="middle" class="ax">'+e(labs[i])+'</text>'});
  if(o.goal)s+='<line x1="'+L+'" x2="'+W+'" y1="'+y(o.goal)+'" y2="'+y(o.goal)+'" stroke="#e8a317" stroke-width="2" stroke-dasharray="6 4"/><text x="'+(L+4)+'" y="'+(y(o.goal)-5)+'" text-anchor="start" class="ax" style="fill:#b8860b;font-size:10px">meta '+o.f(o.goal)+'</text>';
  return s+'</svg>'}
-svg=function(v,labs,o){return o.line?line3d(v,labs,o):bars3d(v,labs,o)};
+function trimLead(v,labs){var i=0;while(i<v.length-4&&!v[i])i++;return[v.slice(i),labs.slice(i)]}
+svg=function(v,labs,o){var t=trimLead(v,labs);return o.line?line3d(t[0],t[1],o):bars3d(t[0],t[1],o)};
 // retângulos planos (barras empilhadas) viram blocos 3D
 function to3D(h){var R2=[],first=-1;h=h.replace(/<rect x="([\d.\-]+)" y="([\d.\-]+)" width="([\d.]+)" height="([\d.\-]+)"([^>]*?)(?:\/>|>(?:<title>([\s\S]*?)<\/title>)?<\/rect>)/g,function(m,x,y,w,hh,rest,tt,off){var f=(rest.match(/fill="(#[0-9a-fA-F]{3,6})"/)||[])[1];if(!f||+hh<=0)return m;if(first<0)first=off;R2.push({x:+x,y:+y,w:+w,h:+hh,c:f,t:tt||''});return '\u0001'});
  if(!R2.length)return h;R2.sort(function(a,b){return a.x-b.x||b.y-a.y});var g=R2.map(function(r){return bar3d(r.x,r.y,r.w,r.h,r.c,r.t.replace(/<[^>]+>/g,''))}).join('');var k=h.indexOf('\u0001');h=h.replace(/\u0001/g,'');return h.slice(0,k)+g+h.slice(k)}
@@ -2375,22 +2376,57 @@ function withBlank(names,fn){var o={};names.forEach(function(n){o[n]=G0[n];G0[n]
 var Vpainel33=V.painel;
 V.painel=function(){var h=withBlank(['cardPie','cardQ','cardDaily','hoursChart','incCard','lsCard','erCharts'],function(){return Vpainel33()});
  h=h.replace('<h2 style="margin:22px 2px 10px">Edital e leitura</h2>','').replace(/<section class="dc"><div class="dch-h"><div><h3>Caderno de erros<\/h3>[\s\S]*?<\/section>/,'').replace(/<section class="dc dc-chart"><\/section>/g,'');
- var ev=withBlank(['cardCtl'],function(){return V.evo()});
- var g='<h2 class="pgh">📊 Gráficos</h2>';
- g+=psec('q','Questões',cardQ());
- g+=psec('est','Estudo e evolução',cardDaily()+evoCard()+cardDisc()+ev);
- g+=psec('ed','Edital e lei seca',cardPie()+incCard1()+incCard2()+lsCard());
- g+=psec('sim','Simulados',simPanel());
- g+=psec('er','Caderno de erros',S.er.length?'<div class="card"><h2>Onde você mais erra ('+S.er.length+' erros)</h2>'+erCharts(S.er)+'<p><button class="btn g" onclick="go(\'erros\')">Abrir o caderno</button></p></div>':'<div class="card"><p class="mu">Nenhum erro registrado ainda.</p></div>');
- g+=psec('ctl','Controle geral',cardCtl());
  h=h.replace(/(<b>Base[^<]*30 min\)[^<]*<\/b>[\s\S]*?<span class="dmin">[\s\S]*?<\/svg> )\d+m/g,'$130m');
+ var mais=function(t,lb){return '<p class="vmais"><button class="btn g" onclick="go(\''+t+'\')">'+lb+' →</button></p>'};
+ var g='<h2 class="pgh">📊 Resumo em gráficos</h2>';
+ g+=psec('q','Questões','<div class="card dcw">'+eqSec()+'</div>'+mais('qst','Ver detalhes das questões'));
+ g+=psec('est','Estudo',cardDaily()+mais('estr','Ver a evolução'));
+ g+=psec('ed','Edital',jaEst()+incCard1()+mais('edital','Ver o edital por matéria'));
+ var P=pieParts();g+=psec('ls','Lei seca',(P[1]?'<div class="card dcw">'+P[1]+'</div>':'')+mais('lei','Ver a lei seca por matéria'));
+ g+=psec('sim','Simulados',simEvoOnly()+mais('sim','Ver o diagnóstico'));
+ g+=psec('er','Caderno de erros',S.er.length?'<div class="card"><h2>Onde você mais erra ('+S.er.length+' erros)</h2>'+erCharts(S.er)+'</div>'+mais('erros','Abrir o caderno'):'<div class="card"><p class="mu">Nenhum erro registrado ainda.</p></div>');
  return h+g};
-// ---- abas sem gráficos (ficam no Painel)
-TABS=(function(o){var n={};Object.keys(o).forEach(function(k){if(k!='evo')n[k]=o[k]});return n})(TABS);
-if(tab=='evo')tab='painel';
-V.estr=(function(b){return function(){var h=withBlank(['cardDisc'],function(){return b()});return h.replace(/<div class="card"><h2>Evolução<\/h2>[\s\S]*?<\/svg><\/div>/,'')}})(V.estr);
-V.sim=(function(b){return function(){return withBlank(['cardSimEvo','diagCharts'],function(){return b()})}})(V.sim);
+function simEvoOnly(){var L=S.sim.slice().sort(function(a,b){return a.date<b.date?-1:1});if(!L.length)return '<div class="card"><p class="mu">Quando você fizer um simulado ou uma prova montada, a evolução das notas aparece aqui.</p></div>';var tot=function(m){var a=0,r=0,b=0;m.rows.forEach(function(x){a+=x.ac;r+=x.er;b+=x.br});return{a:a,r:r,t:a+r+b}};return cardSimEvo(L,tot).replace(/<h4 style="margin:14px 0 6px">Por matéria nos simulados<\/h4>[\s\S]*$/,'</div>')}
+// ---- só o que já foi estudado: total e por matéria
+function jaEst(){var R3=S.subs.map(function(s){var o=cntTopics(s.id);return{s:s,c:o.c,p:o.p,t:o.t}}).filter(function(x){return x.c||x.p}),N=0,NP=0;R3.forEach(function(x){N+=x.c;NP+=x.p});
+ if(!R3.length)return '<div class="card"><h2>Já estudado</h2><p class="mu">Quando você concluir assuntos, eles aparecem aqui por matéria.</p></div>';
+ var parts=R3.filter(function(x){return x.c}).map(function(x){return{v:x.c,c:sCol(x.s.id),l:SN(x.s)}});
+ var G=R3.map(function(x){var p=x.t?x.c/x.t:0;return{l:SN(x.s),v:p,c:sCol(x.s.id),top:Math.round(p*100)+'%',tc:'var(--tx)',sub:x.c+'/'+x.t+(x.p?' +'+x.p+'p':''),tip:x.s.name+': '+x.c+' concluídos de '+x.t}});
+ return '<div class="card"><h2>Já estudado</h2><p class="ctp"><b>'+N+'</b> assuntos concluídos'+(NP?' e <b>'+NP+'</b> parciais':'')+', em '+R3.length+' matéria'+(R3.length>1?'s':'')+'.</p><div class="pieg"><div class="pie1">'+donut(parts,150,22,N+'','concluídos')+pieLeg(parts)+'</div><div><h4 style="margin:4px 0 6px">% de cada matéria já concluído</h4>'+towers(G,{max:Math.max(.1,Math.max.apply(null,G.map(function(g){return g.v}))*1.25),gw:76,h:180,fit:G.length<=6})+'</div></div><p class="mu">Pizza: como os assuntos que você já concluiu se dividem entre as matérias. Torres: quanto de cada matéria já foi concluído (só as matérias que você começou; "p" = parciais).</p></div>'}
+// ---- Evolução (Estratégia): linhas 3D por matéria, com o total
+var EVH={};
+function evH(k){EVH[k]=!EVH[k];R()}
+function mline3d(SR,labs,o){var W=520,H=230,L=46,B=24,T=24,n=labs.length,bw=(W-L-30)/n,y=function(x){return T+(H-T-B)*(1-x/100)},d=5,s='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;max-width:640px;height:auto;display:block;margin:0 auto" role="img" aria-label="Evolução por matéria">';
+ [0,50,100].forEach(function(v){s+='<line x1="'+L+'" x2="'+W+'" y1="'+y(v)+'" y2="'+y(v)+'" class="gl"/><text x="'+(L-6)+'" y="'+(y(v)+4)+'" text-anchor="end" class="ax">'+v+'%</text>'});
+ if(o.goal)s+='<line x1="'+L+'" x2="'+W+'" y1="'+y(o.goal)+'" y2="'+y(o.goal)+'" stroke="#e8a317" stroke-width="2" stroke-dasharray="6 4"/><text x="'+(L+4)+'" y="'+(y(o.goal)-5)+'" class="ax" style="fill:#b8860b;font-size:10px">meta '+o.goal+'%</text>';
+ labs.forEach(function(l,i){if(n<=8||(n-1-i)%2==0)s+='<text x="'+(L+bw*i+bw/2)+'" y="'+(H-6)+'" text-anchor="middle" class="ax">'+e(l)+'</text>'});
+ SR.forEach(function(sr){var P=[];sr.v.forEach(function(x,i){if(x!=null)P.push([L+bw*i+bw/2,y(x),x])});if(!P.length)return;var c=sr.c,w=sr.tot?4.5:3;
+  for(var i=1;i<P.length;i++){var a=P[i-1],b=P[i];s+='<polygon points="'+a[0]+','+a[1]+' '+b[0]+','+b[1]+' '+(b[0]+d)+','+(b[1]-d)+' '+(a[0]+d)+','+(a[1]-d)+'" fill="'+shade(c,.4)+'" opacity=".8"/>'}
+  if(P.length>1)s+='<polyline points="'+P.map(function(p){return p[0]+','+p[1]}).join(' ')+'" fill="none" stroke="'+c+'" stroke-width="'+w+'" stroke-linejoin="round"/>';
+  P.forEach(function(p,k){s+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="'+(sr.tot?5:4)+'" fill="'+c+'" stroke="#fff" stroke-width="1.5"/>';if(k==P.length-1)s+='<text x="'+(p[0]+8)+'" y="'+(p[1]+4)+'" style="font-size:11px;font-weight:700;fill:'+c+'">'+Math.round(p[2])+'%</text>'})});
+ return s+'</svg>'}
+function evoCard2(){var t0=today(),W=evW,nb=W==7?7:W==30?10:13,sz=Math.ceil(W/nb),labs=[],B=[];for(var i=nb-1;i>=0;i--){var b=addD(t0,-i*sz);B.push([addD(b,-(sz-1)),b]);labs.push(dm2(b))}
+ var cur=winQ(addD(t0,-(W-1)),t0),prv=winQ(addD(t0,-(2*W-1)),addD(t0,-W));
+ var dl=function(x,y,f,pct){if(x==null||y==null||(!pct&&!y))return '<span class="mu">sem período anterior</span>';var d=x-y;if(pct)d=Math.round(d*100);var up=d>=0;return '<b class="'+(up?'up':'dn')+'">'+(up?'↑ +':'↓ −')+f(Math.abs(d))+'</b> <span class="mu">vs antes</span>'};
+ var SR=[{k:'_t',n:'Total',c:'#212529',tot:1,v:B.map(function(p){var w=winQ(p[0],p[1]);return w.q?w.r*100:null})}];
+ S.subs.forEach(function(s){var v=B.map(function(p){var w=winQ(p[0],p[1],s.id);return w.q?w.r*100:null});if(v.some(function(x){return x!=null}))SR.push({k:s.id,n:SN(s),c:sCol(s.id),v:v})});
+ var tr=function(v){var f=null,l=null;v.forEach(function(x){if(x!=null){if(f==null)f=x;l=x}});return f==null||l==f?'':l>f?'<b class="up">↑</b>':'<b class="dn">↓</b>'};
+ var h='<div class="card"><h2>Evolução do aproveitamento por matéria</h2><div class="seg" style="margin-bottom:10px">'+[7,30,90].map(function(w){return '<button class="'+(evW==w?'on':'')+'" onclick="evW='+w+';R()">'+w+' dias</button>'}).join('')+'</div>';
+ h+='<div class="qk"><div><span>Horas</span><b>'+fm(cur.min)+'</b><small style="display:block">'+dl(cur.min,prv.min,function(x){return fm(x)})+'</small></div><div><span>Questões</span><b>'+cur.q+'</b><small style="display:block">'+dl(cur.q,prv.q,function(x){return x})+'</small></div><div><span>Rendimento</span><b style="color:'+colMeta(cur.r)+'">'+(cur.r==null?'–':Math.round(cur.r*100)+'%')+'</b><small style="display:block">'+dl(cur.r,prv.r,function(x){return x+'%'},1)+'</small></div></div>';
+ if(SR[0].v.every(function(x){return x==null}))return h+'<p class="mu">Registre questões para ver a evolução.</p></div>';
+ var st=0;while(st<labs.length-4&&SR[0].v[st]==null)st++;if(st){labs=labs.slice(st);SR.forEach(function(r){r.v=r.v.slice(st)})}
+ h+=mline3d(SR.filter(function(s){return !EVH[s.k]}),labs,{goal:Math.round(metaPct()*100)});
+ h+='<div class="dleg evl">'+SR.map(function(s){return '<button type="button" class="ql'+(EVH[s.k]?' off':'')+'" onclick="evH(\''+s.k+'\')"><i style="background:'+s.c+'"></i>'+e(s.n)+' '+tr(s.v)+'</button>'}).join('')+'</div>';
+ return h+'<p class="mu">% de acerto por período de '+sz+' dia'+(sz>1?'s':'')+'. A linha preta é o total. Toque no nome para mostrar ou esconder a matéria. Períodos sem questões ficam sem ponto.</p></div>'}
+// ---- abas com os detalhes (sem repetir o que está no Painel)
+TABS=(function(o){if(o.evo)return o;var n={};Object.keys(o).forEach(function(k){n[k]=o[k];if(k=='rev')n.evo='Evolução'});return n})(TABS);
+V.estr=(function(b){return function(){var h=b();return h.replace(/<div class="card"><h2>Evolução<\/h2>[\s\S]*?<\/svg><\/div>/,function(){return evoCard2()})}})(V.estr);
+V.evo=(function(b){return function(){return withBlank(['cardEvo'],function(){return b()})}})(V.evo);
+V.sim=(function(b){return function(){return withBlank(['cardSimEvo'],function(){return b()})}})(V.sim);
 V.erros=(function(b){return function(){return b().replace(/<div class="card"><h2>Onde você mais erra \(\d+ erros\)<\/h2>[\s\S]*?<\/div>(?=<div class="card"><h2>Lista)/,'')}})(V.erros);
+V.edital=(function(b){return function(){var h=b();if(evT)return h;var P=pieParts();return '<div class="card dcw">'+P[0]+'</div>'+incCard2()+h}})(V.edital);
+V.lei=(function(b){return function(){return lsCard()+b()}})(V.lei);
+Vqst=(function(b){return function(){return b()+'<h2 style="margin:18px 2px 10px">Desempenho nas questões</h2>'+withBlank(['eqSec'],function(){return cardQ()})}})(Vqst);
 // ---- questões: 4 botões sempre visíveis
 function pq4(i,v){if(!PQ||!PQ.L[i])return;var q=PQ.L[i];if(v=='er'){q.r='er';q.c=''}else{q.r='ok';q.c=v;if(q.m&&!q.g)q.g=q.m}pqSv();pqRB(i)}
 pqBI=(function(b){return function(i){var h=b(i),q=PQ.L[i];if(PQ.g)return h;h=h.replace(/<div><label>Resultado<\/label>[\s\S]*?<\/div><\/div><\/div>/,'</div>').replace(/<div class="sqk">[\s\S]*?<\/div>/,'');
