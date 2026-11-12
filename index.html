@@ -2595,7 +2595,7 @@ Vqst=(function(b){return function(){var c;try{c=qmCard()}catch(x){c='<div class=
 merge=(function(b){return function(a,c){var r=b(a,c),M={};(a.qb||[]).concat(c.qb||[]).forEach(function(x){if(!x)return;var y=M[x.id];if(!y||(x.u||0)>(y.u||0))M[x.id]=x});r.qb=(r.qb||[]).map(function(x){return M[x.id]&&(M[x.id].u||0)>(x.u||0)?M[x.id]:x});return r}})(merge);
 (function(){try{var c=document.createElement('style');c.textContent='.qmr{align-items:flex-start}.qmb{display:flex;gap:6px;align-items:center;flex-shrink:0}.qme{border:1px dashed var(--bd);border-radius:8px;padding:10px;margin:4px 0 10px}.qme textarea{width:100%}.qme textarea.qal{min-height:42px;height:42px}';document.head.appendChild(c)}catch(x){}})();
 
-var APPV='12/11 16:45';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
+var APPV='12/11 16:55';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
 R=(function(b){return function(){b.apply(this,arguments);try{var m=document.getElementById('app')||document.body,v=document.getElementById('appv');if(!v){v=document.createElement('div');v.id='appv';document.body.appendChild(v)}v.textContent='versão '+APPV}catch(x){}}})(R);
 // banco por assunto: só questões do próprio assunto (sem completar com outros temas)
 qbTopic=function(tid){qbLoad().then(function(){var r=findT(tid),A=qbAll(),own=qShuf(A.filter(function(q){return (q.t||[]).indexOf(tid)>=0})).sort(function(a,b){return qRank(a)-qRank(b)}),ids=own.slice(0,10).map(function(q){return q.id});
@@ -2628,6 +2628,10 @@ function trFix2(){var t='2026-11-12',ch=0;Object.keys(S.tr||{}).forEach(function
  tr.res=g;tr.cs=0;var h=String(tr.h||'').split(',');if(h.length&&h[h.length-1]=='er')h[h.length-1]=g;tr.h=h.join(',');tr.fx2=1;tr.u=Date.now();ch=1});return ch}
 try{if(trFix2())save()}catch(x){}
 cloud=(function(b){return function(){var r=b.apply(this,arguments);setTimeout(function(){try{if(trFix2()){save();R()}}catch(x){}},9000);return r}})(cloud);
+// link “Lançar” (tarefa/revisão) já traz matéria E assunto no “Colar as questões”
+pqCard=(function(b){return function(){var h=b();if(PQ||!QFP||!QFP.tid||!findT(QFP.tid))return h;var sid=QFP.sid||findT(QFP.tid).s.id;
+ h=h.replace(/(<select id="pq_s"[^>]*>)([\s\S]*?)(<\/select>)/,function(a,o,ops,c){return o+ops.replace(/ selected/g,'').replace('value="'+sid+'"','value="'+sid+'" selected')+c});
+ return h.replace(/(<select id="pq_t">)[\s\S]*?(<\/select>)/,function(a,o,c){return o+pqTopOpts(sid,QFP.tid)+c})}})(pqCard);
 
 mig4();R();tmInit();cloud();
 </script>
