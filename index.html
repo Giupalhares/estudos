@@ -2569,6 +2569,31 @@ function erFix1(L){var ch=0;(L||[]).forEach(function(x){if(!x.fx1&&x.sid=='adm'&
 try{if(erFix1(S.er))save()}catch(x){}
 merge=(function(b){return function(a,c){var r=b(a,c);try{erFix1(r.er)}catch(x){}return r}})(merge);
 (function(){try{var c=document.createElement('style');c.textContent='.ermo{font:inherit;font-size:12px;padding:1px 4px;border:1px solid var(--bd);border-radius:6px;background:var(--card);color:var(--mu);max-width:200px}.mox{color:#e03131;font-weight:600}.moxs{border:2px solid #e03131!important}';document.head.appendChild(c)}catch(x){}})();
+// Minhas questões: ver todas, buscar, editar e excluir
+var QMQ='',QMS='',QMN=20,QED='',QEDS='';
+function qmList(){var q=QMQ.toLowerCase();return (S.qb||[]).slice().reverse().filter(function(x){return (!QMS||x.s==QMS)&&(!q||((x.e||'')+' '+(x.o||[]).join(' ')+' '+(x.src||'')).toLowerCase().indexOf(q)>=0)})}
+function qmFind(id){return (S.qb||[]).filter(function(x){return x.id==id})[0]}
+function qmEd(id){QED=QED==id?'':id;var q=qmFind(id);QEDS=q?q.s:'';R();setTimeout(function(){var el=document.getElementById('qm_'+id);if(el&&el.scrollIntoView)el.scrollIntoView({block:'start'})},50)}
+function qmSubCh(){var el=document.getElementById('qe_s');QEDS=el?el.value:'';var t=document.getElementById('qe_t');if(t)t.innerHTML=qbTopOpts(QEDS)}
+function qmSave(id){var q=qmFind(id);if(!q)return;var v=function(i){var el=document.getElementById(i);return el?String(el.value||'').trim():''},o=[];'ABCDE'.split('').forEach(function(l){var t=v('qe_'+l);if(t)o.push(t)});
+ if(!v('qe_e')){toast('O enunciado não pode ficar vazio.');return}if(o.length<2){toast('Coloque pelo menos duas alternativas.');return}var g=v('qe_g');if(g&&'ABCDE'.indexOf(g)>=o.length){toast('O gabarito '+g+' não tem alternativa.');return}
+ q.e=v('qe_e');q.o=o;q.g=g;q.s=v('qe_s')||q.s;q.t=v('qe_t')?[v('qe_t')]:[];q.src=v('qe_o')||q.src;q.bc=v('qe_b')||q.bc;q.u=Date.now();
+ var c=document.getElementById('qe_c');if(c&&String(c.value).trim()!=qcmGet(id))qcmSet(id,c.value);
+ QED='';save();R();toast('Questão atualizada.')}
+function qmCard(){var M=S.qb||[];if(!M.length)return '';var L=qmList(),subs={};M.forEach(function(x){subs[x.s]=(subs[x.s]||0)+1});
+ var h='<div class="card" id="qmcard"><details'+(QMQ||QMS||QED?' open':'')+'><summary style="cursor:pointer"><h2 style="display:inline">Minhas questões ('+M.length+')</h2> <span class="mu">ver, editar e excluir</span></summary>';
+ h+='<div class="f" style="margin-top:10px"><div><label>Buscar</label><input id="qm_q" value="'+e(QMQ)+'" placeholder="palavra do enunciado, alternativa ou origem" onkeydown="if(event.key==\'Enter\'){QMQ=this.value;QMN=20;R()}"></div><div><label>Matéria</label><select onchange="QMS=this.value;QMN=20;R()"><option value="">Todas</option>'+S.subs.filter(function(s){return subs[s.id]}).map(function(s){return '<option value="'+s.id+'"'+(QMS==s.id?' selected':'')+'>'+e(SN(s))+' ('+subs[s.id]+')</option>'}).join('')+'</select></div></div>';
+ h+='<p style="margin:6px 0"><button class="btn g" onclick="QMQ=document.getElementById(\'qm_q\').value;QMN=20;R()">Buscar</button>'+(QMQ||QMS?' <button class="btn g" onclick="QMQ=\'\';QMS=\'\';R()">Limpar busca</button>':'')+' <span class="mu">'+L.length+' encontrada'+(L.length==1?'':'s')+'</span></p>';
+ L.slice(0,QMN).forEach(function(q){var s=sub(q.s),tn=q.t&&q.t[0]&&findT(q.t[0]);h+='<div class="row qmr" id="qm_'+q.id+'"><div class="t"><b>'+e((q.e||'').slice(0,140))+((q.e||'').length>140?'…':'')+'</b><div class="mu">'+e(s?SN(s):q.s)+(tn?' · '+e(sqShort(tn.t)):'')+' · '+e(q.src||'Minhas questões')+' · gabarito '+(q.g||'–')+(q.dt?' · '+q.dt.split('-').reverse().join('/'):'')+(qcmGet(q.id)?' · 💬':'')+'</div></div><div class="qmb"><button class="btn g" onclick="qmEd(\''+q.id+'\')">'+(QED==q.id?'Fechar':'Editar')+'</button> <button class="x" title="Excluir" onclick="qbDel(\''+q.id+'\')">✕</button></div></div>';
+  if(QED==q.id){var sid=QEDS||q.s,o=q.o||[];h+='<div class="qme"><div class="f"><div><label>Matéria</label><select id="qe_s" onchange="qmSubCh()">'+qbSubOpts(sid)+'</select></div><div><label>Assunto do edital</label><select id="qe_t">'+qbTopOpts(sid).replace('value="'+((q.t||[])[0]||'@')+'"','value="'+((q.t||[])[0]||'@')+'" selected')+'</select></div></div>'+
+   '<div class="f"><div><label>Gabarito</label><select id="qe_g"><option value="">–</option>'+'ABCDE'.split('').map(function(l){return '<option'+(q.g==l?' selected':'')+'>'+l+'</option>'}).join('')+'</select></div><div><label>Origem</label><input id="qe_o" value="'+e(q.src||'')+'"></div><div><label>Banca</label><input id="qe_b" value="'+e(q.bc||'')+'"></div></div>'+
+   '<label>Enunciado</label><textarea id="qe_e" rows="6">'+e(q.e||'')+'</textarea>'+'ABCDE'.split('').map(function(l,i){return '<label>Alternativa '+l+'</label><textarea class="qal" id="qe_'+l+'" rows="2">'+e(o[i]||'')+'</textarea>'}).join('')+
+   '<label>💬 Comentários</label><textarea id="qe_c" rows="3">'+e(qcmGet(q.id))+'</textarea><p><button class="btn" onclick="qmSave(\''+q.id+'\')">Salvar alterações</button> <button class="btn g" onclick="QED=\'\';R()">Cancelar</button></p></div>'}});
+ if(L.length>QMN)h+='<p><button class="btn g" onclick="QMN+=30;R()">Mostrar mais ('+(L.length-QMN)+')</button></p>';
+ return h+'</details></div>'}
+Vqst=(function(b){return function(){return b()+qmCard()}})(Vqst);
+merge=(function(b){return function(a,c){var r=b(a,c),M={};(a.qb||[]).concat(c.qb||[]).forEach(function(x){if(!x)return;var y=M[x.id];if(!y||(x.u||0)>(y.u||0))M[x.id]=x});r.qb=(r.qb||[]).map(function(x){return M[x.id]&&(M[x.id].u||0)>(x.u||0)?M[x.id]:x});return r}})(merge);
+(function(){try{var c=document.createElement('style');c.textContent='.qmr{align-items:flex-start}.qmb{display:flex;gap:6px;align-items:center;flex-shrink:0}.qme{border:1px dashed var(--bd);border-radius:8px;padding:10px;margin:4px 0 10px}.qme textarea{width:100%}.qme textarea.qal{min-height:42px;height:42px}';document.head.appendChild(c)}catch(x){}})();
 
 mig4();R();tmInit();cloud();
 </script>
