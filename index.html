@@ -2522,6 +2522,27 @@ cronCard=(function(b){return function(fl){var h=b(fl);if(fl)return h;
 '@media(max-width:600px){.cwfx{grid-template-columns:1fr;gap:4px}}.cwc .cwt>span:first-child{white-space:nowrap}'+
 '.cwmore{margin-top:8px;font-size:13px}.cwmore summary{cursor:pointer;color:var(--mu)}.cwmore .cwpo{margin-top:6px}';
 document.head.appendChild(c)}catch(x){}})();
+// revisão: some com qualquer ação (estudo salvo, questões do banco, questões lançadas)
+var RVT='';
+function rvDueT(tid){var t=today();return revs().filter(function(x){return x.kind=='T'&&x.tid==tid&&x.due<=t})[0]}
+function rvAuto(tid,ac,er,dv,ch,how){if(!tid||!rvDueT(tid))return '';var res=(ac+er)?rvRes(ac,er,dv||0,ch||0):'dv';rvRec('T'+tid,tid,res);var iv=trApply(tid,res);save();
+ setTimeout(function(){toast('Revisão feita'+(how?' ('+how+')':'')+'. Próxima em '+iv+' dia'+(iv>1?'s':'')+'.')},900);return res}
+function rvSweep(n0,how){var A={};S.logs.slice(n0).forEach(function(l){if(!l.tid)return;var a=A[l.tid]||(A[l.tid]={ac:0,er:0,dv:0,ch:0});a.ac+=+l.ac||0;a.er+=+l.er||0;a.dv+=+l.dv||0;a.ch+=+l.ch||0});
+ var k=Object.keys(A);k.forEach(function(t){var a=A[t];rvAuto(t,a.ac,a.er,a.dv,a.ch,how)});if(k.length)R()}
+['tmSaveLog','pqSave','qfSave'].forEach(function(f){var G=(function(){return this})(),b=G[f];if(typeof b!='function')return;G[f]=function(){var n0=S.logs.length,r=b.apply(this,arguments);if(S.logs.length>n0)rvSweep(n0,f=='tmSaveLog'?'estudo salvo':'questões lançadas');return r}});
+qbStart=(function(b){return function(ids,nm){b(ids,nm);if(EX&&!EX.fim){EX.rvt=RVT||'';exSv()}RVT=''}})(qbStart);
+exEntregar=(function(b){return function(){var ex0=EX,was=EX&&EX.fim;b();if(ex0&&ex0.rvt&&EX===ex0&&EX.fim&&!was){var m=S.sim[S.sim.length-1],ac=0,er=0;((m&&m.rows)||[]).forEach(function(r){ac+=+r.ac||0;er+=+r.er||0});if(rvAuto(ex0.rvt,ac,er,0,0,'questões do banco'))R()}}})(exEntregar);
+var RVQB='';
+function rvQ(tid){var n=(qtCount()||{})[tid]||0;if(!n){qfOpen(tid,'rev');return}RVQB=RVQB==tid?'':tid;R()}
+function rvQBank(tid){RVQB='';RVT=tid;qbTopic(tid)}
+function rvQNew(tid){RVQB='';qfOpen(tid,'rev')}
+V.rev=(function(b){return function(){var h=b();
+ h=h.replace(/ ?<button class="btn g" onclick="RVQ='[^']*';R\(\)">📝 Com questões<\/button>/g,'').replace(/ ?<button class="dgo" onclick="qbTopic\('[^']+'\)"[^>]*>✎ Questões \(\d+\)<\/button>/g,'');
+ h=h.replace(/<div class="rvq">[\s\S]*?<\/div><\/div><\/div>(?=<\/div>)/g,'');
+ var m=QBI?qtCount():{};
+ return h.replace(/estudar\('([^']+)','([^']+)'\)">(▶ )?Estudar<\/button>/g,function(all,s,t){if(!rvDueT(t))return all;var n=m[t]||0;
+  return all+' <button class="btn g" onclick="rvQ(\''+t+'\')">✎ Questões</button>'+(RVQB==t&&n?'<div class="rvqb"><button class="btn" onclick="rvQBank(\''+t+'\')">Banco de questões ('+n+')</button> <button class="btn g" onclick="rvQNew(\''+t+'\')">Lançar questões novas</button></div>':'')})}})(V.rev);
+(function(){try{var c=document.createElement('style');c.textContent='.rvqb{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 2px;padding:8px;border:1px dashed var(--bd);border-radius:8px}';document.head.appendChild(c)}catch(x){}})();
 
 mig4();R();tmInit();cloud();
 </script>
