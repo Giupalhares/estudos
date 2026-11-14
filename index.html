@@ -2595,7 +2595,7 @@ Vqst=(function(b){return function(){var c;try{c=qmCard()}catch(x){c='<div class=
 merge=(function(b){return function(a,c){var r=b(a,c),M={};(a.qb||[]).concat(c.qb||[]).forEach(function(x){if(!x)return;var y=M[x.id];if(!y||(x.u||0)>(y.u||0))M[x.id]=x});r.qb=(r.qb||[]).map(function(x){return M[x.id]&&(M[x.id].u||0)>(x.u||0)?M[x.id]:x});return r}})(merge);
 (function(){try{var c=document.createElement('style');c.textContent='.qmr{align-items:flex-start}.qmb{display:flex;gap:6px;align-items:center;flex-shrink:0}.qme{border:1px dashed var(--bd);border-radius:8px;padding:10px;margin:4px 0 10px}.qme textarea{width:100%}.qme textarea.qal{min-height:42px;height:42px}';document.head.appendChild(c)}catch(x){}})();
 
-var APPV='14/11 04:10';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
+var APPV='14/11 04:20';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
 R=(function(b){return function(){b.apply(this,arguments);try{var m=document.getElementById('app')||document.body,v=document.getElementById('appv');if(!v){v=document.createElement('div');v.id='appv';document.body.appendChild(v)}v.textContent='versão '+APPV}catch(x){}}})(R);
 // banco por assunto: só questões do próprio assunto (sem completar com outros temas)
 qbTopic=function(tid){qbLoad().then(function(){var r=findT(tid),A=qbAll(),own=qShuf(A.filter(function(q){return (q.t||[]).indexOf(tid)>=0})).sort(function(a,b){return qRank(a)-qRank(b)}),ids=own.slice(0,10).map(function(q){return q.id});
@@ -2858,6 +2858,18 @@ function tpsSync(){var st=tpsGet();if(!st)return 0;var L=lsOfT(TM.tid).filter(fu
  if(ch)tmSv();return ch}
 tpsLs=function(i){lsTog(i);if(tpsSync())R()};
 tpsMark=(function(b){return function(k){var st=tpsGet();if(!st)return;if((k=='l'||k=='j')&&st[k]==null){var L=lsOfT(TM.tid).filter(function(i){return LS[i]&&((k=='l')==(LS[i][1]=='A'))&&!S.ls[i]});if(L.length){S.u=S.u||{};L.forEach(function(i){S.ls[i]=today();S.u['L'+i]=Date.now()});save()}}return b(k)}})(tpsMark);
+// ---- assuntos do Paraná: aplica sozinho pela importância (sem quadro para conferir)
+prCard=function(){return ''};
+function prAuto(){try{if(!PRM||!prList().length)return;var any=PRM.some(function(id){var x=(S.tr||{})[id];return x&&x.pr});if(any)return;PRSEL={};var t0=toast;toast=function(){};try{prApply()}finally{toast=t0}}catch(x){}}
+cloud=(function(b){return function(){var r=b.apply(this,arguments);setTimeout(prAuto,12000);return r}})(cloud);
+setTimeout(prAuto,15000);
+prApply=function(){var L=prList().filter(function(r){return !PRSEL[r.t.id]});if(!L.length){toast('Nenhum assunto marcado.');return}
+ L.sort(function(a,b){return (b.t.inc||0)-(a.t.inc||0)});var t=today(),now=Date.now(),d0=t>=RST0?addD(t,1):RST0,n4=0,tot={},top={};S.u=S.u||{};S.tr=S.tr||{};
+ Object.keys(S.tr).forEach(function(k){var x=S.tr[k];if(x&&(x.pr||x.rs)&&x.nx)tot[x.nx]=(tot[x.nx]||0)+1});
+ var last=d0;L.forEach(function(r){var x=r.t,i=x.inc||0,st=i>=4?0:i>=3?1:2,d=last;if(i>=4)n4++;
+  while((tot[d]||0)>=3||(i>=4&&(top[d]||0)>=2))d=addD(d,1);last=d;tot[d]=(tot[d]||0)+1;if(i>=4)top[d]=(top[d]||0)+1;
+  x.d=true;x.dt=t;S.u[x.id]=now;try{heads(r.s)}catch(e){}S.tr[x.id]={s:st,n:0,lp:0,cs:0,h:'',res:'',last:'',nx:d,pr:1,u:now}});
+ try{localStorage.setItem('prx','1')}catch(x){}PLC.k='';save();R();toast(L.length+' assuntos do Paraná organizados por importância: os '+n4+' de incidência altíssima voltam primeiro, com estudo + questões.')};
 
 mig4();R();tmInit();cloud();
 </script>
