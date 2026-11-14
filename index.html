@@ -2448,7 +2448,7 @@ document.head.appendChild(st)}catch(x){}})();
 cardDisc=(function(b){return function(){return b().replace(/towers-gw64/,'')}})(cardDisc);
 
 // ---- Painel: estudo por dia ao lado de Próximos estudos; Questões de hoje embaixo de Precisa de atenção
-function qHoje(){var t=today(),qd=0;S.logs.forEach(function(l){if(l.date==t)qd+=(l.ac||0)+(l.er||0)+(l.br||0)});S.sim.forEach(function(m){if(m.date==t)m.rows.forEach(function(x){qd+=x.ac+x.er+x.br})});var mt=qMeta(),Q=qtPend().filter(function(x){return !x.done}),p=Math.min(1,qd/Math.max(1,mt));
+function qHoje(){var t=today(),qd=qToday();var mt=qMeta(),Q=qtPend().filter(function(x){return !x.done}),p=Math.min(1,qd/Math.max(1,mt));
  return '<section class="dc qhj"><div class="dch-h"><div><h3>Questões de hoje</h3><p class="dsub"><b>'+qd+'</b> de '+mt+' · meta do dia'+(qd>=mt?' ✓':'')+'</p></div><button class="btn" onclick="go(\'qst\')">Lançar questões</button></div><div class="qhb"><i style="width:'+Math.round(p*100)+'%;background:'+(qd>=mt?'#2f9e44':'#e8a317')+'"></i></div>'+
   (Q.length?'<p class="dsub" style="margin:10px 0 4px">10 questões pendentes:</p>'+Q.map(function(x){return '<div class="qhr"><span>'+e(x.t.n)+' <small class="mu">· '+e(SN(x.s))+'</small></span><b>'+x.p+'/'+x.n+'</b></div>'}).join(''):'<p class="dsub" style="margin:10px 0 0">Nenhum tema com questões pendentes.</p>')+'</section>'}
 V.painel=(function(b){return function(){var h=b(),a='<div class="dg2"><section class="dc"><h3>Próximos estudos',i=h.indexOf(a);if(i>=0){var j=h.indexOf('</section>',i);if(j>=0){j+='</section>'.length;return h.slice(0,j)+'<div class="dcolr">'+qHoje()+rvCard('0000')+'</div>'+h.slice(j)}}
@@ -2595,7 +2595,7 @@ Vqst=(function(b){return function(){var c;try{c=qmCard()}catch(x){c='<div class=
 merge=(function(b){return function(a,c){var r=b(a,c),M={};(a.qb||[]).concat(c.qb||[]).forEach(function(x){if(!x)return;var y=M[x.id];if(!y||(x.u||0)>(y.u||0))M[x.id]=x});r.qb=(r.qb||[]).map(function(x){return M[x.id]&&(M[x.id].u||0)>(x.u||0)?M[x.id]:x});return r}})(merge);
 (function(){try{var c=document.createElement('style');c.textContent='.qmr{align-items:flex-start}.qmb{display:flex;gap:6px;align-items:center;flex-shrink:0}.qme{border:1px dashed var(--bd);border-radius:8px;padding:10px;margin:4px 0 10px}.qme textarea{width:100%}.qme textarea.qal{min-height:42px;height:42px}';document.head.appendChild(c)}catch(x){}})();
 
-var APPV='14/11 05:20';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
+var APPV='14/11 05:30';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
 R=(function(b){return function(){b.apply(this,arguments);try{var m=document.getElementById('app')||document.body,v=document.getElementById('appv');if(!v){v=document.createElement('div');v.id='appv';document.body.appendChild(v)}v.textContent='versão '+APPV}catch(x){}}})(R);
 // banco por assunto: só questões do próprio assunto (sem completar com outros temas)
 qbTopic=function(tid){qbLoad().then(function(){var r=findT(tid),A=qbAll(),own=qShuf(A.filter(function(q){return (q.t||[]).indexOf(tid)>=0})).sort(function(a,b){return qRank(a)-qRank(b)}),ids=own.slice(0,10).map(function(q){return q.id});
@@ -2913,6 +2913,9 @@ V.painel=(function(b){return function(){return b().replace(/<div class="dha">[\s
 // erros lançados só na contagem também entram no Caderno
 ['qfSave','rvqSave','tmSaveLog','pqSave'].forEach(function(f){var G=(function(){return this})(),b=G[f];if(typeof b!='function')return;G[f]=function(){var n0=S.logs.length,e0=S.er.length,r=b.apply(this,arguments);var L=S.logs.slice(n0),need=0;L.forEach(function(l){need+=(+l.er||0)});var miss=need-(S.er.length-e0);
  if(miss>0&&L.length){var l=L[L.length-1],now=Date.now(),rt=l.tid&&findT(l.tid);for(var i=0;i<miss;i++)S.er.push({id:uid(),date:l.date,sid:l.sid,tid:l.tid||'',mot:'Questões',nt:'Erro lançado só na contagem ('+(l.ts||'questões')+(rt?' · '+rt.t.n.slice(0,60):'')+'), sem enunciado. Anote aqui a questão e a regra.',u:now});save()}return r}});
+// Painel: meta do dia e barras do dia sem os simulados (só treinos, questões lançadas e revisões)
+qToday=(function(b){return function(){var n=b(),t=today();S.sim.forEach(function(m){if(m.date==t&&!m.tr)(m.rows||[]).forEach(function(x){n-=(x.ac||0)+(x.er||0)+(x.br||0)})});return Math.max(0,n)}})(qToday);
+qDiaSub=function(){var t=today(),o={};S.logs.forEach(function(l){if(l.date!=t||!l.sid)return;var a=o[l.sid]=o[l.sid]||{a:0,r:0};a.a+=+l.ac||0;a.r+=(+l.er||0)+(+l.br||0)});S.sim.forEach(function(m){if(m.date!=t||!m.tr)return;(m.rows||[]).forEach(function(x){var a=o[x.sid]=o[x.sid]||{a:0,r:0};a.a+=x.ac||0;a.r+=(x.er||0)+(x.br||0)})});return o};
 
 mig4();R();tmInit();cloud();
 </script>
