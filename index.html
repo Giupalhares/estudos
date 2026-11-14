@@ -2595,7 +2595,7 @@ Vqst=(function(b){return function(){var c;try{c=qmCard()}catch(x){c='<div class=
 merge=(function(b){return function(a,c){var r=b(a,c),M={};(a.qb||[]).concat(c.qb||[]).forEach(function(x){if(!x)return;var y=M[x.id];if(!y||(x.u||0)>(y.u||0))M[x.id]=x});r.qb=(r.qb||[]).map(function(x){return M[x.id]&&(M[x.id].u||0)>(x.u||0)?M[x.id]:x});return r}})(merge);
 (function(){try{var c=document.createElement('style');c.textContent='.qmr{align-items:flex-start}.qmb{display:flex;gap:6px;align-items:center;flex-shrink:0}.qme{border:1px dashed var(--bd);border-radius:8px;padding:10px;margin:4px 0 10px}.qme textarea{width:100%}.qme textarea.qal{min-height:42px;height:42px}';document.head.appendChild(c)}catch(x){}})();
 
-var APPV='14/11 03:55';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
+var APPV='14/11 04:10';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
 R=(function(b){return function(){b.apply(this,arguments);try{var m=document.getElementById('app')||document.body,v=document.getElementById('appv');if(!v){v=document.createElement('div');v.id='appv';document.body.appendChild(v)}v.textContent='versão '+APPV}catch(x){}}})(R);
 // banco por assunto: só questões do próprio assunto (sem completar com outros temas)
 qbTopic=function(tid){qbLoad().then(function(){var r=findT(tid),A=qbAll(),own=qShuf(A.filter(function(q){return (q.t||[]).indexOf(tid)>=0})).sort(function(a,b){return qRank(a)-qRank(b)}),ids=own.slice(0,10).map(function(q){return q.id});
@@ -2787,7 +2787,7 @@ qfCard=(function(b){return function(){var h=b();try{if(QFP&&S.qt&&S.qt[QFP.tid])
 V.sim=(function(b){return function(){var h=b(),sm=simMes();if(sm.d!=null&&sm.d<30)return h;return '<div class="card qsmc"><b>📝 Simulado do mês</b> <span class="mu">'+(sm.last?'O último simulado completo (40 questões ou mais) foi há '+sm.d+' dias.':'Você ainda não fez um simulado completo (40 questões ou mais).')+' Até o edital, faça um por mês para treinar o ritmo de prova.</span></div>'+h}})(V.sim);
 (function(){try{var c=document.createElement('style');c.textContent='.qsmc{border-left:4px solid #e8a317}';document.head.appendChild(c)}catch(x){}})();
 // ---- 9. Recomeço em 14/11/2026: atrasados voltam para a fila e revisões vencidas antes dessa data saem da lista (registros intactos)
-var RST0='2026-11-14';
+var RST0='2026-11-15';
 function rvSlot(d0,cap){var c={};Object.keys(S.tr||{}).forEach(function(k){var x=S.tr[k];if(x&&(x.pr||x.rs)&&x.nx)c[x.nx]=(c[x.nx]||0)+1});var d=d0;while((c[d]||0)>=cap)d=addD(d,1);return d}
 prApply=(function(b){return function(){var L=prList().filter(function(r){return !PRSEL[r.t.id]});if(!L.length){toast('Nenhum assunto marcado.');return}
  L.sort(function(a,b){return (b.t.inc||0)-(a.t.inc||0)});var t=today(),now=Date.now(),d0=addD(t>RST0?t:RST0,1);S.u=S.u||{};S.tr=S.tr||{};
@@ -2799,13 +2799,13 @@ function rst1(){var ch=0,now=Date.now();
  var L=revs().filter(function(r){return r.due<RST0});
  L.filter(function(r){return r.kind!='T'}).forEach(function(r){if(!S.rv[r.k]){S.rv[r.k]=RST0;ch=1}});
  var T=L.filter(function(r){return r.kind=='T'});T.sort(function(a,b){var x=findT(a.tid),y=findT(b.tid);return ((y&&y.t.inc)||0)-((x&&x.t.inc)||0)});
- T.forEach(function(r){var tr=S.tr[r.tid]||{s:r.stg||0,n:0,lp:0,cs:0,h:''};if(tr.s==null)tr.s=r.stg||0;tr.nx=rvSlot(addD(RST0,1),3);tr.rs=1;tr.u=now;S.tr[r.tid]=tr;ch=1});
+ T.forEach(function(r){var tr=S.tr[r.tid]||{s:r.stg||0,n:0,lp:0,cs:0,h:''};if(tr.s==null)tr.s=r.stg||0;tr.nx=rvSlot(RST0,3);tr.rs=1;tr.u=now;S.tr[r.tid]=tr;ch=1});
  if(ch)PLC.k='';return ch}
 try{rst1()}catch(x){}
 cloud=(function(b){return function(){var r=b.apply(this,arguments);setTimeout(function(){try{if(rst1()){save();R()}}catch(x){}},10000);return r}})(cloud);
 // ---- 10. Assuntos do Paraná por importância: altíssima = revisão com estudo (2/dia, primeiro); alta = estudo + questões (3/dia); demais = só questões, por último
 prApply=function(){var L=prList().filter(function(r){return !PRSEL[r.t.id]});if(!L.length){toast('Nenhum assunto marcado.');return}
- L.sort(function(a,b){return (b.t.inc||0)-(a.t.inc||0)});var t=today(),now=Date.now(),d0=addD(t>RST0?t:RST0,1),n4=0;S.u=S.u||{};S.tr=S.tr||{};
+ L.sort(function(a,b){return (b.t.inc||0)-(a.t.inc||0)});var t=today(),now=Date.now(),d0=t>=RST0?addD(t,1):RST0,n4=0;S.u=S.u||{};S.tr=S.tr||{};
  L.forEach(function(r){var x=r.t,i=x.inc||0,st=i>=4?0:i>=3?1:2;if(i>=4)n4++;x.d=true;x.dt=t;S.u[x.id]=now;try{heads(r.s)}catch(e){}S.tr[x.id]={s:st,n:0,lp:0,cs:0,h:'',res:'',last:'',nx:rvSlot(d0,i>=4?2:3),pr:1,u:now}});
  try{localStorage.setItem('prx','1')}catch(x){}PLC.k='';save();R();toast(L.length+' assuntos organizados: os '+n4+' de incidência altíssima voltam primeiro, com estudo + questões.')};
 prCard=(function(b){return function(){return b().replace(/Ao aplicar, eles saem da fila de assuntos novos e voltam aos poucos como revisão com questões \(3 por dia\)\./,'Ao aplicar, eles saem da fila de assuntos novos e voltam como revisão, pela importância: primeiro os de incidência altíssima (2 por dia, com estudo + questões, porque foram vistos correndo), depois os de alta (estudo + questões) e por último os sem incidência (só questões).')}})(prCard);
@@ -2852,6 +2852,12 @@ var QNOTE={'T5-53':'⚠️ Atualização: a Lei 15.397/2026 mudou a pena do furt
 'MG-57':'⚠️ Atualização: o fato é de 2024, então vale o percentual da época (40%). Para crime hediondo cometido a partir de 25/03/2026, a Lei 15.358/2026 elevou para 70% (primário).',
 'ES-57':'⚠️ Atualização: o fato é de 2025, então vale 55%. Para feminicídio cometido a partir de 25/03/2026, a Lei 15.358/2026 elevou para 75% (primário).'};
 qbLoad=(function(b){return function(){return b().then(function(L){if(L&&!L._upd){L._upd=1;for(var i=L.length-1;i>=0;i--){var q=L[i];if(QHIDE[q.id]){L.splice(i,1);continue}if(QNOTE[q.id]&&String(q.c||'').indexOf('⚠️ Atualização')<0)q.c=QNOTE[q.id]+(q.c?'\n\n'+q.c:'')}}return L})}})(qbLoad);
+// ---- 3 passos: ler todos os itens tica o passo; ticar o passo marca os itens como lidos
+function tpsSync(){var st=tpsGet();if(!st)return 0;var L=lsOfT(TM.tid).filter(function(i){return LS[i]}),ch=0;
+ [['l',L.filter(function(i){return LS[i][1]=='A'})],['j',L.filter(function(i){return LS[i][1]!='A'})]].forEach(function(p){var k=p[0],a=p[1];if(!a.length)return;var all=a.every(function(i){return S.ls[i]});if(all&&st[k]==null){st[k]=tmMinNow();ch=1}else if(!all&&st[k]!=null&&st[k+'a']){delete st[k];delete st[k+'a'];ch=1}if(all&&ch)st[k+'a']=1});
+ if(ch)tmSv();return ch}
+tpsLs=function(i){lsTog(i);if(tpsSync())R()};
+tpsMark=(function(b){return function(k){var st=tpsGet();if(!st)return;if((k=='l'||k=='j')&&st[k]==null){var L=lsOfT(TM.tid).filter(function(i){return LS[i]&&((k=='l')==(LS[i][1]=='A'))&&!S.ls[i]});if(L.length){S.u=S.u||{};L.forEach(function(i){S.ls[i]=today();S.u['L'+i]=Date.now()});save()}}return b(k)}})(tpsMark);
 
 mig4();R();tmInit();cloud();
 </script>
