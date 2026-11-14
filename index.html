@@ -2595,7 +2595,7 @@ Vqst=(function(b){return function(){var c;try{c=qmCard()}catch(x){c='<div class=
 merge=(function(b){return function(a,c){var r=b(a,c),M={};(a.qb||[]).concat(c.qb||[]).forEach(function(x){if(!x)return;var y=M[x.id];if(!y||(x.u||0)>(y.u||0))M[x.id]=x});r.qb=(r.qb||[]).map(function(x){return M[x.id]&&(M[x.id].u||0)>(x.u||0)?M[x.id]:x});return r}})(merge);
 (function(){try{var c=document.createElement('style');c.textContent='.qmr{align-items:flex-start}.qmb{display:flex;gap:6px;align-items:center;flex-shrink:0}.qme{border:1px dashed var(--bd);border-radius:8px;padding:10px;margin:4px 0 10px}.qme textarea{width:100%}.qme textarea.qal{min-height:42px;height:42px}';document.head.appendChild(c)}catch(x){}})();
 
-var APPV='14/11 04:20';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
+var APPV='14/11 05:20';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
 R=(function(b){return function(){b.apply(this,arguments);try{var m=document.getElementById('app')||document.body,v=document.getElementById('appv');if(!v){v=document.createElement('div');v.id='appv';document.body.appendChild(v)}v.textContent='versão '+APPV}catch(x){}}})(R);
 // banco por assunto: só questões do próprio assunto (sem completar com outros temas)
 qbTopic=function(tid){qbLoad().then(function(){var r=findT(tid),A=qbAll(),own=qShuf(A.filter(function(q){return (q.t||[]).indexOf(tid)>=0})).sort(function(a,b){return qRank(a)-qRank(b)}),ids=own.slice(0,10).map(function(q){return q.id});
@@ -2870,6 +2870,49 @@ prApply=function(){var L=prList().filter(function(r){return !PRSEL[r.t.id]});if(
   while((tot[d]||0)>=3||(i>=4&&(top[d]||0)>=2))d=addD(d,1);last=d;tot[d]=(tot[d]||0)+1;if(i>=4)top[d]=(top[d]||0)+1;
   x.d=true;x.dt=t;S.u[x.id]=now;try{heads(r.s)}catch(e){}S.tr[x.id]={s:st,n:0,lp:0,cs:0,h:'',res:'',last:'',nx:d,pr:1,u:now}});
  try{localStorage.setItem('prx','1')}catch(x){}PLC.k='';save();R();toast(L.length+' assuntos do Paraná organizados por importância: os '+n4+' de incidência altíssima voltam primeiro, com estudo + questões.')};
+// ---- Precisa de atenção: recomeça em 14/11 (só entra assunto com erro a partir de hoje)
+var ATT0='2026-11-14';
+function attRecent(){var M={};S.logs.forEach(function(l){if(l.tid&&l.date>=ATT0&&(+l.er||0)>0)M[l.tid]=1});S.er.forEach(function(x){if(x.tid&&x.date>=ATT0)M[x.tid]=1});S.sim.forEach(function(m){if(m.date>=ATT0)(m.q||[]).forEach(function(x){if(x.tid&&x.r&&x.r!='ok')M[x.tid]=1})});return M}
+V.painel=(function(b){return function(){var h=b(),i=h.indexOf('<h3>Precisa de atenção</h3>');if(i<0)return h;var s0=h.lastIndexOf('<section',i),j=h.indexOf('</section>',i);if(s0<0||j<0)return h;var seg=h.slice(s0,j),M=attRecent(),n=0;
+ seg=seg.replace(/<li onclick="estudar\('[^']*','([^']*)'\)"[\s\S]*?<\/li>/g,function(a,t){if(M[t]){n++;return a}return ''});
+ seg=seg.replace(/<p class="dsub">[^<]*<\/p>/,'<p class="dsub">'+(n?n+' assunto'+(n==1?'':'s')+' com erros desde 14/11':'Recomeço em 14/11: nada pendente. Aqui aparecem os assuntos em que você errar daqui para frente.')+'</p>');
+ return h.slice(0,s0)+seg+h.slice(j)}})(V.painel);
+// ---- sessão do plano: recuperação da mesma matéria, base com 30 min, 5 questões, 3 passos
+function recSame(x){var L=S.logs.filter(function(l){return l.sid==x.s.id&&l.tid&&l.tid!=x.t.id&&(+l.min||0)>=10}).sort(function(a,b){return a.date<b.date?1:-1});if(!L.length)return null;var r=findT(L[0].tid);return r?r.t:null}
+sessH=function(x,prev,dueQ){var B=blk().b,base=x.kind=='ponte',m=base?30:(S.sess||90),mr=Math.round(m*B.rec/100),mt=Math.round(m*B.teo/100),mq=Math.round(m*B.q/100),mc=Math.max(0,m-mr-mt-mq),q=x.t.inc||0;
+ var dz=[];for(var i=0;i<dueQ.length&&dz.length<2;i++){if(dueQ[i].s==x.s.name){dz.push(dueQ[i]);dueQ.splice(i,1);i--}}
+ var pt=recSame(x)||(prev&&prev.s&&prev.s.id==x.s.id?prev.t:null);
+ var rec=dz.length?'Revisões vencidas desta matéria: '+dz.map(function(r){return e(r.t.slice(0,60))}).join('; '):pt?'Lembrar, sem consultar, o que estudou de '+e(pt.n.slice(0,70)):'Lembrar, sem consultar, o que você já sabe sobre o tema';
+ var nq=x.kind=='rea'?Math.max(5,Math.round(mq/2.2)):base?3:5;
+ var teo=x.kind=='rea'?'Reestudar os pontos que você errou':x.kind=='rf'?'Revisão ativa: resumo, lei seca e jurisprudência do assunto':base?'Leitura rápida do conceito, só o essencial':'Teoria → lei seca do tema → súmulas e temas (estudo em 3 passos)';
+ return '<div class="row b'+q+'" style="display:block"><div style="display:flex;gap:8px;align-items:flex-start"><div class="t"><b>'+(x.kind=='rea'?'🔁 Reestudar: ':x.kind=='rf'?'🔂 Revisão final: ':kLbl({k:x.kind}))+e(x.t.n)+'</b>'+(ppOf(x.t.id)?'<div class="lspp">◐ Parou em: '+e(ppOf(x.t.id).w)+'</div>':'')+'<div class="mu">'+e(x.s.name)+'</div>'+(x.kind=='rea'&&x.why&&x.why.length?'<div class="why">Por quê: '+e(x.why.join('; '))+'</div>':'')+nts0(x.t)+'</div><span class="tag '+(q?'i'+q:'')+'" style="cursor:default">'+(q?INC[q]:'–')+'</span></div>'+
+ '<div class="blk"><div><b>'+mr+' min</b> Recuperação<br><span class="mu">'+rec+'</span></div><div><b>'+mt+' min</b> Teoria<br><span class="mu">'+teo+'</span></div><div><b>'+mq+' min</b> Questões<br><span class="mu">'+(base?'Cerca de 3 questões, opcional':'Cerca de '+nq+' questões do assunto')+'</span></div><div><b>'+mc+' min</b> Correção<br><span class="mu">Corrigir, lançar os erros no Caderno e registrar</span></div></div>'+
+ '<p style="margin:8px 0 0"><button class="btn" onclick="estudar(\''+x.s.id+'\',\''+x.t.id+'\')">▶ Estudar</button> <button class="btn g" onclick="regFor(\''+x.s.id+'\',\''+x.t.id+'\')">Registrar</button></p></div>'};
+// ===== Treino e simulados separados; treino abre na aba Questões; gráfico de questões; erros sempre no caderno
+if(MOT.indexOf('Questões')<0)MOT.push('Questões');
+function isTrNm(nm){return !/simulado|prova montada/i.test(nm||'')}
+qbStart=(function(b){return function(ids,nm){var n0=EX;b(ids,nm);if(EX&&EX!==n0&&!EX.fim&&isTrNm(nm)){EX.tr=1;exSv();tab='qst';R();try{window.scrollTo(0,0)}catch(x){}}}})(qbStart);
+exEntregar=(function(b){return function(){var n0=S.sim.length,e0=S.er.length,tr=EX&&EX.tr,nm=EX&&EX.nm;b();if(tr&&S.sim.length>n0){var m=S.sim[S.sim.length-1];m.tr=1;m.nome=(nm||'Questões do banco')+' ('+(m.q||[]).length+' questões)';for(var i=e0;i<S.er.length;i++){var x=S.er[i];if(x.mot=='Simulado'){x.mot='Questões';x.nt=String(x.nt||'').replace(/^Prova montada:/,(nm||'Questões do banco')+':')}}save()}}})(exEntregar);
+function noTr(fn){return function(){var all=S.sim;S.sim=all.filter(function(m){return !m.tr});try{return fn.apply(this,arguments)}finally{S.sim=all}}}
+V.sim=noTr((function(b){return function(){if(EX&&EX.tr){var ex=EX;EX=null;try{return b()}finally{EX=ex}}return b()}})(V.sim));
+simAll=noTr(simAll);simEvoOnly=noTr(simEvoOnly);sqDiag=noTr(sqDiag);diagCharts=noTr(diagCharts);simMes=noTr(simMes);
+Vqst=(function(b){return function(){if(EX&&EX.tr&&!EX.fim){if(!QBI){qbLoad().then(function(){if(tab=='qst')R()});return '<div class="card"><p class="mu">Abrindo as questões…</p></div>'}return exView()}var h=b();if(EX&&EX.tr&&EX.fim)return (QBI?exRes():'')+h;return h}})(Vqst);
+// gráfico de questões (treinos, questões lançadas e revisões; simulados ficam na aba Simulados)
+var QSP=30;
+function qStats(days){var t=today(),a=days?addD(t,-(days-1)):'0000',o={},T={a:0,r:0,b:0};function add(sid,ac,er,br){var x=o[sid]=o[sid]||{a:0,r:0,b:0};x.a+=ac;x.r+=er;x.b+=br;T.a+=ac;T.r+=er;T.b+=br}
+ S.logs.forEach(function(l){if(l.sid&&l.date>=a&&((+l.ac||0)+(+l.er||0)+(+l.br||0))>0)add(l.sid,+l.ac||0,+l.er||0,+l.br||0)});
+ S.sim.forEach(function(m){if(m.tr&&m.date>=a)(m.rows||[]).forEach(function(x){add(x.sid,x.ac||0,x.er||0,x.br||0)})});return{by:o,t:T}}
+function qStatsCard(){var s=qStats(QSP==0?0:QSP),T=s.t,n=T.a+T.r+T.b;
+ var h='<div class="card" id="qstc"><h2>Questões: acertos e erros</h2><p class="mu">Treinos do banco, questões lançadas e revisões. Os simulados têm os gráficos deles na aba Simulados.</p><div class="seg" style="margin:6px 0 10px">'+[[7,'7 dias'],[30,'30 dias'],[90,'90 dias'],[0,'Tudo']].map(function(x){return '<button class="'+(QSP==x[0]?'on':'')+'" onclick="QSP='+x[0]+';R()">'+x[1]+'</button>'}).join('')+'</div>';
+ if(!n)return h+'<p class="mu">Nenhuma questão nesse período.</p></div>';
+ h+='<div class="pieg"><div class="pie1">'+donut([{v:T.a,c:'#2f9e44',l:'Acertos'},{v:T.r+T.b,c:'#e03131',l:'Erros'}],130,20,Math.round(T.a/n*100)+'%','de '+n)+'</div><div class="qdm" style="flex:1;min-width:220px">'+
+  S.subs.filter(function(x){return s.by[x.id]}).sort(function(x,y){var p=s.by[x.id],q=s.by[y.id];return (q.a+q.r+q.b)-(p.a+p.r+p.b)}).map(function(x){var p=s.by[x.id],k=p.a+p.r+p.b;return '<div class="qdr"><span>'+e(SN(x))+'</span><div class="qdb"><i class="ok" style="width:'+(p.a/k*100)+'%"></i><i class="er" style="width:'+((p.r+p.b)/k*100)+'%"></i></div><b>'+p.a+'/'+k+' <span class="mu">'+Math.round(p.a/k*100)+'%</span></b></div>'}).join('')+'</div></div></div>';return h}
+qasCard=(function(b){return function(){var h=b(),c='';try{c=qStatsCard()}catch(x){}return h+c}})(qasCard);
+// Painel: sem os botões Ver o plano / Cronômetro
+V.painel=(function(b){return function(){return b().replace(/<div class="dha">[\s\S]*?<\/div><\/header>/,'</header>')}})(V.painel);
+// erros lançados só na contagem também entram no Caderno
+['qfSave','rvqSave','tmSaveLog','pqSave'].forEach(function(f){var G=(function(){return this})(),b=G[f];if(typeof b!='function')return;G[f]=function(){var n0=S.logs.length,e0=S.er.length,r=b.apply(this,arguments);var L=S.logs.slice(n0),need=0;L.forEach(function(l){need+=(+l.er||0)});var miss=need-(S.er.length-e0);
+ if(miss>0&&L.length){var l=L[L.length-1],now=Date.now(),rt=l.tid&&findT(l.tid);for(var i=0;i<miss;i++)S.er.push({id:uid(),date:l.date,sid:l.sid,tid:l.tid||'',mot:'Questões',nt:'Erro lançado só na contagem ('+(l.ts||'questões')+(rt?' · '+rt.t.n.slice(0,60):'')+'), sem enunciado. Anote aqui a questão e a regra.',u:now});save()}return r}});
 
 mig4();R();tmInit();cloud();
 </script>
