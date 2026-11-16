@@ -2595,7 +2595,7 @@ Vqst=(function(b){return function(){var c;try{c=qmCard()}catch(x){c='<div class=
 merge=(function(b){return function(a,c){var r=b(a,c),M={};(a.qb||[]).concat(c.qb||[]).forEach(function(x){if(!x)return;var y=M[x.id];if(!y||(x.u||0)>(y.u||0))M[x.id]=x});r.qb=(r.qb||[]).map(function(x){return M[x.id]&&(M[x.id].u||0)>(x.u||0)?M[x.id]:x});return r}})(merge);
 (function(){try{var c=document.createElement('style');c.textContent='.qmr{align-items:flex-start}.qmb{display:flex;gap:6px;align-items:center;flex-shrink:0}.qme{border:1px dashed var(--bd);border-radius:8px;padding:10px;margin:4px 0 10px}.qme textarea{width:100%}.qme textarea.qal{min-height:42px;height:42px}';document.head.appendChild(c)}catch(x){}})();
 
-var APPV='16/11 17:40';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
+var APPV='16/11 18:00';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
 R=(function(b){return function(){b.apply(this,arguments);try{var m=document.getElementById('app')||document.body,v=document.getElementById('appv');if(!v){v=document.createElement('div');v.id='appv';document.body.appendChild(v)}v.textContent='versão '+APPV}catch(x){}}})(R);
 // banco por assunto: só questões do próprio assunto (sem completar com outros temas)
 qbTopic=function(tid){qbLoad().then(function(){var r=findT(tid),A=qbAll(),own=qShuf(A.filter(function(q){return (q.t||[]).indexOf(tid)>=0})).sort(function(a,b){return qRank(a)-qRank(b)}),ids=own.slice(0,10).map(function(q){return q.id});
@@ -2963,7 +2963,7 @@ exRes=(function(b){return function(){var h=b(),sk=(EX&&EX.sk||[]).length;if(sk)h
  return h}})(exRes);
 // --- limpeza: brancos não são erros; registros 0/0 sem estudo; treinos antigos fora dos simulados
 function dataFix16(){var ch=0,tm={},T=function(id){S.tomb=(S.tomb||[]).concat(id);tm[id]=1;ch=1};
- S.logs.filter(function(l){return !(+l.ac)&&!(+l.er)&&!(+l.br)&&(+l.min||0)<=1&&!(+l.pg)}).forEach(function(l){T(l.id)});
+ S.logs.forEach(function(l){var q=l.ts=='Questões'||(!l.ts&&(+l.min||0)<=1&&!(+l.pg));if(+l.br){l.br=0;ch=1}if(q&&!(+l.ac)&&!(+l.er))T(l.id)});
  var BL={};S.er.filter(function(x){return /deixei em branco|marquei em branco/.test(x.nt||'')}).forEach(function(x){(BL[x.date]=BL[x.date]||[]).push(x);T(x.id)});
  S.logs=S.logs.filter(function(l){return !tm[l.id]});S.er=S.er.filter(function(x){return !tm[x.id]});
  S.sim.forEach(function(m){if(m.bank&&!m.tr&&isTrNm(m.nome)){m.tr=1;ch=1}
@@ -2971,9 +2971,9 @@ function dataFix16(){var ch=0,tm={},T=function(id){S.tomb=(S.tomb||[]).concat(id
   if(!m.rows||!m.rows.some(function(r){return (r.br||0)>0}))return;var bl=(BL[m.date]||[]).slice();
   m.rows.forEach(function(r){var n=r.br||0;if(!n)return;var Q=m.q||[];for(var k=0;k<n;k++){var j=-1;for(var z=0;z<Q.length;z++){if(Q[z].sid==r.sid&&Q[z].r=='er'&&bl.some(function(b){return b.sid==Q[z].sid&&(b.tid||'')==(Q[z].tid||'')})){j=z;break}}
     if(j<0)for(var z2=Q.length-1;z2>=0;z2--){if(Q[z2].sid==r.sid&&Q[z2].r=='er'&&!Q[z2].c){j=z2;break}}
-    if(j>=0){var x=Q.splice(j,1)[0],bi=bl.findIndex?bl.findIndex(function(b){return b.sid==x.sid&&(b.tid||'')==(x.tid||'')}):-1;if(bi>=0)bl.splice(bi,1);var h=(S.qh||{})[x.qid];if(h&&h.r=='er'&&h.d==m.date)delete S.qh[x.qid]}}
+    if(j>=0){var x=Q.splice(j,1)[0],bi=bl.findIndex?bl.findIndex(function(b){return b.sid==x.sid&&(b.tid||'')==(x.tid||'')}):-1;if(bi>=0)bl.splice(bi,1);var h=(S.qh||{})[x.qid],oth=S.sim.some(function(o){return o!==m&&o.date==m.date&&(o.q||[]).some(function(y){return y.qid==x.qid})});if(h&&h.r=='er'&&h.d==m.date&&!oth)delete S.qh[x.qid]}}
    r.br=0;ch=1});
-  m.rows=m.rows.filter(function(r){return (r.ac||0)+(r.er||0)>0});m.nome=String(m.nome||'').replace(/\((\d+) questões\)/,'('+(m.q||[]).length+' questões)');if(!m.rows.length)T(m.id)});
+  m.rows=m.rows.filter(function(r){return (r.ac||0)+(r.er||0)>0});m.nome=String(m.nome||'').replace(/\((\d+) questões?\)/,'('+(m.q||[]).length+((m.q||[]).length==1?' questão)':' questões)'));if(!m.rows.length)T(m.id)});
  S.sim=S.sim.filter(function(m){return !tm[m.id]});if(ch){S.tomb=Object.keys(S.tomb.reduce(function(o,k){o[k]=1;return o},{}));PLC.k=''}return ch}
 try{dataFix16()}catch(x){}
 cloud=(function(b){return function(){var r=b.apply(this,arguments);setTimeout(function(){try{if(dataFix16()){save();R()}}catch(x){}},10500);return r}})(cloud);
