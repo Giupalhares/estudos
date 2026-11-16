@@ -2595,7 +2595,7 @@ Vqst=(function(b){return function(){var c;try{c=qmCard()}catch(x){c='<div class=
 merge=(function(b){return function(a,c){var r=b(a,c),M={};(a.qb||[]).concat(c.qb||[]).forEach(function(x){if(!x)return;var y=M[x.id];if(!y||(x.u||0)>(y.u||0))M[x.id]=x});r.qb=(r.qb||[]).map(function(x){return M[x.id]&&(M[x.id].u||0)>(x.u||0)?M[x.id]:x});return r}})(merge);
 (function(){try{var c=document.createElement('style');c.textContent='.qmr{align-items:flex-start}.qmb{display:flex;gap:6px;align-items:center;flex-shrink:0}.qme{border:1px dashed var(--bd);border-radius:8px;padding:10px;margin:4px 0 10px}.qme textarea{width:100%}.qme textarea.qal{min-height:42px;height:42px}';document.head.appendChild(c)}catch(x){}})();
 
-var APPV='16/11 19:27';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
+var APPV='16/11 19:57';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
 R=(function(b){return function(){b.apply(this,arguments);try{var m=document.getElementById('app')||document.body,v=document.getElementById('appv');if(!v){v=document.createElement('div');v.id='appv';document.body.appendChild(v)}v.textContent='versão '+APPV}catch(x){}}})(R);
 // banco por assunto: só questões do próprio assunto (sem completar com outros temas)
 qbTopic=function(tid){qbLoad().then(function(){var r=findT(tid),A=qbAll(),own=qShuf(A.filter(function(q){return (q.t||[]).indexOf(tid)>=0})).sort(function(a,b){return qRank(a)-qRank(b)}),ids=own.slice(0,10).map(function(q){return q.id});
@@ -3106,6 +3106,100 @@ trailOf=(function(b){return function(sid,ph){var L=b(sid,ph);if(!QSEQ[sid])retur
  return h.concat(r)}})(trailOf);
 // estado antigo sem a migração 4: o que ela marcar como estudado dentro do reestudo volta para estudo
 mig4=(function(b){return function(){var had=!!S.mig4,r=b.apply(this,arguments);if(!had&&S.mig4&&S.mig4.l){var ch=0;S.mig4.l.forEach(function(x){if(!RSET[x.tid])return;var q=findT(x.tid);if(!q)return;q.t.d=false;q.t.dt=null;try{heads(q.s)}catch(e){}S.u[x.tid]=RSAT;S.pp[x.tid]={ok:0,w:null,u:RSAT};ch=1});if(ch){MEM=S;try{localStorage.setItem(K,JSON.stringify(slim()))}catch(x){}}}return r}})(mig4);
+
+// ===== mod38 (16/11): placares por fonte, faixas (meta acima de 85%), motivos A–F, erro recorrente, mapa assunto × motivo, simulados no calendário, fases por data, saída do reestudo e painel de inteligência
+// ---- fontes das questões
+var FGVX={'26':1,MG:1,PI:1,SC:1,IN:1,PE:1,ML:1,ES:1,GO:1,T5:1,T3:1,TO:1,DP:1,AM:1,RN:1,AG:1},PROFX={AP:1,RV:1};
+var PCAT=[['fgv','FGV real'],['out','Outras bancas'],['prof','Professores'],['ia','IA'],['tot','Total']];
+var IARE=/\bIA\b|ChatGPT|GPT|Gemini|Claude|Copilot|Autoral\/IA/i;
+function catQ(qid){qid=String(qid||'');var p=qid.split('-')[0];if(FGVX[p])return 'fgv';if(PROFX[p])return 'prof';
+ var q=(S.qb||[]).filter(function(x){return x.id==qid})[0];if(q){var s=String(q.src||'')+' '+String(q.bc||'')+' '+String(q.org||'');if(IARE.test(s))return 'ia';if(/fgv/i.test(s))return 'fgv';return 'out'}
+ return qid.indexOf('-')>0?'out':'ia'}
+function catL(l){if(isIA(l))return 'ia';var s=String(l.bc||'')+' '+String(l.org||'');if(/fgv/i.test(s))return 'fgv';if(/professor|apostila|revis[ãa]o d|aula/i.test(s))return 'prof';return 'out'}
+var PRC={k:'',v:null};
+function pRecs(){var k=(S.at||0)+'|'+today()+'|'+S.logs.length+'|'+S.sim.length+'|'+(S.qb||[]).length;if(PRC.k==k)return PRC.v;var R=[];
+ S.logs.forEach(function(l){var a=+l.ac||0,r=+l.er||0;if(!a&&!r)return;R.push({d:l.date,sid:l.sid,tid:l.tid||'',c:catL(l),a:a,r:r})});
+ S.sim.forEach(function(m){if(m.q&&m.q.length){m.q.forEach(function(x){if(x.r!='ok'&&x.r!='er')return;R.push({d:m.date,sid:x.sid,tid:x.tid||'',c:catQ(x.qid),a:x.r=='ok'?1:0,r:x.r=='er'?1:0})})}
+  else (m.rows||[]).forEach(function(x){if(!x.ac&&!x.er)return;R.push({d:m.date,sid:x.sid,tid:'',c:/fgv/i.test(m.nome||'')?'fgv':'out',a:x.ac||0,r:x.er||0})})});
+ PRC={k:k,v:R};return R}
+function pAgg(f){var o={};pRecs().forEach(function(x){if(f&&!f(x))return;var s=o[x.sid]||(o[x.sid]={});[x.c,'tot'].forEach(function(c){var z=s[c]||(s[c]={a:0,r:0});z.a+=x.a;z.r+=x.r})});return o}
+// ---- faixas: meta da prova acima de 85%
+function band(a,n,min){if(n<(min||10))return{k:'na',l:'amostra pequena',c:'#868e96'};var p=a/n;return p<.6?{k:'al',l:'alerta',c:'#e03131'}:p<.75?{k:'at',l:'atenção',c:'#f08c00'}:p<.85?{k:'bo',l:'bom',c:'#c99700'}:{k:'do',l:'domínio',c:'#2f9e44'}}
+function pcs(z){if(!z||!(z.a+z.r))return '<span class="mu">–</span>';var n=z.a+z.r;return z.a+'/'+n+' · <b>'+Math.round(z.a/n*100)+'%</b>'}
+function placarCard(){var A=pAgg(),T={};QORD.forEach(function(k){var s=A[k]||{};PCAT.forEach(function(c){var z=s[c[0]];if(!z)return;var t=T[c[0]]||(T[c[0]]={a:0,r:0});t.a+=z.a;t.r+=z.r})});
+ var cell=function(z,c){var h=pcs(z);if(c=='fgv'&&z&&(z.a+z.r)){var b=band(z.a,z.a+z.r,10);h+=' <span style="color:'+b.c+';font-weight:600">'+b.l+'</span>'}return h};
+ var rows=QORD.map(function(k){var s=A[k]||{},sb=sub(k);return '<tr><td>'+e(sb?SN(sb):k)+'</td>'+PCAT.map(function(c){return '<td class="n">'+cell(s[c[0]],c[0])+'</td>'}).join('')+'</tr>'}).join('');
+ var tf=T.fgv,bt=tf?band(tf.a,tf.a+tf.r,20):null;
+ return '<div class="card tw"><h2>Placares por fonte</h2><p class="mu">Só o placar <b>FGV real</b> orienta as decisões. Meta da prova: <b>acima de 85%</b>. Faixas: alerta abaixo de 60%, atenção de 60% a 74%, bom de 75% a 84%, domínio a partir de 85%. A matéria só ganha faixa com 10 ou mais questões FGV. Questões em branco não contam.</p>'+
+  '<table><tr><th>Matéria</th>'+PCAT.map(function(c){return '<th>'+c[1]+'</th>'}).join('')+'</tr>'+rows+'<tr style="font-weight:700"><td>Total</td>'+PCAT.map(function(c){return '<td class="n">'+cell(T[c[0]],c[0])+'</td>'}).join('')+'</tr></table>'+
+  (bt?'<p style="margin-top:8px">Geral FGV: <b style="color:'+bt.c+'">'+bt.l+'</b>'+(bt.k!='do'&&bt.k!='na'?' – abaixo da meta de 85%, risco de ficar de fora.':bt.k=='do'?' – dentro da meta.':'')+'</p>':'')+'</div>'}
+
+// ---- motivos A–F
+var MOTN=['A) Não sabia','B) Esqueci','C) Interpretação','D) Pegadinha FGV','E) Jurisprudência','F) Atenção'];
+var MOTO={'Não estudei o assunto':0,'Dúvida conceitual':0,'Prova anterior':0,'Lei seca':1,'Súmula/jurisprudência':4,'Pegadinha da banca':3,'Distração':5};
+MOT.length=0;MOTN.forEach(function(m){MOT.push(m)});
+function motIx(m){var i=MOTN.indexOf(m);if(i>=0)return i;if(MOTO[m]!=null)return MOTO[m];var c=String(m||'').charAt(0);i='ABCDEF'.indexOf(c);return i>=0&&/^[A-F]\)/.test(m)?i:0}
+// ---- mapa assunto × motivo (caderno de erros)
+function mapaCard(){var M={};(S.er||[]).forEach(function(x){if(!x.tid)return;var o=M[x.tid]||(M[x.tid]={n:0,m:[0,0,0,0,0,0]});o.n++;o.m[motIx(x.mot)]++});
+ var L=Object.keys(M).sort(function(a,b){return M[b].n-M[a].n}).slice(0,12);if(!L.length)return '';
+ var mx=1;L.forEach(function(t){M[t].m.forEach(function(v){if(v>mx)mx=v})});
+ return '<div class="card tw"><h2>Mapa: assunto × motivo do erro</h2><p class="mu">Os 12 assuntos com mais erros no caderno e o motivo de cada erro. Mais escuro = mais erros.</p><table><tr><th>Assunto</th>'+MOTN.map(function(m){return '<th title="'+e(m)+'">'+m.charAt(0)+'</th>'}).join('')+'<th>Total</th></tr>'+
+  L.map(function(t){var r=findT(t),o=M[t];return '<tr><td>'+e(r?sqShort(r.t):t)+' <small class="mu">· '+e(r?SN(r.s):'')+'</small></td>'+o.m.map(function(v){return '<td class="n" style="background:rgba(224,49,49,'+(v?(.12+.6*v/mx).toFixed(2):0)+')">'+(v||'')+'</td>'}).join('')+'<td class="n"><b>'+o.n+'</b></td></tr>'}).join('')+
+  '</table><p class="mu" style="margin-top:6px">'+MOTN.join(' · ')+'</p></div>'}
+V.erros=(function(b){return function(){var h=b(),m=mapaCard();if(!m)return h;var k=h.indexOf('<div class="card"><h2>Lista');return k<0?m+h:h.slice(0,k)+m+h.slice(k)}})(V.erros);
+
+// ---- erro recorrente: 3 erros no mesmo assunto desde o último estudo, ele volta sozinho para reestudo
+var RRB=0;
+function rrCheck(){var C={},ch=[],now=Date.now();(S.er||[]).forEach(function(x){if(!x.tid)return;var r=findT(x.tid);if(!r||!r.t.d)return;if(r.t.dt&&x.date>r.t.dt)C[x.tid]=(C[x.tid]||0)+1});
+ Object.keys(C).forEach(function(tid){if(C[tid]<3)return;setDone(tid,false);S.bump=S.bump||{};S.bump[tid]={x:1,rr:1,u:now};ch.push(tid)});
+ if(ch.length){PLC.k='';var r=findT(ch[0]);toast((ch.length>1?ch.length+' assuntos voltaram':'“'+(r?sqShort(r.t):ch[0])+'” voltou')+' para reestudo: 3 erros desde o último estudo.')}return ch.length}
+R=(function(b){return function(){if(!RRB){RRB=1;try{if(rrCheck())save()}catch(x){}RRB=0}return b.apply(this,arguments)}})(R);
+
+// ---- simulados: 06/12, um por mês até janeiro, quinzenal em fevereiro, todo domingo a partir de março
+var SIMC=['2026-12-06','2027-01-03','2027-02-07','2027-02-21'];
+simDays=function(start,ph){var o=[];for(var i=0;i<7;i++){var d=addD(start,i),w=new Date(d+'T12:00:00').getDay(),ok=SIMC.indexOf(d)>=0||(d>='2027-03-07'&&w==0);if(ok&&!(S.simSkip&&S.simSkip[d]&&S.simSkip[d].x))o.push(d)}return o};
+
+// ---- fases por data: até 31/01 base e reestudo; fevereiro; março; edital; pós-edital com Penal + Processo Penal + Legislação perto de 50%
+phases=(function(b){return function(){var L=b(),ed=S.edit||'2027-03-31';
+ var f3=L[2].ini,f2=mStart(f3,-1);if(!S.ph2){L[0].fim=addD(f2,-1);L[1].ini=f2}if(!S.ph3){L[1].fim=addD(f3,-1)}
+ if(L[2].ini>ed){L[2].ini=ed}L[2].fim=ed;L[3].ini=addD(ed,1);
+ L[0].n='Base e reestudo';L[0].foco='Teoria de base primeiro em cada matéria, com a parte especial intercalada; reestudo dos assuntos de maior incidência; um simulado por mês.';
+ L[1].foco='Questões no estilo FGV, assuntos que já caíram em provas de delegado e simulado quinzenal com correção no caderno de erros.';
+ L[2].foco='Simulado todo domingo, revisão de lei seca, caderno de erros e conteúdo novo só de incidência alta.';
+ L[3].n='Pós-edital';L[3].foco='Penal, Processo Penal e Legislação com cerca de metade do tempo; simulado todo domingo; confira mudanças no edital.';return L}})(phases);
+var HRS4={dpen:4.5,pple:4.5,leg:4.5,dcon:3,adm:3,dhum:2.5,lopc:1.5,dciv:.75,mleg:.75,crim:.75};
+function weakF(sid){var s=pAgg()[sid],z=s&&s.fgv;if(!z)return 1;var b=band(z.a,z.a+z.r,10);return b.k=='al'?1.3:b.k=='at'?1.15:b.k=='do'?.85:1}
+rodWeights=function(ph){var w={},H=ph&&ph.k>=4?HRS4:HRS;S.subs.forEach(function(s){var m=mwOf(s.id);if(!m)return;w[s.id]=(H[s.id]||1)*m*weakF(s.id)});return w};
+
+// ---- saída do reestudo: 80% em pelo menos 5 questões depois do estudo (FGV primeiro, completa com outras bancas e professores, nunca IA) + revisão seguinte com acerto
+function rsSet(){var o={},lf=function(t){var r=findT(t);return r&&leaf(r.s,r.i)};Object.keys(RSET).forEach(function(t){if(!LEGR[t]&&lf(t))o[t]=1});var bp=S.bump||{};Object.keys(bp).forEach(function(t){if(bp[t]&&bp[t].rr)o[t]=1});return o}
+function rsStat(tid){var r=findT(tid);if(!r)return null;var t=r.t;if(!t.d||((S.u||{})[tid]||0)<=RSAT&&RSET[tid])return{st:'est'};var dt=t.dt||today(),f={a:0,r:0},o={a:0,r:0};
+ pRecs().forEach(function(x){if(x.tid!=tid||x.d<dt||x.c=='ia')return;var z=x.c=='fgv'?f:o;z.a+=x.a;z.r+=x.r});
+ var n=f.a+f.r,a=f.a;if(n<5){var need=5-n,on=o.a+o.r;if(on){var k=Math.min(need,on);a+=o.a*k/on;n+=k}}
+ var rv=(S.rvd||[]).some(function(x){return x.tid==tid&&x.d>dt&&x.res=='ok'}),ok=n>=5&&a/n>=.8&&rv;return{st:ok?'ok':'aguarda',n:Math.round(n),p:n?a/n:null,rv:rv}}
+// ---- painel de inteligência
+function intelCard(){var c=qcfg().d,A=pAgg(),g={a:0,r:0};QORD.forEach(function(k){var z=A[k]&&A[k].fgv;if(z){g.a+=z.a;g.r+=z.r}});var gp=g.a+g.r?g.a/(g.a+g.r):null,tot=0,exp=0,has=0;
+ QORD.forEach(function(k){var d=c[k]||0,z=A[k]&&A[k].fgv,n=z?z.a+z.r:0;tot+=d;if(n>=5){exp+=d*z.a/n;has++}else if(gp!=null)exp+=d*gp});
+ var meta=Math.ceil(tot*.85),pj=gp==null?null:Math.round(exp),bp=pj==null?null:band(pj,tot,1);
+ var h='<div class="card"><h2>Inteligência</h2>';
+ h+='<h4 style="margin:6px 0">Projeção pela FGV real</h4>'+(pj==null?'<p class="mu">Ainda sem questões FGV para projetar.</p>':'<p><b style="font-size:20px;color:'+bp.c+'">'+pj+' de '+tot+'</b> ('+Math.round(pj/tot*100)+'%) · meta: <b>'+meta+'</b> (85%)'+(pj>=meta?' ✓ dentro da meta':' · faltam <b>'+(meta-pj)+'</b> acertos')+'</p><p class="mu">Acerto FGV de cada matéria × questões dela na prova'+(has<QORD.length?'; matérias com menos de 5 questões FGV usam a sua média FGV geral':'')+'. Estimativa, não nota de corte.</p>');
+ // pontos recuperáveis
+ var IW={4:4,3:3,2:2,1:1,0:.5},T={};pRecs().forEach(function(x){if(!x.tid||x.c=='ia')return;var o=T[x.tid]||(T[x.tid]={fa:0,fr:0,a:0,r:0});if(x.c=='fgv'){o.fa+=x.a;o.fr+=x.r}o.a+=x.a;o.r+=x.r});
+ var P=[];Object.keys(T).forEach(function(tid){var o=T[tid],r=findT(tid);if(!r)return;var fn=o.fa+o.fr,n=o.a+o.r,p=fn>=3?o.fa/fn:n>=3?o.a/n:null;if(p==null||p>=.85)return;P.push({tid:tid,r:r,p:p,n:fn>=3?fn:n,f:fn>=3,sc:(IW[r.t.inc||0]||1)*(.85-p)})});
+ P.sort(function(a,b){return b.sc-a.sc});var IL=['sem','baixa','média','alta','altíssima'];
+ h+='<h4 style="margin:14px 0 6px">Pontos recuperáveis</h4>'+(P.length?'<p class="mu">Onde você ganha mais nota com menos esforço: incidência alta e acerto abaixo de 85%.</p>'+P.slice(0,5).map(function(x){var b=band(x.p*x.n,x.n,1);return '<div class="qhr"><span>'+e(sqShort(x.r.t))+' <small class="mu">· '+e(SN(x.r.s))+' · incidência '+IL[x.r.t.inc||0]+'</small></span><b style="color:'+b.c+'">'+Math.round(x.p*100)+'% <small class="mu">('+x.n+(x.f?' FGV':'')+')</small></b></div>'}).join(''):'<p class="mu">Ainda não há assuntos com 3 ou mais questões abaixo de 85%.</p>');
+ // retenção por etapa da revisão
+ var byT={};(S.rvd||[]).forEach(function(x){if(x.tid&&/^T/.test(x.k||''))(byT[x.tid]=byT[x.tid]||[]).push(x)});var st=[{n:0,o:0},{n:0,o:0},{n:0,o:0}];
+ Object.keys(byT).forEach(function(tid){byT[tid].sort(function(a,b){return a.d<b.d?-1:1}).forEach(function(x,i){var z=st[Math.min(i,2)];z.n++;if(x.res=='ok')z.o++})});
+ h+='<h4 style="margin:14px 0 6px">Retenção nas revisões</h4>'+(st[0].n?'<div class="dg2b">'+['1 dia','3 dias','7 dias ou mais'].map(function(l,i){var z=st[i];return '<div><b>'+l+'</b><br>'+(z.n?'<span style="font-size:18px;color:'+band(z.o,z.n,1).c+'">'+Math.round(z.o/z.n*100)+'%</span> <small class="mu">'+z.o+' de '+z.n+' com acerto</small>':'<span class="mu">–</span>')+'</div>'}).join('')+'</div><p class="mu">Se cair muito de uma etapa para a outra, você está esquecendo rápido: encurte a leitura e aumente as questões.</p>':'<p class="mu">Aparece depois das primeiras revisões concluídas.</p>');
+ // saída do reestudo
+ var RS=rsSet(),cnt={est:0,aguarda:0,ok:0},prox=[];Object.keys(RS).forEach(function(tid){var s=rsStat(tid);if(!s)return;cnt[s.st]++;if(s.st=='aguarda')prox.push({tid:tid,s:s})});
+ prox.sort(function(a,b){return (b.s.n||0)-(a.s.n||0)});
+ h+='<h4 style="margin:14px 0 6px">Reestudo</h4><p><b>'+cnt.est+'</b> a estudar · <b>'+cnt.aguarda+'</b> estudados, aguardando o critério · <b style="color:#2f9e44">'+cnt.ok+'</b> concluídos</p><p class="mu">Sai do reestudo com 80% em pelo menos 5 questões feitas depois do estudo (FGV primeiro; completa com outras bancas, nunca IA) e a revisão seguinte com acerto.</p>'+
+  prox.slice(0,5).map(function(x){var r=findT(x.tid);return '<div class="qhr"><span>'+e(sqShort(r.t))+' <small class="mu">· '+e(SN(r.s))+'</small></span><b>'+x.s.n+'/5'+(x.s.p!=null?' · '+Math.round(x.s.p*100)+'%':'')+(x.s.rv?' · revisão ✓':'')+'</b></div>'}).join('');
+ return h+'</div>'}
+V.painel=(function(b){return function(){var h=b(),add='';try{add=intelCard()+placarCard()}catch(x){}var k=h.indexOf('<div class="psec">');return k<0?h+add:h.slice(0,k)+add+h.slice(k)}})(V.painel);
+Vqst=(function(b){return function(){var h=b(),add='';try{add=placarCard()}catch(x){}var a='<div class="card"><h2>Refazer e treinar</h2>',k=h.indexOf(a);return k<0?h+add:h.slice(0,k)+add+h.slice(k)}})(Vqst);
 
 mig4();R();tmInit();cloud();
 </script>
