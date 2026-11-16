@@ -2595,7 +2595,7 @@ Vqst=(function(b){return function(){var c;try{c=qmCard()}catch(x){c='<div class=
 merge=(function(b){return function(a,c){var r=b(a,c),M={};(a.qb||[]).concat(c.qb||[]).forEach(function(x){if(!x)return;var y=M[x.id];if(!y||(x.u||0)>(y.u||0))M[x.id]=x});r.qb=(r.qb||[]).map(function(x){return M[x.id]&&(M[x.id].u||0)>(x.u||0)?M[x.id]:x});return r}})(merge);
 (function(){try{var c=document.createElement('style');c.textContent='.qmr{align-items:flex-start}.qmb{display:flex;gap:6px;align-items:center;flex-shrink:0}.qme{border:1px dashed var(--bd);border-radius:8px;padding:10px;margin:4px 0 10px}.qme textarea{width:100%}.qme textarea.qal{min-height:42px;height:42px}';document.head.appendChild(c)}catch(x){}})();
 
-var APPV='16/11 20:04';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
+var APPV='16/11 20:14';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
 R=(function(b){return function(){b.apply(this,arguments);try{var m=document.getElementById('app')||document.body,v=document.getElementById('appv');if(!v){v=document.createElement('div');v.id='appv';document.body.appendChild(v)}v.textContent='versão '+APPV}catch(x){}}})(R);
 // banco por assunto: só questões do próprio assunto (sem completar com outros temas)
 qbTopic=function(tid){qbLoad().then(function(){var r=findT(tid),A=qbAll(),own=qShuf(A.filter(function(q){return (q.t||[]).indexOf(tid)>=0})).sort(function(a,b){return qRank(a)-qRank(b)}),ids=own.slice(0,10).map(function(q){return q.id});
@@ -3206,7 +3206,7 @@ function qmErOf(id){return (S.er||[]).filter(function(x){return x.qid==id})[0]}
 qmCard=(function(b){return function(){var h=b();if(!QED)return h;var q=qmFind(QED);if(!q)return h;var hq=(S.qh||{})[q.id]||{},er=qmErOf(q.id),r=er?'er':hq.r=='er'?'er':hq.r=='ok'?(hq.c||'ok'):(hq.r||''),mo=er?MOTN[motIx(er.mot)]:'';
  var x='<div class="f"><div><label>Como você respondeu</label><select id="qe_r" onchange="var m=document.getElementById(\'qe_mw\');if(m)m.style.display=this.value==\'er\'?\'\':\'none\'">'+QRL.map(function(o){return '<option value="'+o[0]+'"'+(o[0]==r?' selected':'')+'>'+o[1]+'</option>'}).join('')+'</select></div><div id="qe_mw"'+(r=='er'?'':' style="display:none"')+'><label>Motivo do erro</label><select id="qe_mo">'+MOTN.map(function(m){return '<option'+(m==mo?' selected':'')+'>'+m+'</option>'}).join('')+'</select></div></div>';
  return h.replace('<label>💬 Comentários</label><textarea id="qe_c"',x+'<label>💬 Comentários</label><textarea id="qe_c"')}})(qmCard);
-qmSave=(function(b){return function(id){var q=qmFind(id),el=document.getElementById('qe_r'),me=document.getElementById('qe_mo'),r=el?el.value:'',mo=me?me.value:MOTN[0];b(id);if(!q||!el)return;
+qmSave=(function(b){return function(id){var q=qmFind(id),el=document.getElementById('qe_r'),me=document.getElementById('qe_mo'),r=el?el.value:'',mo=me?me.value:MOTN[0];b(id);if(QED||!q||!el)return;
  S.qh=S.qh||{};var er=qmErOf(id),now=Date.now();
  if(r){var o=S.qh[id]||{};o.r=r=='er'?'er':'ok';o.c=r=='er'?'':r;o.d=o.d||today();o.u=now;S.qh[id]=o}
  if(r=='er'){if(er){if(er.mot!=mo){er.mot=mo;er.u=now}}else{var o2=q.o||[],nt=(q.e||'')+'\n'+o2.map(function(t,i){return 'ABCDE'.charAt(i)+') '+t}).join('\n')+'\nGabarito: '+(q.g||'?')+'\nOrigem: '+(q.src||'Minhas questões');S.er.push({id:uid(),date:today(),sid:q.s,tid:(q.t||[])[0]||'',mot:mo,nt:nt,qid:id,u:now})}}
@@ -3227,6 +3227,14 @@ intelCard=(function(b){return function(){var h=b(),t=today(),H=ritmoH(),a14=avgH
  var x='<h4 style="margin:6px 0">Ritmo</h4><p>Média dos últimos 14 dias: <b>'+a14.toFixed(1)+'h por dia</b> · plano atual: <b>'+H+'h por dia</b> = '+k+' sessões de 50 min de teoria + revisões.</p><p class="mu">Reavaliado toda segunda ('+nm.split('-').reverse().slice(0,2).join('/')+'): quando a sua média dos 14 dias anteriores passar de '+(H+.5)+'h, o plano sobe para '+Math.min(6,H+.5)+'h. Nunca fica abaixo de 4h.</p>';
  return h.replace('<div class="card"><h2>Inteligência</h2>','<div class="card"><h2>Inteligência</h2>'+x)}})(intelCard);
 sesPerDay=function(){return Math.max(2,Math.floor(ritmoH())-1)};
+// editar a questão para corrigir o resultado lançado errado: ajusta também a estatística e o caderno
+qmSave=(function(b){return function(id){var q=qmFind(id),el=document.getElementById('qe_r'),nr=el?el.value:'',o=((S.qh||{})[id])||{},or=o.r=='er'?'er':o.r=='ok'?'ok':'';b(id);
+ if(QED||!q||!nr)return;var n2=nr=='er'?'er':'ok';if(!or||or==n2)return;var fixed=0;
+ (S.sim||[]).forEach(function(m){if(fixed||!m.q)return;m.q.forEach(function(x){if(fixed||x.qid!=id||x.r!=or)return;x.r=n2;if(n2=='ok')x.c=nr;var w=(m.rows||[]).filter(function(r){return r.sid==x.sid})[0];if(w){if(n2=='er'){w.ac=Math.max(0,w.ac-1);w.er++}else{w.er=Math.max(0,w.er-1);w.ac++}}fixed=1})});
+ if(!fixed){var L=S.logs.filter(function(l){return l.sid==q.s&&l.ts=='Questões'&&(n2=='er'?(+l.ac||0)>0:(+l.er||0)>0)&&(!o.d||l.date==o.d)}),tq=(q.t||[])[0],lg=L.filter(function(l){return l.tid==tq}).pop()||L.pop();
+  if(lg){if(n2=='er'){lg.ac--;lg.er=(+lg.er||0)+1}else{lg.er--;lg.ac=(+lg.ac||0)+1}lg.u=Date.now();fixed=1}}
+ if(n2=='ok'){var er=qmErOf(id);if(er){S.tomb=(S.tomb||[]).concat(er.id);S.er=S.er.filter(function(x){return x.id!=er.id})}}
+ S.at=Date.now();save();R();toast(fixed?'Resultado corrigido: estatística e Caderno de erros atualizados.':'Resultado corrigido. Não achei o lançamento original para ajustar a estatística.')}})(qmSave);
 
 mig4();R();tmInit();cloud();
 </script>
