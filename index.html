@@ -2595,7 +2595,7 @@ Vqst=(function(b){return function(){var c;try{c=qmCard()}catch(x){c='<div class=
 merge=(function(b){return function(a,c){var r=b(a,c),M={};(a.qb||[]).concat(c.qb||[]).forEach(function(x){if(!x)return;var y=M[x.id];if(!y||(x.u||0)>(y.u||0))M[x.id]=x});r.qb=(r.qb||[]).map(function(x){return M[x.id]&&(M[x.id].u||0)>(x.u||0)?M[x.id]:x});return r}})(merge);
 (function(){try{var c=document.createElement('style');c.textContent='.qmr{align-items:flex-start}.qmb{display:flex;gap:6px;align-items:center;flex-shrink:0}.qme{border:1px dashed var(--bd);border-radius:8px;padding:10px;margin:4px 0 10px}.qme textarea{width:100%}.qme textarea.qal{min-height:42px;height:42px}';document.head.appendChild(c)}catch(x){}})();
 
-var APPV='16/11 20:14';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
+var APPV='16/11 20:17';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
 R=(function(b){return function(){b.apply(this,arguments);try{var m=document.getElementById('app')||document.body,v=document.getElementById('appv');if(!v){v=document.createElement('div');v.id='appv';document.body.appendChild(v)}v.textContent='versão '+APPV}catch(x){}}})(R);
 // banco por assunto: só questões do próprio assunto (sem completar com outros temas)
 qbTopic=function(tid){qbLoad().then(function(){var r=findT(tid),A=qbAll(),own=qShuf(A.filter(function(q){return (q.t||[]).indexOf(tid)>=0})).sort(function(a,b){return qRank(a)-qRank(b)}),ids=own.slice(0,10).map(function(q){return q.id});
@@ -3235,6 +3235,11 @@ qmSave=(function(b){return function(id){var q=qmFind(id),el=document.getElementB
   if(lg){if(n2=='er'){lg.ac--;lg.er=(+lg.er||0)+1}else{lg.er--;lg.ac=(+lg.ac||0)+1}lg.u=Date.now();fixed=1}}
  if(n2=='ok'){var er=qmErOf(id);if(er){S.tomb=(S.tomb||[]).concat(er.id);S.er=S.er.filter(function(x){return x.id!=er.id})}}
  S.at=Date.now();save();R();toast(fixed?'Resultado corrigido: estatística e Caderno de erros atualizados.':'Resultado corrigido. Não achei o lançamento original para ajustar a estatística.')}})(qmSave);
+// ---- 16/11: plano começa amanhã (hoje sem estudos no painel) e "Classificação" (Lei Orgânica) vai para outro dia
+var PL0='2026-11-17';
+curPlan=(function(b){return function(){var t=today();if(t<PL0&&S.pl&&S.pl.ini==t&&(S.pl.t0||[]).length){S.pl.t0=[];S.pl.ls0=[];S.pl.c=Date.now();PLC.k='';MEM=S;try{localStorage.setItem(K,JSON.stringify(slim()))}catch(x){}}var P=b();if(t<PL0){var c={};for(var k in P)c[k]=P[k];c.it=(P.it||[]).filter(function(x){return x.d>=PL0});return c}return P}})(curPlan);
+(function(){S.rad=S.rad||{};if(!S.rad['lopc-4']||(S.rad['lopc-4'].u||0)<1794880000000){S.rad['lopc-4']={d:'2026-11-18',u:1794880000000}}})();
+trailOf=(function(b){return function(sid,ph){var L=b(sid,ph);if(!L.length)return L;var i=0;while(i<L.length&&L[i].k=='parc')i++;if(L[i]&&radOn(L[i].t.id))return [];return L.filter(function(x){return !radOn(x.t.id)})}})(trailOf);
 
 mig4();R();tmInit();cloud();
 </script>
