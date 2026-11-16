@@ -2595,7 +2595,7 @@ Vqst=(function(b){return function(){var c;try{c=qmCard()}catch(x){c='<div class=
 merge=(function(b){return function(a,c){var r=b(a,c),M={};(a.qb||[]).concat(c.qb||[]).forEach(function(x){if(!x)return;var y=M[x.id];if(!y||(x.u||0)>(y.u||0))M[x.id]=x});r.qb=(r.qb||[]).map(function(x){return M[x.id]&&(M[x.id].u||0)>(x.u||0)?M[x.id]:x});return r}})(merge);
 (function(){try{var c=document.createElement('style');c.textContent='.qmr{align-items:flex-start}.qmb{display:flex;gap:6px;align-items:center;flex-shrink:0}.qme{border:1px dashed var(--bd);border-radius:8px;padding:10px;margin:4px 0 10px}.qme textarea{width:100%}.qme textarea.qal{min-height:42px;height:42px}';document.head.appendChild(c)}catch(x){}})();
 
-var APPV='14/11 09:30';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
+var APPV='16/11 17:40';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
 R=(function(b){return function(){b.apply(this,arguments);try{var m=document.getElementById('app')||document.body,v=document.getElementById('appv');if(!v){v=document.createElement('div');v.id='appv';document.body.appendChild(v)}v.textContent='versão '+APPV}catch(x){}}})(R);
 // banco por assunto: só questões do próprio assunto (sem completar com outros temas)
 qbTopic=function(tid){qbLoad().then(function(){var r=findT(tid),A=qbAll(),own=qShuf(A.filter(function(q){return (q.t||[]).indexOf(tid)>=0})).sort(function(a,b){return qRank(a)-qRank(b)}),ids=own.slice(0,10).map(function(q){return q.id});
@@ -2774,7 +2774,7 @@ qasCard=(function(b){return function(){var h=b();return h.replace('<b>Só assunt
 V.sim=(function(b){return function(){var h=b();if(h.indexOf('id="qest"')<0)return h;return h.replace(/(<input type="checkbox" id="qest"[^>]*>[^<]*<span class="mu">[^<]*<\/span><\/label>)/,'$1<label style="display:block;margin-top:6px"><input type="checkbox" id="qfgv" '+(QFGV?'checked':'')+' onchange="qfgvSet(this.checked)"> Só questões da FGV</label>')}})(V.sim);
 // ---- 7. Revisões: a partir de 7 dias, só questões (estudo opcional); revisão de 1 dia pede 10 questões
 function rvStg(tid){var r=rvDueT(tid);return r?r.stg||0:0}
-rvcPut=(function(b){return function(tid,c){if(c&&c.q&&!c.e&&rvStg(tid)>=2){c.e=1;c.eo=1}return b(tid,c)}})(rvcPut);
+
 V.rev=(function(b){return function(){var h=b();
  h=h.replace(/<h2>Revisão inteligente<\/h2><p class="mu">[\s\S]*?<\/p>/,'<h2>Revisão inteligente</h2><p class="mu">Revisão de 1 e 3 dias: Estudo + Questões (na de 1 dia, faça 10). Da revisão de 7 dias em diante, basta fazer as Questões: o estudo vira opcional. Acertou tudo, a próxima vem mais longe; errou, volta mais cedo.</p>');
  h=h.replace(/onclick="rvEst\('([^']+)'\)" title="Toque para marcar ou desmarcar">☐ Estudo<\/button>/g,function(a,t){return rvStg(t)>=2?a.replace('☐ Estudo','☐ Estudo (opcional)'):a});
@@ -2923,6 +2923,60 @@ function plFix(){var p=S.pl,t=today();if(!p||p.v!=4||p.ini!=t||!p.t0)return 0;va
 curPlan=(function(b){return function(){var P=b();try{if(plFix()){MEM=S;try{localStorage.setItem(K,JSON.stringify(slim()))}catch(x){}P=b()}}catch(e){}return P}})(curPlan);
 pickPl=(function(b){return function(x,y){var r=b(x,y);if(r&&r.t0&&r.ini==today()){var k=r.t0.filter(function(z){return !plStale(z,r.ini)});if(k.length!=r.t0.length){var c={};Object.keys(r).forEach(function(q){c[q]=r[q]});c.t0=k;return c}}return r}})(pickPl);
 cloud=(function(b){return function(){var r=b.apply(this,arguments);setTimeout(function(){try{if(plFix()){save();R()}}catch(x){}},11000);return r}})(cloud);
+// ===== Revisões: 1 e 3 dias só questões (lê só o que errou); 7+ dias lembrar antes de ler + questões; dificuldade crescente baseada na FGV
+var QLV={ES:3,GO:3,T5:3,T3:3,TO:3,DP:3,'26':2,MG:2,PI:2,SC:2,AM:2,RN:2,IN:1,PE:1,ML:1,AG:1,AP:1,RV:1,U:1};
+function qDiff(q){var l=QLV[q.x]||1,len=((q.e||'').length>600?1:(q.e||'').length>300?.5:0);return l+len}
+function rvPick(tid,stg){var A=qbAll().filter(function(q){return (q.t||[]).indexOf(tid)>=0}),F=A.filter(isFGV),P=F.length>=5?F:A;
+ var err=function(q){var r=qRank(q);return r==1?0:r==2?1:r==0?2:3};
+ P=qShuf(P);if(stg<=0)P.sort(function(a,b){return err(a)-err(b)||qDiff(a)-qDiff(b)});
+ else if(stg==1)P.sort(function(a,b){return err(a)-err(b)||(Math.min(QLV[b.x]||1,3)>=2?1:0)-(Math.min(QLV[a.x]||1,3)>=2?1:0)||qDiff(b)-qDiff(a)});
+ else P.sort(function(a,b){return qDiff(b)-qDiff(a)||err(a)-err(b)});
+ var ids=P.slice(0,10).map(function(q){return q.id});if(ids.length<10&&P.length>ids.length){}return ids}
+qbTopic=function(tid){qbLoad().then(function(){var r=findT(tid),stg=rvStg(tid),ids=rvPick(tid,stg);if(!ids.length){toast('Ainda não há questões deste assunto no banco. Use “Lançar questões novas”.');return}qbStart(ids,'Questões: '+(r?sqShort(r.t):'assunto'))})};
+// fechar a revisão: até 3 dias, só as questões bastam; de 7 dias em diante, lembrar + questões
+rvcPut=(function(b){return function(tid,c){if(c&&c.q&&!c.e&&rvStg(tid)<2){c.e=1;c.eo=1}return b(tid,c)}})(rvcPut);
+V.rev=(function(b){return function(){var h=b();
+ h=h.replace(/<h2>Revisão inteligente<\/h2><p class="mu">[\s\S]*?<\/p>/,'<h2>Revisão inteligente</h2><p class="mu">Revisões de 1 e 3 dias: só questões; errou, leia só o ponto errado (a lei ou a súmula da questão). De 7 dias em diante: 5 min lembrando o tema sem consultar, depois questões mais difíceis (FGV de MP e Magistratura), e leitura só do que faltou. Acertou tudo, a próxima vem mais longe; errou, volta mais cedo.</p>');
+ h=h.replace(/<button class="rvk[^"]*" onclick="rvEst\('([^']+)'\)" title="[^"]*">(☐|☑) Estudo[^<]*<\/button>/g,function(a,t,k){var s=rvStg(t);if(s<2)return '';return '<button class="rvk'+(k=='☑'?' on':'')+'" onclick="rvEst(\''+t+'\')" title="Lembrar o tema sem consultar (5 min) e ler só o que faltou">'+k+' Lembrar antes de ler</button>'});
+ h=h.replace(/onclick="rvQ\('([^']+)'\)">(☐) (10 )?Questões<\/button>/g,function(a,t,k){var s=rvStg(t);return 'onclick="rvQ(\''+t+'\')">'+k+' 10 questões'+(s==1?' (mais difíceis)':s>=2?' (difíceis)':'')+'</button>'});
+ return h}})(V.rev);
+// ===== 16/11: questões em branco e "não estudei" não contam; desistir salvando só as feitas; motivo do erro no resultado; limpeza dos dados
+// --- prova/treino: só as respondidas contam
+exAns=(function(b){return function(l){if(EX&&!EX.fim&&EX.ns){delete EX.ns[EX.q[EX.i]]}return b(l)}})(exAns);
+function exNs(){if(!EX||EX.fim)return;var id=EX.q[EX.i];EX.ns=EX.ns||{};if(EX.ns[id])delete EX.ns[id];else{EX.ns[id]=1;delete EX.a[id]}exSv();R()}
+exEntregar=(function(b){return function(dsc){if(!EX||EX.fim)return b();var ns=EX.ns||{},ans=EX.q.filter(function(id){return EX.a[id]&&!ns[id]}),sk=EX.q.length-ans.length;
+ if(!ans.length){if(!cf2('exnone',(dsc?'Encerrar':'Entregar')+' sem nenhuma questão respondida? Nada será salvo. Toque de novo para confirmar.'))return;EX=null;exSv();R();toast('Prova encerrada. Nada foi salvo.');return}
+ if(!cf2(dsc?'exdes':'exent2',(dsc?'Desistir agora? ':'')+'Serão corrigidas e salvas só as '+ans.length+' que você respondeu'+(sk?'; as '+sk+' em branco ou marcadas como “não estudei” não contam em nada (nem no Caderno de erros)':'')+'. Toque de novo para confirmar.'))return;
+ var q0=EX.q,e0=S.er.length,c0=cf2;EX.sk=q0.filter(function(id){return ans.indexOf(id)<0});EX.q=ans;EX.i=0;cf2=function(){return true};try{b()}finally{cf2=c0}
+ var M=qbMap(),k=e0;ans.forEach(function(id){var q=M[id];if(q&&EX.a[id]!=q.g&&S.er[k]){S.er[k].qid=id;k++}});if(k>e0)save()}})(exEntregar);
+function exDesistir(){exEntregar(1)}
+exView=(function(b){return function(){var h=b();if(!EX||EX.fim)return h;var id=EX.q[EX.i],ns=EX.ns&&EX.ns[id];
+ h=h.replace('<details class="exgd"','<p style="margin:8px 0 0"><button class="btn g sm" onclick="exDesistir()">Desistir e salvar só as que fiz</button></p><details class="exgd"');
+ var i=h.indexOf('<div class="exo">');if(i>=0)h=h.slice(0,i)+'<p style="margin:6px 0"><button class="rvk'+(ns?' on':'')+'" onclick="exNs()" title="A questão fica em branco e não conta em nada">'+(ns?'☑':'☐')+' Não estudei este assunto (não contar)</button></p>'+h.slice(i);
+ return h}})(exView);
+// --- resultado: só as respondidas; motivo do erro igual ao Registrar erros
+exRes=(function(b){return function(){var h=b(),sk=(EX&&EX.sk||[]).length;if(sk)h=h.replace('<h4 style="margin:14px 0 6px">Por matéria</h4>','<p class="mu" style="margin:10px 0 0">'+sk+(sk>1?' questões':' questão')+' em branco ou “não estudei” fora da correção: não contam nas estatísticas nem no Caderno de erros.</p><h4 style="margin:14px 0 6px">Por matéria</h4>');
+ h=h.replace(/Erros e brancos/,'Erros').replace('>Erradas e em branco<','>Erradas<');
+ h=h.replace(/(<details class="exr bad"><summary>[\s\S]*?<\/summary>)/g,function(a){return a});
+ var M=qbMap();h=h.replace(/<details class="exr bad"><summary><b>(\d+)\.<\/b>/g,function(a,n){var id=EX.q[+n-1],x=S.er.filter(function(y){return y.qid==id&&y.date==today()})[0];if(!x)x=S.er.filter(function(y){return y.qid==id})[0];if(!x)return a;var mo=x.mot;
+  return a.replace('<summary>','<summary><select class="ermo" style="float:right" onclick="event.stopPropagation()" onchange="erMot(\''+x.id+'\',this.value)" title="Motivo do erro">'+MOT.concat(MOT.indexOf(mo)<0?[mo]:[]).map(function(m){return '<option'+(m==mo?' selected':'')+'>'+m+'</option>'}).join('')+'</select>')});
+ return h}})(exRes);
+// --- limpeza: brancos não são erros; registros 0/0 sem estudo; treinos antigos fora dos simulados
+function dataFix16(){var ch=0,tm={},T=function(id){S.tomb=(S.tomb||[]).concat(id);tm[id]=1;ch=1};
+ S.logs.filter(function(l){return !(+l.ac)&&!(+l.er)&&!(+l.br)&&(+l.min||0)<=1&&!(+l.pg)}).forEach(function(l){T(l.id)});
+ var BL={};S.er.filter(function(x){return /deixei em branco|marquei em branco/.test(x.nt||'')}).forEach(function(x){(BL[x.date]=BL[x.date]||[]).push(x);T(x.id)});
+ S.logs=S.logs.filter(function(l){return !tm[l.id]});S.er=S.er.filter(function(x){return !tm[x.id]});
+ S.sim.forEach(function(m){if(m.bank&&!m.tr&&isTrNm(m.nome)){m.tr=1;ch=1}
+  if(m.rows&&m.rows.some(function(r){return (r.ac||0)+(r.er||0)+(r.br||0)==0})){m.rows=m.rows.filter(function(r){return (r.ac||0)+(r.er||0)+(r.br||0)>0});ch=1;if(!m.rows.length){T(m.id);return}}
+  if(!m.rows||!m.rows.some(function(r){return (r.br||0)>0}))return;var bl=(BL[m.date]||[]).slice();
+  m.rows.forEach(function(r){var n=r.br||0;if(!n)return;var Q=m.q||[];for(var k=0;k<n;k++){var j=-1;for(var z=0;z<Q.length;z++){if(Q[z].sid==r.sid&&Q[z].r=='er'&&bl.some(function(b){return b.sid==Q[z].sid&&(b.tid||'')==(Q[z].tid||'')})){j=z;break}}
+    if(j<0)for(var z2=Q.length-1;z2>=0;z2--){if(Q[z2].sid==r.sid&&Q[z2].r=='er'&&!Q[z2].c){j=z2;break}}
+    if(j>=0){var x=Q.splice(j,1)[0],bi=bl.findIndex?bl.findIndex(function(b){return b.sid==x.sid&&(b.tid||'')==(x.tid||'')}):-1;if(bi>=0)bl.splice(bi,1);var h=(S.qh||{})[x.qid];if(h&&h.r=='er'&&h.d==m.date)delete S.qh[x.qid]}}
+   r.br=0;ch=1});
+  m.rows=m.rows.filter(function(r){return (r.ac||0)+(r.er||0)>0});m.nome=String(m.nome||'').replace(/\((\d+) questões\)/,'('+(m.q||[]).length+' questões)');if(!m.rows.length)T(m.id)});
+ S.sim=S.sim.filter(function(m){return !tm[m.id]});if(ch){S.tomb=Object.keys(S.tomb.reduce(function(o,k){o[k]=1;return o},{}));PLC.k=''}return ch}
+try{dataFix16()}catch(x){}
+cloud=(function(b){return function(){var r=b.apply(this,arguments);setTimeout(function(){try{if(dataFix16()){save();R()}}catch(x){}},10500);return r}})(cloud);
 
 mig4();R();tmInit();cloud();
 </script>
