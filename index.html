@@ -2595,7 +2595,7 @@ Vqst=(function(b){return function(){var c;try{c=qmCard()}catch(x){c='<div class=
 merge=(function(b){return function(a,c){var r=b(a,c),M={};(a.qb||[]).concat(c.qb||[]).forEach(function(x){if(!x)return;var y=M[x.id];if(!y||(x.u||0)>(y.u||0))M[x.id]=x});r.qb=(r.qb||[]).map(function(x){return M[x.id]&&(M[x.id].u||0)>(x.u||0)?M[x.id]:x});return r}})(merge);
 (function(){try{var c=document.createElement('style');c.textContent='.qmr{align-items:flex-start}.qmb{display:flex;gap:6px;align-items:center;flex-shrink:0}.qme{border:1px dashed var(--bd);border-radius:8px;padding:10px;margin:4px 0 10px}.qme textarea{width:100%}.qme textarea.qal{min-height:42px;height:42px}';document.head.appendChild(c)}catch(x){}})();
 
-var APPV='16/11 20:22';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
+var APPV='16/11 20:45';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
 R=(function(b){return function(){b.apply(this,arguments);try{var m=document.getElementById('app')||document.body,v=document.getElementById('appv');if(!v){v=document.createElement('div');v.id='appv';document.body.appendChild(v)}v.textContent='versão '+APPV}catch(x){}}})(R);
 // banco por assunto: só questões do próprio assunto (sem completar com outros temas)
 qbTopic=function(tid){qbLoad().then(function(){var r=findT(tid),A=qbAll(),own=qShuf(A.filter(function(q){return (q.t||[]).indexOf(tid)>=0})).sort(function(a,b){return qRank(a)-qRank(b)}),ids=own.slice(0,10).map(function(q){return q.id});
@@ -3075,7 +3075,7 @@ revs=(function(b){var C={v0:null,d:'',k:'',v:null};return function(){var v0=b(),
  while(rest.length&&guard++<400){var cap=isStudyDay(d)?(d==t?Math.max(0,RVCAP-dn):RVCAP):0,pool=rest.filter(function(x){return x.due<=d});
   if(!pool.length){d=rest[0].due>d?rest[0].due:addD(d,1);continue}
   pool.sort(function(a,c){return rvPri(c)-rvPri(a)||(a.due<c.due?-1:a.due>c.due?1:0)});var take=pool.slice(0,cap);
-  take.forEach(function(x){var y=x;if(x.due!=d){y={};for(var k in x)y[k]=x[k];y.due=d;y.mv=1}out.push(y);rest.splice(rest.indexOf(x),1)});d=addD(d,1)}
+  take.forEach(function(x){var y=x;if(x.due!=d){y={};for(var k in x)y[k]=x[k];y.od=x.due;y.due=d;y.mv=1}out.push(y);rest.splice(rest.indexOf(x),1)});d=addD(d,1)}
  var V=out.concat(O).sort(function(a,c){return a.due<c.due?-1:a.due>c.due?1:0});C={v0:v0,k:key,v:V};return V}})(revs);
 // questões por revisão: 5; 10 quando a revisão anterior do assunto foi com erro
 function rvN(tid){var tr=(S.tr||{})[tid];return tr&&tr.res=='er'&&(!RSET[tid]||(tr.u||0)>RSAT)?10:5}
@@ -3086,7 +3086,7 @@ V.rev=(function(b){return function(){var h=b(),own=lsOwn();
  h=h.replace(/(<button class="rvk[^"]*" onclick="rvQ\('([^']+)'\)">)/g,function(a,full,t){var ex=[],ne=(S.er||[]).filter(function(z){return z.tid==t}).length,L=lsOfT(t).filter(function(i){return S.ls[i]&&LS[i]}).slice(0,3);
   if(L.length)ex.push('📜 Lei seca do tema: '+L.map(function(i){return e(LS[i][2])}).join('; '));if(ne)ex.push('📕 '+ne+' erro'+(ne>1?'s':'')+' deste assunto no caderno: as questões erradas vêm primeiro');
   return (ex.length?'<div class="mu" style="font-size:12px;margin:4px 0;width:100%">'+ex.join('<br>')+'</div>':'')+full});
- h=h.replace(/<h2>Revisão inteligente<\/h2><p class="mu">/,'<h2>Revisão inteligente</h2><p class="mu">No máximo '+RVCAP+' revisões de assunto por dia, 5 questões cada (10 quando a anterior teve erro); o excesso vai sozinho para os próximos dias, pela prioridade. Só revisa assunto estudado. ');
+ h=h.replace(/<h2>Revisão inteligente<\/h2><p class="mu">/,'<h2>Revisão inteligente</h2><p class="mu">No máximo '+(typeof rvCapNow=='function'?rvCapNow():RVCAP)+' revisões de assunto por dia, 5 questões cada (10 quando a anterior teve erro); o excesso vai sozinho para os próximos dias, pela prioridade. Só revisa assunto estudado. ');
  return h}})(V.rev);
 
 // ---- 4. Plano: segue o edital da PCMG, teoria de base primeiro, parte especial intercalada; horas por semana
@@ -3251,6 +3251,135 @@ trailOf=(function(b){return function(sid,ph){var L=b(sid,ph),lim=addD(today(),-1
 erCharts=(function(b){return function(L){return b((L||[]).map(function(x){var y={};for(var k in x)y[k]=x[k];y.mot=MOTN[motIx(x.mot)];return y}))}})(erCharts);
 (function(){try{var c=document.createElement('style');c.textContent='.pie1{min-width:0;max-width:100%}.pleg{min-width:0;max-width:100%;overflow-wrap:anywhere}';document.head.appendChild(c)}catch(x){}})();
 (function(){try{var c=document.createElement('style');c.textContent='.dg2b>div,.dg2>div,.dg2>section{min-width:0}.qtw{max-width:100%;overflow-x:auto}.qtw svg{max-width:100%;height:auto}.pie1>*{min-width:0}';document.head.appendChild(c)}catch(x){}})();
+
+// ===== mod39 (16/11): revisão por partes temáticas do edital (até ~6 assuntos ligados), intervalos por incidência e domínio
+// cada parte: [matéria, título (numeração do edital), índices dos assuntos]
+var BLKD=[
+ ['dcon','3.1–3.2 Teoria da Constituição e normas constitucionais',[0,1]],
+ ['dcon','3.3–3.6 Interpretação, dinâmica constitucional e poder constituinte',[4,5,6,8,9]],
+ ['dcon','3.7 Princípios fundamentais (arts. 1º a 4º)',[11,12]],
+ ['dcon','3.7.3.1 Direitos individuais e coletivos (art. 5º) e remédios constitucionais',[15,16,17]],
+ ['dcon','3.7.3.2–3.7.3.4 Direitos sociais, nacionalidade e direitos políticos',[18,19,20]],
+ ['dcon','3.8 Organização do Estado: federação, intervenção e Administração Pública',[22,23,24]],
+ ['dcon','3.9.1–3.9.2 Poder Legislativo, processo legislativo e Poder Executivo',[28,29]],
+ ['dcon','3.9.3 e 3.12.1 Poder Judiciário, CNJ e controle de constitucionalidade (difuso e concentrado)',[31,42,43]],
+ ['dcon','3.12.1.3 Ações do controle concentrado (Leis 9.868/99 e 9.882/99)',[45,46,47,48]],
+ ['dcon','3.10 Funções essenciais à Justiça (MP, Advocacia Pública, Advocacia e Defensoria)',[33,34,35]],
+ ['dcon','3.11 Defesa do Estado, Forças Armadas e segurança pública',[37,38,39]],
+ ['dcon','3.13 Constituição de Minas Gerais',[50,52,54]],
+ ['adm','1.1 Conceito, objeto e princípios constitucionais do Direito Administrativo',[1,2,3]],
+ ['adm','1.2 Administração Pública, regimes e princípios',[5,6,7,8]],
+ ['adm','1.2.5 Organização administrativa',[10,11,12,13,14,15]],
+ ['adm','1.4.1–1.4.5 Poderes administrativos',[25,26,27,28,29]],
+ ['adm','1.4.6 Poder de polícia',[30]],
+ ['adm','1.5.1–1.5.4 Atos administrativos: conceito, classificação, atributos e elementos',[32,33,34,35]],
+ ['adm','1.5.5–1.5.6 Atos administrativos: discricionariedade e espécies',[36,37]],
+ ['adm','1.5.7–1.5.9 Atos administrativos: extinção, convalidação e conversão',[38,39,40]],
+ ['adm','1.3.1–1.3.5 Agentes públicos, cargos e provimento',[17,18,19,20,21]],
+ ['adm','1.3.6–1.3.7 e 1.8 Deveres, processo disciplinar e CF arts. 37 a 43',[22,23,56]],
+ ['adm','1.6 Controle da Administração Pública',[42,43,44,45,46]],
+ ['adm','1.7.1–1.7.4 Responsabilidade do Estado: evolução, objetiva e subjetiva',[48,49,50,51]],
+ ['adm','1.7.5–1.7.8 Responsabilidade do Estado: excludentes, atos legislativos e jurisdicionais, reparação',[52,53,54,55]],
+ ['adm','1.13 Improbidade administrativa (Lei 8.429/92)',[62]],
+ ['adm','1.14–1.15 Processo administrativo (Lei 9.784/99) e mandado de segurança (Lei 12.016/09)',[63,64]],
+ ['adm','1.16–1.17 Licitações e contratos (Lei 14.133/21) e estatais (Lei 13.303/16)',[66,65]],
+ ['adm','1.18 LINDB, arts. 20 a 30',[67]],
+ ['adm','1.9–1.12 Legislação de Minas Gerais (CE/MG, LC 129/13, Lei 5.406/69, Decreto 46.549/14)',[57,58,59,60,61]],
+ ['dpen','5.1 Fundamentos, princípios e escolas penais',[1,2,3,4,5]],
+ ['dpen','5.2 Norma penal: lei no tempo, no espaço, quanto às pessoas e conflito aparente',[7,8,9,10]],
+ ['dpen','5.3 Teoria do crime: conceito, bem jurídico, conduta e classificação',[12,13,14,16,17]],
+ ['dpen','5.4 Tipo penal: tipicidade, dolo e culpa, causalidade e imputação objetiva',[19,20,21,27,28]],
+ ['dpen','5.4.4 Fases do crime: consumação, tentativa, desistência, arrependimento e crime impossível',[23,24,25,26]],
+ ['dpen','5.5–5.6 Ilicitude, culpabilidade, imputabilidade e erro',[29,31,32]],
+ ['dpen','5.7 Concurso de pessoas',[33]],
+ ['dpen','5.8.1–5.8.2 Penas: espécies, dosimetria e regimes',[35,36]],
+ ['dpen','5.8.3–5.8.6 Sursis, livramento condicional, efeitos da condenação e reabilitação',[37,38,39,40]],
+ ['dpen','5.9–5.10 Medidas de segurança e concurso de crimes',[41,43,44]],
+ ['dpen','5.11–5.12 Ação penal e extinção da punibilidade (com a Lei 15.438/26)',[45,46,97]],
+ ['dpen','5.13.1 Crimes contra a pessoa (com o vicaricídio, Lei 15.384/26)',[48,93]],
+ ['dpen','5.13.2 Crimes contra o patrimônio (com a Lei 15.397/26)',[49,94]],
+ ['dpen','5.13.6 Crimes contra a dignidade sexual (com a Lei 15.353/26)',[53,91]],
+ ['dpen','5.13.10 Crimes contra a fé pública',[57]],
+ ['dpen','5.13.11 Crimes contra a Administração Pública (com a Lei 15.402/26)',[58,95]],
+ ['dpen','5.13.8–5.13.9 Incolumidade e paz pública (com as Leis 15.358/26 e 15.425/26)',[55,56,92,96]],
+ ['dpen','5.13.3–5.13.7 Demais crimes do Código Penal (propriedade imaterial, trabalho, sentimento religioso, família)',[50,51,52,54]],
+ ['dpen','5.14.1–5.14.2 Legislação penal extravagante: princípios e aplicação da lei penal',[60,62,63,64]],
+ ['dpen','5.14.3 Legislação penal extravagante: crime (classificação a dolo e culpa)',[66,67,68,69,70,71]],
+ ['dpen','5.14.3 Legislação penal extravagante: erro, ilicitude, excesso e culpabilidade',[72,73,74,75]],
+ ['dpen','5.14.3–5.14.4 Legislação penal extravagante: concursos, pena e extinção da punibilidade',[76,77,79]],
+ ['dpen','5.14.5 Legislação penal extravagante: crimes contra a pessoa, patrimônio, propriedade imaterial e dignidade sexual',[81,82,83,84]],
+ ['dpen','5.14.5 Legislação penal extravagante: incolumidade, paz pública, fé pública e Administração Pública',[85,86,87,88]],
+ ['pple','6.1–6.4 Sistemas processuais, princípios, interpretação e aplicação da lei processual',[1,2,3,4,5,6]],
+ ['pple','6.5.1–6.5.6 Inquérito policial: histórico, natureza, conceito, finalidade, características e fundamento',[8,9,10,11,12,13]],
+ ['pple','6.5.7–6.5.11 Inquérito policial: titularidade, cognição, instauração e notitia criminis',[14,15,17,18]],
+ ['pple','6.5.9 e 6.5.13–6.5.15 Inquérito policial: valor probatório, procedimentos, indiciamento e garantias',[16,19,20,21]],
+ ['pple','6.6 e 6.22.10–6.22.12 Prisões: flagrante, preventiva e audiência de custódia',[23,24,108,109,110,143]],
+ ['pple','6.7 e 6.22.13 Liberdade provisória e fiança',[27,28,29,30,111]],
+ ['pple','6.8.1–6.8.5 Medidas cautelares diversas da prisão (I)',[32,33,34,35,36]],
+ ['pple','6.8.6–6.8.10 e 6.22.14 Medidas cautelares diversas da prisão (II), fiança e monitoração',[37,38,39,40,41,112]],
+ ['pple','6.9 e 6.13.2.4 Ação penal e acordo de não persecução penal (ANPP)',[43,44,45,63]],
+ ['pple','6.10 Sujeitos processuais',[47,48,49]],
+ ['pple','6.11 Jurisdição e competência',[51,52,53,54,55]],
+ ['pple','6.15 e 6.22.3–6.22.4 Prova: licitude, ilegitimidade, sigilos, ônus e nulidade da prova',[66,67,68,101,102]],
+ ['pple','6.22.1–6.22.2, 6.22.5 e 6.22.8 Prova: local de crime, cadeia de custódia, documentos e indícios',[99,100,103,106]],
+ ['pple','6.22.6–6.22.9 Reconhecimento de pessoas, acareação e busca e apreensão',[104,105,107]],
+ ['pple','6.12, 6.14, 6.16 e 6.19 Procedimentos, sentença, nulidades e comunicação dos atos',[56,64,69,80]],
+ ['pple','6.17 Recursos',[71,72]],
+ ['pple','6.18 Questões incidentes e medidas assecuratórias',[74,75,76,77,78]],
+ ['dhum','7.1–7.3 Teoria geral, histórico e hermenêutica dos direitos humanos',[0,1,2]],
+ ['dhum','7.6 Sistema global e sistema interamericano de proteção',[12]],
+ ['dhum','7.7 CF/88, democratização e tratados de direitos humanos (hierarquia)',[14,15]],
+ ['dhum','7.11 Segurança pública, uso da força e direitos humanos',[20]],
+ ['dhum','7.5 Grupos vulneráveis I: mulheres, pessoas com deficiência e refugiados',[5,9,11]],
+ ['dhum','7.5 Grupos vulneráveis II: idosos, crianças e adolescentes, povos indígenas e LGBTQIA+',[6,7,8,10]],
+ ['dhum','7.4 e 7.8–7.10 Democracia, PNDH-3, educação em direitos humanos e Agenda 2030',[3,16,17,18]]];
+var BLK={},BLKOF={},BLKW=4;RVCAP=100000;
+(function(){BLKD.forEach(function(b,i){var id='B'+i,t=b[2].map(function(n){return b[0]+'-'+n}).filter(function(x){return !LEGR[x]});BLK[id]={id:id,sid:b[0],ti:b[1],t:t};t.forEach(function(x){BLKOF[x]=id})});
+ LEGT.forEach(function(x,i){var id='BL'+i;BLK[id]={id:id,sid:'leg',ti:x[0].replace(/^8\.\d+ /,'')+(x[2]&&/Recorte FGV: ([^.]*)/.test(x[2])?' · '+x[2].match(/Recorte FGV: ([^.]*)/)[1]:''),t:['leg-'+i]};BLKOF['leg-'+i]=id});
+ // matérias menores: partes pelos subtítulos do edital
+ ['lopc','dciv','mleg','crim'].forEach(function(sid){var L=ED[sid]||[],G={},o=[];var leafI=function(i){return !(L[i+1]&&L[i+1][1]>L[i][1])},par=function(i){for(var j=i-1;j>=0;j--)if(L[j][1]<L[i][1])return j;return -1};
+  L.forEach(function(t,i){if(!leafI(i))return;var p=par(i),k=p<0?'r'+i:'p'+p;if(!G[k]){G[k]={p:p,t:[]};o.push(k)}G[k].t.push(i)});
+  o.forEach(function(k,j){var g=G[k],id='B'+sid+j,ti=g.p>=0?L[g.p][0]:L[g.t[0]][0];BLK[id]={id:id,sid:sid,ti:ti,t:g.t.map(function(n){return sid+'-'+n})};g.t.forEach(function(n){BLKOF[sid+'-'+n]=id})})})})();
+// intervalos por incidência e domínio
+ladv=function(tid,stg){var x=findT(tid),i=x?(x.t.inc||0):0,L=i>=3?[1,3,7,15,30,60]:i==2?[1,7,21,60]:[1,15,60],d=DOM()[tid],pr=d&&d.pr!=null?d.pr:null,f=pr==null?1:pr<.6?.6:pr>=.85?1.5:1;return Math.max(1,Math.round(L[Math.min(stg,L.length-1)]*f))};
+// agrupa as revisões de assunto por parte: uma revisão por parte, no dia do assunto que vence primeiro
+revs=(function(b){var C={v0:null,v:null};return function(){var v0=b();if(C.v0===v0&&C.v)return C.v;var G={},out=[];
+ v0.forEach(function(x){var B=x.kind=='T'&&BLKOF[x.tid];if(!B){out.push(x);return}(G[B]=G[B]||[]).push(x)});
+ Object.keys(G).forEach(function(B){var L=G[B].sort(function(a,c){return a.due<c.due?-1:a.due>c.due?1:(a.stg||0)-(c.stg||0)}),y={};
+  // assunto novo de uma parte já em revisão entra na próxima revisão dela se ela vier em até BLKW dias
+  if(L.length>1&&!(L[0].stg>0)){var old=L.filter(function(z){return z.stg>0})[0];if(old&&old.due<=addD(L[0].due,BLKW)){L.splice(L.indexOf(old),1);L.unshift(old)}}
+  for(var k in L[0])y[k]=L[0][k];var bk=BLK[B],s=sub(bk.sid);y.blk=B;y.bm=L.map(function(z){return z.tid});y.t=bk.ti;y.s=s?s.name:y.s;out.push(y)});
+ out.sort(function(a,c){return a.due<c.due?-1:a.due>c.due?1:0});C={v0:v0,v:out};return out}})(revs);
+// o teto de 6 por dia passa a valer por parte: reaplica a distribuição sobre as partes
+revs=(function(b){var C={v0:null,k:'',v:null};return function(){var v0=b(),t=today(),dn=(S.rvd||[]).filter(function(r){return r.d==t&&/^T/.test(r.k||'')}).length,key=t+'|'+dn;if(C.v0===v0&&C.k===key&&C.v)return C.v;
+ var T=v0.filter(function(x){return x.kind=='T'}),O=v0.filter(function(x){return x.kind!='T'}),out=[],rest=T.slice().sort(function(a,c){return a.due<c.due?-1:1}),d=t,g=0;
+ while(rest.length&&g++<500){var cap=isStudyDay(d)?(d==t?Math.max(0,rvCapNow()-dn):Math.min(10,rvCapNow())):0,pool=rest.filter(function(x){return x.due<=d});if(!pool.length){d=rest[0].due>d?rest[0].due:addD(d,1);continue}
+  pool.sort(function(a,c){return rvPri(c)-rvPri(a)||(a.due<c.due?-1:1)});pool.slice(0,cap).forEach(function(x){var y=x;if(x.due!=d){y={};for(var k in x)y[k]=x[k];y.od=x.due;y.due=d;y.mv=1}out.push(y);rest.splice(rest.indexOf(x),1)});d=addD(d,1)}
+ var V=out.concat(O).sort(function(a,c){return a.due<c.due?-1:a.due>c.due?1:0});C={v0:v0,k:key,v:V};return V}})(revs);
+// prioridade da parte: maior incidência entre os assuntos e erro recente
+rvPri=function(x){var m=0;(x.bm||[x.tid]).forEach(function(t){var r=findT(t);if(r&&(r.t.inc||0)>m)m=r.t.inc||0});var er=(x.bm||[x.tid]).some(function(t){var q=(S.tr||{})[t];return q&&q.res=='er'});return m*10+(er?5:0)};
+// concluir a revisão da parte avança todos os assuntos estudados dela
+var TRP=0;
+trApply=(function(b){return function(tid,res){var e=null;if(!TRP){var L=revs();for(var i=0;i<L.length;i++){if(L[i].blk&&L[i].tid==tid&&L[i].due<=today()){e=L[i];break}}}var r=b.apply(this,arguments);
+ if(e&&e.bm&&e.bm.length>1){TRP=1;var ro=typeof RVOWN!='undefined'?RVOWN:0;try{RVOWN=1;e.bm.forEach(function(m){if(m!=tid)b(m,res)})}catch(x){}finally{RVOWN=ro;TRP=0}}return r}})(trApply);
+// questões da revisão: misturam os assuntos da parte, primeiro os que você errou, os não testados e os de menor acerto
+function tAcc(tid){var a=0,n=0;pRecs().forEach(function(x){if(x.tid==tid&&x.c!='ia'){a+=x.a;n+=x.a+x.r}});return{a:a,n:n,p:n?a/n:null}}
+rvPick=(function(b){return function(tid,stg){var L=revs().filter(function(x){return x.blk&&x.tid==tid})[0];if(!L||!L.bm||L.bm.length<2)return b(tid,stg);var N=rvN(tid),M=L.bm.map(function(m){var a=tAcc(m),er=((S.tr||{})[m]||{}).res=='er';return{m:m,q:b(m,stg),k:(er?0:1)*10+(a.n?Math.round((a.p||0)*9):-1)}}).sort(function(x,y){return x.k-y.k});
+ var out=[],seen={},i=0,go=true;while(out.length<N&&go){go=false;M.forEach(function(o){if(out.length>=N)return;while(o.q.length){var q=o.q.shift();if(!seen[q]){seen[q]=1;out.push(q);go=true;break}}})}return out}})(rvPick);
+// na tela de revisões: matéria, título da parte (numeração do edital) e cada assunto com o acerto
+V.rev=(function(b){return function(){var h=b(),L=revs().filter(function(x){return x.blk});
+ L.forEach(function(x){var bk=BLK[x.blk];if(!bk)return;var a='onclick="rvQ(\''+x.tid+'\')"',i=h.indexOf(a);if(i<0)return;var j=h.lastIndexOf('<button',i);if(j<0)return;
+  var li=(bk.t.filter(function(m){var r=findT(m);return r&&(r.t.d||(x.bm||[]).indexOf(m)>=0)})).map(function(m){var r=findT(m),c=tAcc(m),bd=c.n?band(c.a,c.n,1):null;return '<li>'+e(r.t.n)+(c.n?' · <b style="color:'+bd.c+'">'+Math.round(c.p*100)+'%</b> <small class="mu">('+c.n+')</small>':' · <small class="mu">sem questões ainda</small>')+'</li>'}).join('');
+  var box='<div class="rvb" style="width:100%;font-size:12.5px;margin:4px 0 6px"><span class="mu">Assuntos desta revisão (para buscar na aula ou no PDF):</span><ul style="margin:4px 0 0 18px;padding:0">'+li+'</ul></div>';h=h.slice(0,j)+box+h.slice(j)});return h}})(V.rev);
+// envelhecimento: a revisão que espera ganha prioridade a cada dia (nenhuma fica esquecida)
+rvPri=(function(b){return function(x){var od=x.od||x.due,late=od&&od<today()?Math.round((new Date(today()+'T12:00:00')-new Date(od+'T12:00:00'))/864e5):0;return b(x)+late*2}})(rvPri);
+// teto acompanha o ritmo: 4h = 6 partes; cada 30 min a mais no plano, +1 (máx. 10); botão para puxar mais 3 hoje
+function rvCapNow(){var h=typeof ritmoH=='function'?ritmoH():4,x=0;try{x=+(localStorage.getItem('rvx.'+today())||0)}catch(e){}return Math.min(10,6+Math.round((h-4)*2))+x}
+function rvMais(){try{var k='rvx.'+today();localStorage.setItem(k,String((+(localStorage.getItem(k)||0))+3))}catch(e){}PLC.k='';S.at=Date.now();R()}
+V.rev=(function(b){return function(){var h=b(),t=today(),W=revs().filter(function(x){return x.kind=='T'&&(x.od||x.due)<=t&&x.due>t}).length;if(!W)return h;
+ var box='<div class="card" style="border-color:#e8a317"><b>'+W+' revis'+(W>1?'ões esperando':'ão esperando')+'</b> <span class="mu">– venceram, mas passaram do limite de hoje ('+rvCapNow()+'). Elas entram nos próximos dias pela prioridade; as que esperam mais sobem na fila.</span><p style="margin:8px 0 0"><button class="btn g" onclick="rvMais()">Tenho tempo: fazer mais 3 hoje</button></p></div>';
+ var k=h.indexOf('<h2>Revisão inteligente</h2>');if(k<0)return box+h;var j=h.indexOf('</div>',k);return j<0?h+box:h.slice(0,j+6)+box+h.slice(j+6)}})(V.rev);
+V.rev=(function(b){return function(){return b().replace(' revisões de assunto por dia, 5 questões cada',' revisões por dia, cada uma é uma parte do edital com assuntos ligados, 5 questões cada')}})(V.rev);
 
 mig4();R();tmInit();cloud();
 </script>
