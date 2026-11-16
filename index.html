@@ -2595,7 +2595,7 @@ Vqst=(function(b){return function(){var c;try{c=qmCard()}catch(x){c='<div class=
 merge=(function(b){return function(a,c){var r=b(a,c),M={};(a.qb||[]).concat(c.qb||[]).forEach(function(x){if(!x)return;var y=M[x.id];if(!y||(x.u||0)>(y.u||0))M[x.id]=x});r.qb=(r.qb||[]).map(function(x){return M[x.id]&&(M[x.id].u||0)>(x.u||0)?M[x.id]:x});return r}})(merge);
 (function(){try{var c=document.createElement('style');c.textContent='.qmr{align-items:flex-start}.qmb{display:flex;gap:6px;align-items:center;flex-shrink:0}.qme{border:1px dashed var(--bd);border-radius:8px;padding:10px;margin:4px 0 10px}.qme textarea{width:100%}.qme textarea.qal{min-height:42px;height:42px}';document.head.appendChild(c)}catch(x){}})();
 
-var APPV='16/11 20:17';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
+var APPV='16/11 20:22';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
 R=(function(b){return function(){b.apply(this,arguments);try{var m=document.getElementById('app')||document.body,v=document.getElementById('appv');if(!v){v=document.createElement('div');v.id='appv';document.body.appendChild(v)}v.textContent='versão '+APPV}catch(x){}}})(R);
 // banco por assunto: só questões do próprio assunto (sem completar com outros temas)
 qbTopic=function(tid){qbLoad().then(function(){var r=findT(tid),A=qbAll(),own=qShuf(A.filter(function(q){return (q.t||[]).indexOf(tid)>=0})).sort(function(a,b){return qRank(a)-qRank(b)}),ids=own.slice(0,10).map(function(q){return q.id});
@@ -3119,7 +3119,7 @@ function catL(l){if(isIA(l))return 'ia';var s=String(l.bc||'')+' '+String(l.org|
 var PRC={k:'',v:null};
 function pRecs(){var k=(S.at||0)+'|'+today()+'|'+S.logs.length+'|'+S.sim.length+'|'+(S.qb||[]).length;if(PRC.k==k)return PRC.v;var R=[];
  S.logs.forEach(function(l){var a=+l.ac||0,r=+l.er||0;if(!a&&!r)return;R.push({d:l.date,sid:l.sid,tid:l.tid||'',c:catL(l),a:a,r:r})});
- S.sim.forEach(function(m){if(m.q&&m.q.length){m.q.forEach(function(x){if(x.r!='ok'&&x.r!='er')return;R.push({d:m.date,sid:x.sid,tid:x.tid||'',c:catQ(x.qid),a:x.r=='ok'?1:0,r:x.r=='er'?1:0})})}
+ S.sim.forEach(function(m){if(m.q&&m.q.length){m.q.forEach(function(x){if(!SQL[x.r])return;R.push({d:m.date,sid:x.sid,tid:x.tid||'',c:catQ(x.qid),a:x.r=='er'?0:1,r:x.r=='er'?1:0})})}
   else (m.rows||[]).forEach(function(x){if(!x.ac&&!x.er)return;R.push({d:m.date,sid:x.sid,tid:'',c:/fgv/i.test(m.nome||'')?'fgv':'out',a:x.ac||0,r:x.er||0})})});
  PRC={k:k,v:R};return R}
 function pAgg(f){var o={};pRecs().forEach(function(x){if(f&&!f(x))return;var s=o[x.sid]||(o[x.sid]={});[x.c,'tot'].forEach(function(c){var z=s[c]||(s[c]={a:0,r:0});z.a+=x.a;z.r+=x.r})});return o}
@@ -3131,7 +3131,7 @@ function placarCard(){var A=pAgg(),T={};QORD.forEach(function(k){var s=A[k]||{};
  var rows=QORD.map(function(k){var s=A[k]||{},sb=sub(k);return '<tr><td>'+e(sb?SN(sb):k)+'</td>'+PCAT.map(function(c){return '<td class="n">'+cell(s[c[0]],c[0])+'</td>'}).join('')+'</tr>'}).join('');
  var tf=T.fgv,bt=tf?band(tf.a,tf.a+tf.r,20):null;
  return '<div class="card tw"><h2>Placares por fonte</h2><p class="mu">Só o placar <b>FGV real</b> orienta as decisões. Meta da prova: <b>acima de 85%</b>. Faixas: alerta abaixo de 60%, atenção de 60% a 74%, bom de 75% a 84%, domínio a partir de 85%. A matéria só ganha faixa com 10 ou mais questões FGV. Questões em branco não contam.</p>'+
-  '<table><tr><th>Matéria</th>'+PCAT.map(function(c){return '<th>'+c[1]+'</th>'}).join('')+'</tr>'+rows+'<tr style="font-weight:700"><td>Total</td>'+PCAT.map(function(c){return '<td class="n">'+cell(T[c[0]],c[0])+'</td>'}).join('')+'</tr></table>'+
+  '<div style="overflow-x:auto"><table><tr><th>Matéria</th>'+PCAT.map(function(c){return '<th>'+c[1]+'</th>'}).join('')+'</tr>'+rows+'<tr style="font-weight:700"><td>Total</td>'+PCAT.map(function(c){return '<td class="n">'+cell(T[c[0]],c[0])+'</td>'}).join('')+'</tr></table></div>'+
   (bt?'<p style="margin-top:8px">Geral FGV: <b style="color:'+bt.c+'">'+bt.l+'</b>'+(bt.k!='do'&&bt.k!='na'?' – abaixo da meta de 85%, risco de ficar de fora.':bt.k=='do'?' – dentro da meta.':'')+'</p>':'')+'</div>'}
 
 // ---- motivos A–F
@@ -3143,9 +3143,9 @@ function motIx(m){var i=MOTN.indexOf(m);if(i>=0)return i;if(MOTO[m]!=null)return
 function mapaCard(){var M={};(S.er||[]).forEach(function(x){if(!x.tid)return;var o=M[x.tid]||(M[x.tid]={n:0,m:[0,0,0,0,0,0]});o.n++;o.m[motIx(x.mot)]++});
  var L=Object.keys(M).sort(function(a,b){return M[b].n-M[a].n}).slice(0,12);if(!L.length)return '';
  var mx=1;L.forEach(function(t){M[t].m.forEach(function(v){if(v>mx)mx=v})});
- return '<div class="card tw"><h2>Mapa: assunto × motivo do erro</h2><p class="mu">Os 12 assuntos com mais erros no caderno e o motivo de cada erro. Mais escuro = mais erros.</p><table><tr><th>Assunto</th>'+MOTN.map(function(m){return '<th title="'+e(m)+'">'+m.charAt(0)+'</th>'}).join('')+'<th>Total</th></tr>'+
+ return '<div class="card tw"><h2>Mapa: assunto × motivo do erro</h2><p class="mu">Os 12 assuntos com mais erros no caderno e o motivo de cada erro. Mais escuro = mais erros.</p><div style="overflow-x:auto"><table><tr><th>Assunto</th>'+MOTN.map(function(m){return '<th title="'+e(m)+'">'+m.charAt(0)+'</th>'}).join('')+'<th>Total</th></tr>'+
   L.map(function(t){var r=findT(t),o=M[t];return '<tr><td>'+e(r?sqShort(r.t):t)+' <small class="mu">· '+e(r?SN(r.s):'')+'</small></td>'+o.m.map(function(v){return '<td class="n" style="background:rgba(224,49,49,'+(v?(.12+.6*v/mx).toFixed(2):0)+')">'+(v||'')+'</td>'}).join('')+'<td class="n"><b>'+o.n+'</b></td></tr>'}).join('')+
-  '</table><p class="mu" style="margin-top:6px">'+MOTN.join(' · ')+'</p></div>'}
+  '</table></div><p class="mu" style="margin-top:6px">'+MOTN.join(' · ')+'</p></div>'}
 V.erros=(function(b){return function(){var h=b(),m=mapaCard();if(!m)return h;var k=h.indexOf('<div class="card"><h2>Lista');return k<0?m+h:h.slice(0,k)+m+h.slice(k)}})(V.erros);
 
 // ---- erro recorrente: 3 erros no mesmo assunto desde o último estudo, ele volta sozinho para reestudo
@@ -3240,6 +3240,17 @@ var PL0='2026-11-17';
 curPlan=(function(b){return function(){var t=today();if(t<PL0&&S.pl&&S.pl.ini==t&&(S.pl.t0||[]).length){S.pl.t0=[];S.pl.ls0=[];S.pl.c=Date.now();PLC.k='';MEM=S;try{localStorage.setItem(K,JSON.stringify(slim()))}catch(x){}}var P=b();if(t<PL0){var c={};for(var k in P)c[k]=P[k];c.it=(P.it||[]).filter(function(x){return x.d>=PL0});return c}return P}})(curPlan);
 (function(){S.rad=S.rad||{};if(!S.rad['lopc-4']||(S.rad['lopc-4'].u||0)<1794880000000){S.rad['lopc-4']={d:'2026-11-18',u:1794880000000}}})();
 trailOf=(function(b){return function(sid,ph){var L=b(sid,ph);if(!L.length)return L;var i=0;while(i<L.length&&L[i].k=='parc')i++;if(L[i]&&radOn(L[i].t.id))return [];return L.filter(function(x){return !radOn(x.t.id)})}})(trailOf);
+
+// ---- auditoria 16/11
+// marcar no edital todos os itens de uma lei (Penal/Processo Penal) marca também a lei em Legislação
+setDone=(function(b){return function(tid,on,d){b(tid,on,d);var L=LEGR[tid];if(!L)return;var r=findT(L);if(!r)return;var all=(LEGL[L]||[]).every(function(o){var q=findT(o);return !q||q.t.d});if(on&&all&&!r.t.d)b(L,true,d);else if(!on&&r.t.d)b(L,false)}})(setDone);
+// assunto marcado para reaprender sai da fila depois de estudado de novo (volta só se continuar errando depois)
+trailOf=(function(b){return function(sid,ph){var L=b(sid,ph),lim=addD(today(),-14);return L.filter(function(x){if(x.k!='rea')return true;return !S.logs.some(function(l){return l.tid==x.t.id&&l.date>=lim&&stLog(l)})})}})(trailOf);
+(function(){try{var c=document.createElement('style');c.textContent='.qg>div{min-width:0}.qg .qtw{max-width:100%;overflow-x:auto}.qg .qtw svg{max-width:100%;height:auto}';document.head.appendChild(c)}catch(x){}})();
+// gráficos do caderno usam os motivos A–F (erros antigos convertidos)
+erCharts=(function(b){return function(L){return b((L||[]).map(function(x){var y={};for(var k in x)y[k]=x[k];y.mot=MOTN[motIx(x.mot)];return y}))}})(erCharts);
+(function(){try{var c=document.createElement('style');c.textContent='.pie1{min-width:0;max-width:100%}.pleg{min-width:0;max-width:100%;overflow-wrap:anywhere}';document.head.appendChild(c)}catch(x){}})();
+(function(){try{var c=document.createElement('style');c.textContent='.dg2b>div,.dg2>div,.dg2>section{min-width:0}.qtw{max-width:100%;overflow-x:auto}.qtw svg{max-width:100%;height:auto}.pie1>*{min-width:0}';document.head.appendChild(c)}catch(x){}})();
 
 mig4();R();tmInit();cloud();
 </script>
