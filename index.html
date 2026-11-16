@@ -2595,7 +2595,7 @@ Vqst=(function(b){return function(){var c;try{c=qmCard()}catch(x){c='<div class=
 merge=(function(b){return function(a,c){var r=b(a,c),M={};(a.qb||[]).concat(c.qb||[]).forEach(function(x){if(!x)return;var y=M[x.id];if(!y||(x.u||0)>(y.u||0))M[x.id]=x});r.qb=(r.qb||[]).map(function(x){return M[x.id]&&(M[x.id].u||0)>(x.u||0)?M[x.id]:x});return r}})(merge);
 (function(){try{var c=document.createElement('style');c.textContent='.qmr{align-items:flex-start}.qmb{display:flex;gap:6px;align-items:center;flex-shrink:0}.qme{border:1px dashed var(--bd);border-radius:8px;padding:10px;margin:4px 0 10px}.qme textarea{width:100%}.qme textarea.qal{min-height:42px;height:42px}';document.head.appendChild(c)}catch(x){}})();
 
-var APPV='16/11 18:20';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
+var APPV='16/11 19:27';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
 R=(function(b){return function(){b.apply(this,arguments);try{var m=document.getElementById('app')||document.body,v=document.getElementById('appv');if(!v){v=document.createElement('div');v.id='appv';document.body.appendChild(v)}v.textContent='versão '+APPV}catch(x){}}})(R);
 // banco por assunto: só questões do próprio assunto (sem completar com outros temas)
 qbTopic=function(tid){qbLoad().then(function(){var r=findT(tid),A=qbAll(),own=qShuf(A.filter(function(q){return (q.t||[]).indexOf(tid)>=0})).sort(function(a,b){return qRank(a)-qRank(b)}),ids=own.slice(0,10).map(function(q){return q.id});
@@ -2981,6 +2981,131 @@ cloud=(function(b){return function(){var r=b.apply(this,arguments);setTimeout(fu
 inflate=(function(b){return function(o){var n=b(o),s0=S;try{S=n;dataFix16()}catch(x){}finally{S=s0}return n}})(inflate);
 perfAll=(function(b){return function(d){var by=b(d);Object.keys(by).forEach(function(k){by[k].b=0;if(!by[k].a&&!by[k].r)delete by[k]});return by}})(perfAll);
 qStats=(function(b){return function(d){var s=b(d);s.t.b=0;Object.keys(s.by).forEach(function(k){s.by[k].b=0;if(!s.by[k].a&&!s.by[k].r)delete s.by[k]});return s}})(qStats);
+
+// ===== mod37 (16/11): reestudo dos assuntos de maior incidência, matéria Legislação Extravagante, revisões com teto e plano pelo edital (teoria de base primeiro)
+// ---- 1. Matéria nova: Legislação Penal e Processual Penal Extravagante (estudada uma vez; marca no edital de Penal e de Processo Penal)
+var LEGT=[
+ ['8.1 Lei nº 11.343/2006 – Lei de Drogas',4,'Altíssima (100% das provas FGV). Recorte FGV: arts. 28 a 30 (usuário), 33 a 47 (crimes, tráfico privilegiado, majorantes) e 48 a 63 (procedimento, destinação de bens). Restante: leitura da lei seca.',['pple-94','pple-122']],
+ ['8.2 Lei nº 12.850/2013 – Organizações Criminosas',4,'Altíssima (100%). Recorte FGV: arts. 1º a 17 (conceito, crimes, colaboração premiada, infiltração, ação controlada) e 21 a 23. Com as alterações da Lei 15.358/2026.',['pple-96','pple-123']],
+ ['8.3 Lei nº 15.358/2026 – domínio social estruturado (Marco Legal do Combate ao Crime Organizado)',4,'Lei nova de 2026, altíssima. Recorte: arts. 2º a 10 (domínio social estruturado, favorecimento, hediondez, normas processuais) e 32 a 39 (alterações no CP, Lei 8.072, LEP, Drogas e Desarmamento).',['pple-97','pple-126','pple-127','pple-128','pple-129','pple-130','pple-131','pple-132','pple-133','pple-134','pple-135','pple-136','pple-137','pple-138','pple-139','pple-140','pple-141']],
+ ['8.4 Lei nº 11.340/2006 – Lei Maria da Penha',4,'Altíssima (100%). Recorte FGV: arts. 5º a 7º, 10 a 12-C, 16, 18 a 24-A e 41 (atuação policial e medidas protetivas). Lei nova: Lei 15.438/2026 (decadência de 12 meses na violência doméstica contra a mulher).',['pple-93','pple-121']],
+ ['8.5 Lei nº 7.960/1989 – Prisão Temporária',4,'Altíssima (95%). Recorte FGV: arts. 1º a 5º (requisitos cumulativos, legitimidade e prazos; prazo de 30 dias nos hediondos).',['pple-25']],
+ ['8.6 Lei nº 8.072/1990 – Crimes Hediondos',3,'Alta (95% junto com a LEP). Recorte FGV: arts. 1º a 9º (rol, efeitos, temporária, progressão). Leis novas: vicaricídio (Lei 15.384/2026) e domínio social estruturado (Lei 15.358/2026) entram no rol.',['pple-116']],
+ ['8.7 Lei nº 7.210/1984 – Execução Penal (LEP)',3,'Alta (95% junto com hediondos). Recorte FGV: arts. 1º a 9º-A, 41, 50 a 60, 112 a 127 e 146-B a 146-D (direitos, faltas, progressão, remição, monitoração). Lei nova: Lei 15.402/2026 (novas frações de progressão, art. 112).',['pple-81','pple-115','pple-144']],
+ ['8.8 Lei nº 9.296/1996 – Interceptação Telefônica e investigação',3,'Alta (85%). Recorte FGV: arts. 1º a 10-A (interceptação e captação ambiental).',['pple-88','pple-118']],
+ ['8.9 Lei nº 9.613/1998 – Lavagem de Dinheiro',3,'Alta (85%). Recorte FGV: arts. 1º a 4º e 9º a 17-D (crime, medidas patrimoniais e deveres).',['pple-92']],
+ ['8.10 Lei nº 13.869/2019 – Abuso de Autoridade',3,'Alta (90%). Recorte FGV: arts. 1º a 8º (dolo específico, efeitos) e 9º a 38 (crimes ligados à atividade investigativa).',['pple-83','pple-124']],
+ ['8.11 ECA (Lei 8.069/1990) e Lei Henry Borel (Lei 14.344/2022)',3,'Alta (80%). Recorte FGV: ECA arts. 103 a 125 (ato infracional e medidas), 171 a 190 (procedimento) e 225 a 244-C (crimes); Lei Henry Borel (medidas protetivas).',[]],
+ ['8.12 Lei nº 10.826/2003 – Estatuto do Desarmamento',3,'Alta (67%). Recorte FGV: arts. 12 a 21-A e 25 (distinções entre os tipos e efeitos). Com as alterações da Lei 15.358/2026.',['pple-120']],
+ ['8.13 Lei nº 9.099/1995 – Juizados Especiais Criminais',3,'Alta (75% junto com trânsito). Recorte FGV: arts. 60 a 92 (TCO, composição civil, transação penal e suspensão condicional do processo).',['pple-87','pple-58','pple-59','pple-60','pple-61','pple-62']],
+ ['8.14 Lei nº 9.503/1997 – Crimes de Trânsito (CTB)',2,'Média-alta (75% junto com JECrim). Recorte: arts. 291 a 312-B (crimes de trânsito e regras processuais).',['pple-90','pple-119']],
+ ['8.15 Lei nº 7.716/1989 – Crimes Raciais e injúria racial',2,'Média (80% no índice estratégico). Recorte FGV: arts. 1º a 20-D.',[]],
+ ['8.16 Crimes tributários e contra o Sistema Financeiro (Lei 8.137/1990 e Lei 7.492/1986)',2,'Média (75%). Súmula Vinculante 24 e extinção da punibilidade pelo pagamento.',['pple-84','pple-117']],
+ ['8.17 Lei nº 9.455/1997 – Tortura',2,'Média (70%). Recorte FGV: arts. 1º a 4º (modalidades, omissão, efeitos e extraterritorialidade).',['pple-89']],
+ ['8.18 Lei nº 9.605/1998 – Crimes Ambientais',2,'Média (70%). Recorte FGV: arts. 2º a 28 (responsabilidade, inclusive da pessoa jurídica) e 29 a 69-A (crimes).',['pple-91']],
+ ['8.19 Lei nº 13.431/2017 – Escuta especializada e depoimento especial',2,'Média. Recorte FGV: arts. 4º a 12 e 14 a 22.',['pple-142']],
+ ['8.20 Lei nº 13.260/2016 – Terrorismo (e crimes de migração)',2,'Média (55%).',['dpen-89']],
+ ['8.21 Lei nº 13.964/2019 – Pacote Anticrime (pontos fora do CPP)',1,'Previsto no edital. As mudanças no CPP (juiz das garantias, ANPP, cadeia de custódia) são estudadas em Processo Penal.',['pple-125']],
+ ['8.22 Lei nº 12.830/2013 – Investigação criminal conduzida pelo delegado',1,'Previsto no edital. Lei curta: leitura da lei seca.',['pple-95']],
+ ['8.23 Idosos, Pessoa com Deficiência, Igualdade Racial e HIV (Leis 10.741/2003, 13.146/2015, 12.288/2010 e 12.984/2014)',1,'Previsto no edital (crimes dessas leis). Leitura da lei seca.',[]],
+ ['8.24 Crimes de responsabilidade, Código Eleitoral e genocídio (DL 201/1967, Lei 1.079/1950, Lei 4.737/1965 e Lei 2.889/1956)',1,'Previsto no edital. Leitura da lei seca.',[]],
+ ['8.25 Economia popular, ordem econômica, consumidor e licitações (Leis 1.521/1951, 8.176/1991, 8.078/1990 e crimes da Lei 14.133/2021)',1,'Previsto no edital. Leitura da lei seca.',['pple-86']],
+ ['8.26 Lei das Contravenções Penais (DL 3.688/1941)',1,'Previsto no edital. Leitura da lei seca.',[]],
+ ['8.27 Demais leis do edital (Leis 9.279/1996, 9.609/1998, 9.434/1997, 11.105/2005, 6.766/1979, 8.906/1994 e 14.597/2023)',1,'Previsto no edital. Leitura da lei seca dos tipos penais.',[]],
+ ['8.28 Lei nº 8.038/1990 – Processos perante o STJ e o STF',1,'Previsto no edital. Leitura da lei seca.',['pple-85']]];
+var LEGL={},LEGR={};LEGT.forEach(function(x,i){LEGL['leg-'+i]=x[3];x[3].forEach(function(o){LEGR[o]='leg-'+i})});
+if(!ED.leg){ED.leg=LEGT.map(function(x){return [x[0],2,x[1],x[2],[]]});NM.push(['leg','Legislação Penal e Processual Penal Extravagante'])}
+SNM.leg='Legislação';ORD.leg=[];
+if(QORD.indexOf('leg')<0){QORD.splice(2,0,'leg')}QDEF.leg=10;QDEF.dpen=10;QDEF.pple=10;
+qcfg=(function(b){return function(){var c=b(),o=(S.qcfg&&S.qcfg.d)||{};if(o.leg==null){if(o.dpen==15)c.d.dpen=10;if(o.pple==15)c.d.pple=10}return c}})(qcfg);
+// lei seca: itens das leis passam para a matéria nova
+(function(){var add={};Object.keys(LSM).forEach(function(tid){var n=LEGR[tid];if(!n)return;(add[n]=add[n]||[]);LSM[tid].forEach(function(i){if(add[n].indexOf(i)<0)add[n].push(i)})});Object.keys(add).forEach(function(n){LSM[n]=add[n]});
+ var own={};Object.keys(LSM).forEach(function(tid){LSM[tid].forEach(function(i){(own[i]=own[i]||[]).push(tid)})});
+ Object.keys(own).forEach(function(i){var L=own[i],legs=L.filter(function(t){return /^leg-/.test(t)}),rest=L.filter(function(t){return !/^leg-/.test(t)&&!LEGR[t]});if(legs.length&&!rest.length&&LS[i])LS[i][0]='leg'})})();
+// questões, registros, erros e simulados das leis passam para a matéria nova (o histórico acompanha o assunto)
+function legQ(q){var ch=0,t=(q.t||[]).map(function(x){var n=LEGR[x];if(n){ch=1;return n}return x});if(ch){var u=[];t.forEach(function(x){if(u.indexOf(x)<0)u.push(x)});q.t=u;if(!u.some(function(x){return /^(dpen|pple)-/.test(x)}))q.s='leg'}return ch}
+qbLoad=(function(b){return function(){return b().then(function(L){if(L&&!L._leg){L._leg=1;L.forEach(legQ)}return L})}})(qbLoad);
+function legNorm(){var ch=0;
+ (S.logs||[]).forEach(function(l){var n=LEGR[l.tid];if(n){l.tid=n;l.sid='leg';ch=1}});
+ (S.er||[]).forEach(function(x){var n=LEGR[x.tid];if(n){x.tid=n;x.sid='leg';ch=1}});
+ (S.qb||[]).forEach(function(q){if(legQ(q))ch=1});
+ (S.sim||[]).forEach(function(m){if(!m.q||!m.q.length)return;var c2=0;m.q.forEach(function(x){var n=LEGR[x.tid];if(n){x.tid=n;x.sid='leg';c2=1}});
+  if(c2){var R={};m.q.forEach(function(x){var o=R[x.sid]||(R[x.sid]={sid:x.sid,ac:0,er:0,br:0});if(x.r=='ok')o.ac++;else if(x.r=='er')o.er++;else o.br++});var tq=0,tr=0;m.rows.forEach(function(r){tr+=r.ac+r.er+r.br});m.q.forEach(function(){tq++});if(tq==tr)m.rows=Object.keys(R).map(function(k){return R[k]});ch=1}});
+ return ch}
+// marcar a lei como estudada marca os itens dela no edital de Penal e de Processo Penal
+setDone=(function(b){return function(tid,on,d){b(tid,on,d);var L=LEGL[tid];if(L)L.forEach(function(o){var r=findT(o);if(r&&!!r.t.d!=!!on)b(o,on,d)})}})(setDone);
+
+// ---- 2. Reestudo: assuntos das fotos (Administrativo, Constitucional, Penal, Processo Penal, Legislação e Direitos Humanos) voltam para estudo, mesmo se já marcados
+var RSAT=1794868068570;
+var RSL={adm:[3,7,8,16,17,18,19,20,21,22,23,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,62,63,66,67],
+ dcon:[10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,26,27,28,29,30,31,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48],
+ dpen:[6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,42,43,44,45,46,48,49,53,56,57,58,90,91,92,93,94,95,96,97],
+ pple:[2,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,50,51,52,53,54,55,56,63,65,66,67,68,69,70,71,72,77,79,80,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,143],
+ dhum:[3,5,9,11,12,13,14,15,16,17,18,19,20]};
+var RSET={};Object.keys(RSL).forEach(function(s){RSL[s].forEach(function(i){RSET[s+'-'+i]=1})});Object.keys(LEGR).forEach(function(o){RSET[o]=1});Object.keys(LEGL).forEach(function(n){RSET[n]=1});
+function rs16Fix(){var ch=0,sb={};S.u=S.u||{};S.pp=S.pp||{};S.tr=S.tr||{};
+ Object.keys(RSET).forEach(function(tid){if((S.u[tid]||0)>=RSAT)return;var r=findT(tid);if(!r)return;
+  if(r.t.d){r.t.d=false;r.t.dt=null;sb[r.s.id]=r.s}S.u[tid]=RSAT;S.pp[tid]={ok:0,w:null,u:RSAT};var o=S.tr[tid];if(o&&(o.nx||o.pr||o.rs))S.tr[tid]={s:0,n:0,lp:0,cs:0,h:'',u:RSAT};ch=1});
+ Object.keys(sb).forEach(function(k){try{heads(sb[k])}catch(e){}});
+ if(ch&&S.pl&&S.pl.v==4&&(S.pl.c||0)<RSAT){S.pl.v=0;S.pl.c=RSAT}
+ return ch}
+function prAuto(){}
+inflate=(function(b){return function(o){if(o&&o.xs&&o.xs.length){var have={};NM.forEach(function(x){have[x[0]]=1});var dup=o.xs.filter(function(s){return have[s.id]});o.xs=o.xs.filter(function(s){return !have[s.id]});dup.forEach(function(s){(s.tp||[]).forEach(function(t){if(t.d){o.d=o.d||{};if(!o.d[t.id])o.d[t.id]=t.dt||1}})})}
+ var n=b(o),s0=S;try{S=n;legNorm();rs16Fix()}catch(x){}finally{S=s0}return n}})(inflate);
+(function(){try{var o=JSON.parse(JSON.stringify(slim()));S=inflate(o);MEM=S;PLC.k='';TRC.k='';try{localStorage.setItem(K,JSON.stringify(slim()))}catch(x){}}catch(x){}})();
+
+// ---- 3. Revisões: só de assunto estudado; teto automático de 6 por dia; erros do caderno e lei seca do tema entram na revisão do assunto
+var RVCAP=6;
+function stLog(l){return l.lsi==null&&l.ts!='Questões'&&l.ts!='Lei seca'&&!(!l.ts&&(+l.min||0)<=1&&!(+l.pg))}
+function lsOwn(){var o={};Object.keys(LSM).forEach(function(tid){LSM[tid].forEach(function(i){(o[i]=o[i]||[]).push(tid)})});return o}
+function rvPri(x){var r=findT(x.tid);return ((r&&r.t.inc)||0)*10+(x.res=='er'?5:0)}
+revs=(function(b){var C={v0:null,d:'',k:'',v:null};return function(){var v0=b(),t=today(),dn=(S.rvd||[]).filter(function(r){return r.d==t&&/^T/.test(r.k||'')}).length,key=t+'|'+dn+'|'+(S.dpw||6);
+ if(C.v0===v0&&C.k===key&&C.v)return C.v;
+ var SL={};S.logs.forEach(function(l){if(l.tid&&stLog(l))SL[l.tid]=1});var own=lsOwn(),T=[],O=[];
+ v0.forEach(function(x){
+  if(x.kind=='T'){var r=findT(x.tid);if(!r)return;if(LEGR[x.tid])return;
+   if(RSET[x.tid]){if(!r.t.d||((S.u||{})[x.tid]||0)<=RSAT)return;var tr=S.tr[x.tid];if(!(tr&&tr.nx&&(tr.u||0)>RSAT)){var y={};for(var k in x)y[k]=x[k];y.due=addD(r.t.dt||t,1);y.stg=0;y.n=1;y.res='';x=y}}
+   else if(!r.t.d&&!SL[x.tid]&&!ppOf(x.tid))return;
+   T.push(x);return}
+  if(/^e/.test(x.k||'')){var id=x.k.slice(1).split(':')[0],er=(S.er||[]).filter(function(z){return z.id==id})[0];if(er&&er.tid&&findT(er.tid))return;O.push(x);return}
+  if(/^L/.test(x.k||'')){var i=x.k.slice(1).split(':')[0];if(own[i]&&own[i].length)return;var y2={};for(var k2 in x)y2[k2]=x[k2];var dw=S.dpw==7?0:6,dd=y2.due;while(new Date(dd+'T12:00:00').getDay()!=dw)dd=addD(dd,1);y2.due=dd;y2.t=String(y2.t||'').replace(' [lei seca]',' [lei seca – revisão semanal]');O.push(y2);return}
+  O.push(x)});
+ // teto: no máximo RVCAP revisões de assunto por dia; o excesso vai para os próximos dias, por prioridade (incidência, erro, atraso)
+ T.sort(function(a,b){return a.due<b.due?-1:a.due>b.due?1:0});var out=[],rest=T.slice(),d=t,guard=0;
+ while(rest.length&&guard++<400){var cap=isStudyDay(d)?(d==t?Math.max(0,RVCAP-dn):RVCAP):0,pool=rest.filter(function(x){return x.due<=d});
+  if(!pool.length){d=rest[0].due>d?rest[0].due:addD(d,1);continue}
+  pool.sort(function(a,c){return rvPri(c)-rvPri(a)||(a.due<c.due?-1:a.due>c.due?1:0)});var take=pool.slice(0,cap);
+  take.forEach(function(x){var y=x;if(x.due!=d){y={};for(var k in x)y[k]=x[k];y.due=d;y.mv=1}out.push(y);rest.splice(rest.indexOf(x),1)});d=addD(d,1)}
+ var V=out.concat(O).sort(function(a,c){return a.due<c.due?-1:a.due>c.due?1:0});C={v0:v0,k:key,v:V};return V}})(revs);
+// questões por revisão: 5; 10 quando a revisão anterior do assunto foi com erro
+function rvN(tid){var tr=(S.tr||{})[tid];return tr&&tr.res=='er'&&(!RSET[tid]||(tr.u||0)>RSAT)?10:5}
+rvPick=(function(b){return function(tid,stg){return b(tid,stg).slice(0,rvN(tid))}})(rvPick);
+V.cfg=(function(b){return function(){return b().replace('Extravagante</td><td>undefined</td>','Extravagante</td><td>Raio-X Vol. 5</td>')}})(V.cfg);
+V.rev=(function(b){return function(){var h=b(),own=lsOwn();
+ h=h.replace(/onclick="rvQ\('([^']+)'\)">☐ 10 questões/g,function(a,t){return 'onclick="rvQ(\''+t+'\')">☐ '+rvN(t)+' questões'});
+ h=h.replace(/(<button class="rvk[^"]*" onclick="rvQ\('([^']+)'\)">)/g,function(a,full,t){var ex=[],ne=(S.er||[]).filter(function(z){return z.tid==t}).length,L=lsOfT(t).filter(function(i){return S.ls[i]&&LS[i]}).slice(0,3);
+  if(L.length)ex.push('📜 Lei seca do tema: '+L.map(function(i){return e(LS[i][2])}).join('; '));if(ne)ex.push('📕 '+ne+' erro'+(ne>1?'s':'')+' deste assunto no caderno: as questões erradas vêm primeiro');
+  return (ex.length?'<div class="mu" style="font-size:12px;margin:4px 0;width:100%">'+ex.join('<br>')+'</div>':'')+full});
+ h=h.replace(/<h2>Revisão inteligente<\/h2><p class="mu">/,'<h2>Revisão inteligente</h2><p class="mu">No máximo '+RVCAP+' revisões de assunto por dia, 5 questões cada (10 quando a anterior teve erro); o excesso vai sozinho para os próximos dias, pela prioridade. Só revisa assunto estudado. ');
+ return h}})(V.rev);
+
+// ---- 4. Plano: segue o edital da PCMG, teoria de base primeiro, parte especial intercalada; horas por semana
+var HRS={dcon:4.5,adm:4,pple:3,dpen:3,leg:3.5,dhum:3,lopc:1.75,dciv:1,mleg:1,crim:1};
+rodWeights=function(ph){var w={};S.subs.forEach(function(s){var m=mwOf(s.id);if(!m)return;w[s.id]=(HRS[s.id]||1)*m});return w};
+var QSEQ={
+ adm:[1,2,3,5,6,7,8,10,11,12,13,14,15,25,26,27,28,29,30,32,33,34,35,36,37,38,39,40,17,18,19,20,21,22,23,56,63,42,43,44,45,46,48,49,50,51,52,53,54,55,62,66,67],
+ dcon:[0,1,10,11,12,14,15,16,17,18,19,20,22,23,24,26,27,28,29,30,31,41,42,43,45,46,47,48,33,34,35,37,38,39,7,8],
+ dpen:[2,12,13,14,15,16,17,19,20,21,27,28,22,23,24,25,26,29,31,32,49,94,35,48,93,36,53,91,37,38,39,40,33,58,95,43,44,45,46,97,57,56,92,7,8,9,10,96],
+ pple:[4,2,5,6,8,9,10,11,12,13,14,15,16,17,18,19,20,21,65,66,67,68,99,100,101,102,103,104,105,106,107,23,24,108,109,110,143,27,28,29,30,32,33,34,35,36,37,38,39,40,41,111,112,43,44,45,63,51,52,53,54,55,77,56,69,71,72,80],
+ dhum:[0,1,2,12,14,15,20,5,9,11,3,16,17,18],
+ leg:LEGT.map(function(x,i){return i})};
+var QIDX={};Object.keys(QSEQ).forEach(function(s){QSEQ[s].forEach(function(i,k){QIDX[s+'-'+i]=k})});
+trailOf=(function(b){return function(sid,ph){var L=b(sid,ph);if(!QSEQ[sid])return L;var bp=S.bump||{},h=[],r=[];
+ L.forEach(function(x,i){if(LEGR[x.t.id])return;x._o=i;if(x.k=='parc'||x.k=='rea'||(bp[x.t.id]&&bp[x.t.id].x))h.push(x);else r.push(x)});
+ r.sort(function(a,c){var ia=QIDX[a.t.id],ic=QIDX[c.t.id];ia=ia==null?1000+a._o:ia;ic=ic==null?1000+c._o:ic;return ia-ic});
+ return h.concat(r)}})(trailOf);
+// estado antigo sem a migração 4: o que ela marcar como estudado dentro do reestudo volta para estudo
+mig4=(function(b){return function(){var had=!!S.mig4,r=b.apply(this,arguments);if(!had&&S.mig4&&S.mig4.l){var ch=0;S.mig4.l.forEach(function(x){if(!RSET[x.tid])return;var q=findT(x.tid);if(!q)return;q.t.d=false;q.t.dt=null;try{heads(q.s)}catch(e){}S.u[x.tid]=RSAT;S.pp[x.tid]={ok:0,w:null,u:RSAT};ch=1});if(ch){MEM=S;try{localStorage.setItem(K,JSON.stringify(slim()))}catch(x){}}}return r}})(mig4);
 
 mig4();R();tmInit();cloud();
 </script>
