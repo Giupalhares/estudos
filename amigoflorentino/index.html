@@ -2596,7 +2596,7 @@ Vqst=(function(b){return function(){var c;try{c=qmCard()}catch(x){c='<div class=
 merge=(function(b){return function(a,c){var r=b(a,c),M={};(a.qb||[]).concat(c.qb||[]).forEach(function(x){if(!x)return;var y=M[x.id];if(!y||(x.u||0)>(y.u||0))M[x.id]=x});r.qb=(r.qb||[]).map(function(x){return M[x.id]&&(M[x.id].u||0)>(x.u||0)?M[x.id]:x});return r}})(merge);
 (function(){try{var c=document.createElement('style');c.textContent='.qmr{align-items:flex-start}.qmb{display:flex;gap:6px;align-items:center;flex-shrink:0}.qme{border:1px dashed var(--bd);border-radius:8px;padding:10px;margin:4px 0 10px}.qme textarea{width:100%}.qme textarea.qal{min-height:42px;height:42px}';document.head.appendChild(c)}catch(x){}})();
 
-var APPV='16/11 20:57';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
+var APPV='17/11 09:19';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
 R=(function(b){return function(){b.apply(this,arguments);try{var m=document.getElementById('app')||document.body,v=document.getElementById('appv');if(!v){v=document.createElement('div');v.id='appv';document.body.appendChild(v)}v.textContent='versão '+APPV}catch(x){}}})(R);
 // banco por assunto: só questões do próprio assunto (sem completar com outros temas)
 qbTopic=function(tid){qbLoad().then(function(){var r=findT(tid),A=qbAll(),own=qShuf(A.filter(function(q){return (q.t||[]).indexOf(tid)>=0})).sort(function(a,b){return qRank(a)-qRank(b)}),ids=own.slice(0,10).map(function(q){return q.id});
@@ -3386,6 +3386,10 @@ V.rev=(function(b){return function(){var h=b(),t=today(),W=revs().filter(functio
  var box='<div class="card" style="border-color:#e8a317"><b>'+W+' revis'+(W>1?'ões esperando':'ão esperando')+'</b> <span class="mu">– venceram, mas passaram do limite de hoje ('+rvCapNow()+'). Elas entram nos próximos dias pela prioridade; as que esperam mais sobem na fila.</span><p style="margin:8px 0 0"><button class="btn g" onclick="rvMais()">Tenho tempo: fazer mais 3 hoje</button></p></div>';
  var k=h.indexOf('<h2>Revisão inteligente</h2>');if(k<0)return box+h;var j=h.indexOf('</div>',k);return j<0?h+box:h.slice(0,j+6)+box+h.slice(j+6)}})(V.rev);
 V.rev=(function(b){return function(){return b().replace(' revisões de assunto por dia, 5 questões cada',' revisões por dia, cada uma é uma parte do edital com assuntos ligados, 5 questões cada')}})(V.rev);
+// questões do banco das leis: garantir a matéria Legislação mesmo quando o banco carrega depois (celular/PC)
+function legQAll(){if(!QBI||QBI._legn===QBI.length)return;QBI.forEach(function(q){if(!q._lg){q._lg=1;legQ(q)}});QBI._legn=QBI.length}
+qbAll=(function(b){return function(){legQAll();return b.apply(this,arguments)}})(qbAll);
+if(typeof qbMap=='function')qbMap=(function(b){return function(){legQAll();return b.apply(this,arguments)}})(qbMap);
 
 // ===== versão do amigo: sem as personalizações do dono; plano pelas escolhas dele
 var AMIGO=1;RSET={};PL0='0000';MVX.d='0000';
