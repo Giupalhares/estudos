@@ -2595,7 +2595,7 @@ Vqst=(function(b){return function(){var c;try{c=qmCard()}catch(x){c='<div class=
 merge=(function(b){return function(a,c){var r=b(a,c),M={};(a.qb||[]).concat(c.qb||[]).forEach(function(x){if(!x)return;var y=M[x.id];if(!y||(x.u||0)>(y.u||0))M[x.id]=x});r.qb=(r.qb||[]).map(function(x){return M[x.id]&&(M[x.id].u||0)>(x.u||0)?M[x.id]:x});return r}})(merge);
 (function(){try{var c=document.createElement('style');c.textContent='.qmr{align-items:flex-start}.qmb{display:flex;gap:6px;align-items:center;flex-shrink:0}.qme{border:1px dashed var(--bd);border-radius:8px;padding:10px;margin:4px 0 10px}.qme textarea{width:100%}.qme textarea.qal{min-height:42px;height:42px}';document.head.appendChild(c)}catch(x){}})();
 
-var APPV='18/11 19:10';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
+var APPV='18/11 19:15';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
 R=(function(b){return function(){b.apply(this,arguments);try{var m=document.getElementById('app')||document.body,v=document.getElementById('appv');if(!v){v=document.createElement('div');v.id='appv';document.body.appendChild(v)}v.textContent='versão '+APPV}catch(x){}}})(R);
 // banco por assunto: só questões do próprio assunto (sem completar com outros temas)
 qbTopic=function(tid){qbLoad().then(function(){var r=findT(tid),A=qbAll(),own=qShuf(A.filter(function(q){return (q.t||[]).indexOf(tid)>=0})).sort(function(a,b){return qRank(a)-qRank(b)}),ids=own.slice(0,10).map(function(q){return q.id});
@@ -3483,15 +3483,21 @@ V.rev=(function(b){return function(){return b().replace(/(<button class="rvk[^"]
 function fix1811(){var ch=0,t='2026-11-18';S.tomb=S.tomb||[];
  ['xuhp6tf','dlgddju'].forEach(function(id){var i=S.logs.findIndex?S.logs.findIndex(function(l){return l.id==id}):-1;if(i>=0){S.logs.splice(i,1);ch=1}if(S.tomb.indexOf(id)<0){S.tomb.push(id);ch=1}});
  var k=-1;S.logs.forEach(function(l,i){if(l.id=='a7um3t9')k=i});if(k>=0){var l=JSON.parse(JSON.stringify(S.logs[k]));l.id='a7um3t9d';l.sid='dhum';l.tid='dhum-0';l.u=Date.now();S.logs[k]=l;if(S.tomb.indexOf('a7um3t9')<0)S.tomb.push('a7um3t9');ch=1}
- var tr=(S.tr||{})['pple-4'];if(tr&&tr.last==t&&tr.h=='er,ok'){S.tr['pple-4']={s:1,n:1,lp:1,cs:0,h:'er',nx:t,rs:1,res:'er',last:'2026-11-16',src:'sim',u:Date.now()};ch=1}
- if(S.rvd){var n=S.rvd.length;S.rvd=S.rvd.filter(function(r){return r.id!='v33r9a0q'});if(S.rvd.length!=n){ch=1;if(S.tomb.indexOf('v33r9a0q')<0)S.tomb.push('v33r9a0q')}}
- var c=(S.rvc||{})['pple-4'];if(c&&c.due==t&&c.ok){S.rvc['pple-4']={due:t,e:0,q:0,ac:0,er:0,dv:0,ch:0,u:Date.now()};ch=1}
  return ch}
 try{if(fix1811()){S.at=Date.now();MEM=S;try{localStorage.setItem(K,JSON.stringify(slim()))}catch(x){};try{rvRecount()}catch(x){}}}catch(x){}
 inflate=(function(b){return function(o){var n=b(o),s0=S;try{S=n;fix1811()}catch(x){}finally{S=s0}return n}})(inflate);
 // cronômetro: mostra em destaque onde as questões e o tempo vão ser gravados
 function tmDest(){var r=TM&&TM.tid&&findT(TM.tid),s=TM&&TM.sid&&sub(TM.sid);if(!s)return '';return '<div style="border:2px solid #e8a317;border-radius:10px;padding:8px 10px;margin:8px 0;font-size:13.5px">Vai gravar em: <b>'+e(SN(s))+(r?' · '+e(r.t.n):'')+'</b><br><span class="mu">Se as questões forem de outro assunto, troque a matéria e o assunto acima antes de salvar.</span></div>'}
 V.cron=(function(b){return function(){var h=b(),i=h.indexOf('onclick="tmSaveLog()');if(i<0)return h;var j=h.lastIndexOf('<button',i);return j<0?h:h.slice(0,j)+tmDest()+h.slice(j)}})(V.cron);
+
+// 18/11 (2ª correção): os 2 registros de 6.2 estavam certos — voltam (com novos ids) e a revisão de 6.2 conclui com eles
+function fix1811b(){var ch=0,t='2026-11-18',have={};S.logs.forEach(function(l){have[l.id]=1});
+ [{id:'xuhp6tf2',min:6,ac:3},{id:'dlgddju2',min:4,ac:2}].forEach(function(o){if(have[o.id]||(S.tomb||[]).indexOf(o.id)>=0)return;S.logs.push({id:o.id,date:t,sid:'pple',tid:'pple-4',min:o.min,ac:o.ac,er:0,br:0,pg:0,au:0,pr:'',ts:'Questões',bc:'IA',dv:0,ch:0,u:Date.now()});ch=1});
+ S.rvd=S.rvd||[];var hv=S.rvd.some(function(r){return r.tid=='pple-4'&&r.d==t});if(!hv&&(S.tomb||[]).indexOf('v33r9a0q2')<0){S.rvd.push({id:'v33r9a0q2',k:'Tpple-4',tid:'pple-4',d:t,due:t,res:'ok',u:Date.now()});ch=1}
+ return ch}
+function fix1811c(){if(today()!='2026-11-18')return 0;var c=rvcGet('pple-4');if(!c||c.ok)return 0;c.ac=5;c.er=0;c.e=1;c.rd=1;c.q=1;c.need=5;rvcPut('pple-4',c);return 1}
+try{var _f=fix1811b();if(_f){S.at=Date.now();MEM=S;try{localStorage.setItem(K,JSON.stringify(slim()))}catch(x){}}fix1811c()}catch(x){}
+inflate=(function(b){return function(o){var n=b(o),s0=S;try{S=n;fix1811b()}catch(x){}finally{S=s0}return n}})(inflate);
 
 mig4();R();tmInit();cloud();
 </script>
