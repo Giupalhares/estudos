@@ -2595,7 +2595,7 @@ Vqst=(function(b){return function(){var c;try{c=qmCard()}catch(x){c='<div class=
 merge=(function(b){return function(a,c){var r=b(a,c),M={};(a.qb||[]).concat(c.qb||[]).forEach(function(x){if(!x)return;var y=M[x.id];if(!y||(x.u||0)>(y.u||0))M[x.id]=x});r.qb=(r.qb||[]).map(function(x){return M[x.id]&&(M[x.id].u||0)>(x.u||0)?M[x.id]:x});return r}})(merge);
 (function(){try{var c=document.createElement('style');c.textContent='.qmr{align-items:flex-start}.qmb{display:flex;gap:6px;align-items:center;flex-shrink:0}.qme{border:1px dashed var(--bd);border-radius:8px;padding:10px;margin:4px 0 10px}.qme textarea{width:100%}.qme textarea.qal{min-height:42px;height:42px}';document.head.appendChild(c)}catch(x){}})();
 
-var APPV='18/11 09:44';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
+var APPV='18/11 09:46';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
 R=(function(b){return function(){b.apply(this,arguments);try{var m=document.getElementById('app')||document.body,v=document.getElementById('appv');if(!v){v=document.createElement('div');v.id='appv';document.body.appendChild(v)}v.textContent='versão '+APPV}catch(x){}}})(R);
 // banco por assunto: só questões do próprio assunto (sem completar com outros temas)
 qbTopic=function(tid){qbLoad().then(function(){var r=findT(tid),A=qbAll(),own=qShuf(A.filter(function(q){return (q.t||[]).indexOf(tid)>=0})).sort(function(a,b){return qRank(a)-qRank(b)}),ids=own.slice(0,10).map(function(q){return q.id});
@@ -3428,7 +3428,7 @@ pqCard=(function(b){return function(){return b.apply(this,arguments).replace('<d
 qfSave=(function(b){return function(){var cg=cgVal('qfcg'),n=S.logs.length;var r=b.apply(this,arguments);if(cg&&S.logs.length>n){S.logs[S.logs.length-1].cg=cg;save()}return r}})(qfSave);
 pqSave=(function(b){return function(){var cg=cgVal('pq_cg'),n=S.logs.length,nq=(S.qb||[]).length;var r=b.apply(this,arguments);if(cg){var ch=0;S.logs.slice(n).forEach(function(l){l.cg=cg;ch=1});(S.qb||[]).slice(nq).forEach(function(q){q.cg=cg;ch=1});if(ch)save()}return r}})(pqSave);
 // ---- títulos sem "10"
-qtTaskH=(function(b){return function(x){return b(x).replace('<b>10 questões: ','<b>')}})(qtTaskH);
+qtTaskH=(function(b){return function(x){return b(x).replace('<b>10 questões: ','<b>Questões do tema: ')}})(qtTaskH);
 V.qst=(function(b){return function(){return b().replace(/>10 questões dos temas estudados</g,'>Questões dos temas estudados<')}})(V.qst);
 V.painel=(function(b){return function(){return b().replace(/>10 questões dos temas estudados</g,'>Questões dos temas estudados<')}})(V.painel);
 // ---- legislação: os itens ligados em Penal/Processo Penal não geram tarefa própria; questões deles contam na lei
