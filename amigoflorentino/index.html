@@ -2596,7 +2596,7 @@ Vqst=(function(b){return function(){var c;try{c=qmCard()}catch(x){c='<div class=
 merge=(function(b){return function(a,c){var r=b(a,c),M={};(a.qb||[]).concat(c.qb||[]).forEach(function(x){if(!x)return;var y=M[x.id];if(!y||(x.u||0)>(y.u||0))M[x.id]=x});r.qb=(r.qb||[]).map(function(x){return M[x.id]&&(M[x.id].u||0)>(x.u||0)?M[x.id]:x});return r}})(merge);
 (function(){try{var c=document.createElement('style');c.textContent='.qmr{align-items:flex-start}.qmb{display:flex;gap:6px;align-items:center;flex-shrink:0}.qme{border:1px dashed var(--bd);border-radius:8px;padding:10px;margin:4px 0 10px}.qme textarea{width:100%}.qme textarea.qal{min-height:42px;height:42px}';document.head.appendChild(c)}catch(x){}})();
 
-var APPV='18/11 09:46';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
+var APPV='18/11 09:48';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
 R=(function(b){return function(){b.apply(this,arguments);try{var m=document.getElementById('app')||document.body,v=document.getElementById('appv');if(!v){v=document.createElement('div');v.id='appv';document.body.appendChild(v)}v.textContent='versão '+APPV}catch(x){}}})(R);
 // banco por assunto: só questões do próprio assunto (sem completar com outros temas)
 qbTopic=function(tid){qbLoad().then(function(){var r=findT(tid),A=qbAll(),own=qShuf(A.filter(function(q){return (q.t||[]).indexOf(tid)>=0})).sort(function(a,b){return qRank(a)-qRank(b)}),ids=own.slice(0,10).map(function(q){return q.id});
@@ -3243,7 +3243,7 @@ curPlan=(function(b){return function(){var t=today();if(t<PL0&&S.pl&&S.pl.ini==t
 // Lei Orgânica "Classificação": só sai de 17/11 (troca de dia), sem pausar a matéria
 var MVX={tid:'lopc-4',d:'2026-11-17'};
 curPlan=(function(b){return function(){var P=b(),t=today();
- if(t==MVX.d&&S.pl&&S.pl.ini==t&&(S.pl.t0||[]).some(function(x){return x.tid==MVX.tid})&&!S.pl.mvx){var ex={};S.pl.t0.forEach(function(x){ex[x.tid]=1});ex[MVX.tid]=1;var add=[];try{var us={},W=rodWeights(PH(t)),bs=null,bx=null;S.pl.t0.forEach(function(x){if(x.tid!=MVX.tid)us[x.sid]=1});us.lopc=1;Object.keys(W).forEach(function(sid){if(us[sid])return;var L=trailOf(sid,PH(t)).filter(function(x){return !ex[x.t.id]});if(L.length&&(!bs||W[sid]>W[bs])){bs=sid;bx=L[0]}});if(bx)add=[{d:t,sid:bs,tid:bx.t.id,k:bx.k,w:''}]}catch(e){}S.pl.t0=S.pl.t0.filter(function(x){return x.tid!=MVX.tid}).concat(add);S.pl.mvx=1;S.pl.c=Date.now();PLC.k='';MEM=S;try{localStorage.setItem(K,JSON.stringify(slim()))}catch(x){}P=b()}
+ if(t==MVX.d&&S.pl&&S.pl.ini==t&&(S.pl.t0||[]).some(function(x){return x.tid==MVX.tid})&&!S.pl.mvx){var ex={};S.pl.t0.forEach(function(x){ex[x.tid]=1});ex[MVX.tid]=1;var add=[];try{var us={},W=rodWeights(PH(t)),bs=null,bx=null;S.pl.t0.forEach(function(x){if(x.tid!=MVX.tid)us[x.sid]=1});us.lopc=1;Object.keys(W).forEach(function(sid){if(us[sid]&&sid!=MVX.pref)return;var L=trailOf(sid,PH(t)).filter(function(x){return !ex[x.t.id]});if(L.length&&(!bs||(sid==MVX.pref&&bs!=MVX.pref)||(bs!=MVX.pref&&W[sid]>W[bs]))){bs=sid;bx=L[0]}});if(bx)add=[{d:t,sid:bs,tid:bx.t.id,k:bx.k,w:''}]}catch(e){}S.pl.t0=S.pl.t0.filter(function(x){return x.tid!=MVX.tid}).concat(add);S.pl.mvx=1;S.pl.c=Date.now();PLC.k='';MEM=S;try{localStorage.setItem(K,JSON.stringify(slim()))}catch(x){}P=b()}
  if(t<MVX.d||t==MVX.d){var it=(P.it||[]).slice(),i=-1;it.forEach(function(x,k){if(x.tid==MVX.tid&&x.d==MVX.d)i=k});if(i>=0){var nd=addD(MVX.d,1),j=-1;it.forEach(function(x,k){if(j<0&&x.d==nd&&x.sid!='lopc')j=k});var c={};for(var q in P)c[q]=P[q];if(j>=0){var a1={},a2={};for(var q1 in it[i])a1[q1]=it[i][q1];for(var q2 in it[j])a2[q2]=it[j][q2];a1.d=nd;a2.d=MVX.d;it[i]=a2;it[j]=a1}else{var a3={};for(var q3 in it[i])a3[q3]=it[i][q3];a3.d=nd;it[i]=a3}c.it=it;return c}}return P}})(curPlan);
 trailOf=(function(b){return function(sid,ph){var L=b(sid,ph);if(!L.length)return L;var i=0;while(i<L.length&&L[i].k=='parc')i++;if(L[i]&&radOn(L[i].t.id))return [];return L.filter(function(x){return !radOn(x.t.id)})}})(trailOf);
 
@@ -3443,6 +3443,9 @@ function logMerge(){var L=S.logs,out=[],dead=[],last=null;for(var i=0;i<L.length
  out.push(l);last=l}
  if(!dead.length)return 0;S.logs=out;S.tomb=(S.tomb||[]).concat(dead);return dead.length}
 var LMB=0;R=(function(b){return function(){if(!LMB){LMB=1;try{if(logMerge()){PLC.k='';save()}}catch(x){}LMB=0}return b.apply(this,arguments)}})(R);
+// 18/11: Lei Orgânica sai de hoje e só volta em 23/11; no lugar entra Constitucional (prioridade combinada)
+(function(){S.rad=S.rad||{};var U=1795000000000;if(!S.rad['lopc-4']||(S.rad['lopc-4'].u||0)<U){S.rad['lopc-4']={d:'2026-11-23',u:U}}})();
+MVX={tid:'lopc-4',d:'2026-11-18',pref:'dcon'};
 
 // ===== versão do amigo: sem as personalizações do dono; plano pelas escolhas dele
 var AMIGO=1;RSET={};PL0='0000';MVX.d='0000';
