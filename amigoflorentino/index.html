@@ -2596,7 +2596,7 @@ Vqst=(function(b){return function(){var c;try{c=qmCard()}catch(x){c='<div class=
 merge=(function(b){return function(a,c){var r=b(a,c),M={};(a.qb||[]).concat(c.qb||[]).forEach(function(x){if(!x)return;var y=M[x.id];if(!y||(x.u||0)>(y.u||0))M[x.id]=x});r.qb=(r.qb||[]).map(function(x){return M[x.id]&&(M[x.id].u||0)>(x.u||0)?M[x.id]:x});return r}})(merge);
 (function(){try{var c=document.createElement('style');c.textContent='.qmr{align-items:flex-start}.qmb{display:flex;gap:6px;align-items:center;flex-shrink:0}.qme{border:1px dashed var(--bd);border-radius:8px;padding:10px;margin:4px 0 10px}.qme textarea{width:100%}.qme textarea.qal{min-height:42px;height:42px}';document.head.appendChild(c)}catch(x){}})();
 
-var APPV='18/11 18:53';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
+var APPV='18/11 19:10';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
 R=(function(b){return function(){b.apply(this,arguments);try{var m=document.getElementById('app')||document.body,v=document.getElementById('appv');if(!v){v=document.createElement('div');v.id='appv';document.body.appendChild(v)}v.textContent='versão '+APPV}catch(x){}}})(R);
 // banco por assunto: só questões do próprio assunto (sem completar com outros temas)
 qbTopic=function(tid){qbLoad().then(function(){var r=findT(tid),A=qbAll(),own=qShuf(A.filter(function(q){return (q.t||[]).indexOf(tid)>=0})).sort(function(a,b){return qRank(a)-qRank(b)}),ids=own.slice(0,10).map(function(q){return q.id});
@@ -3480,6 +3480,19 @@ function rvErrBox(lead){var x=revs().filter(function(z){return z.tid==lead})[0],
  if(!h&&!semTxt)return '<div class="mu" style="font-size:12px;width:100%;margin:2px 0 6px">Não achei as questões erradas da revisão anterior (lançadas sem texto). Releia os assuntos da lista abaixo com acerto mais baixo.</div>';
  return '<div style="font-size:12.5px;width:100%;margin:2px 0 6px"><b>O que você errou na revisão anterior ('+since.split('-').reverse().slice(0,2).join('/')+') — leia isto:</b><ul style="margin:4px 0 0 18px;padding:0">'+h+semTxt+'</ul><span class="mu">Texto completo e comentário no Caderno de erros.</span></div>'}
 V.rev=(function(b){return function(){return b().replace(/(<button class="rvk[^"]*" onclick="rvLeit\('([^']+)'\)")/g,function(a,full,t){var c=(S.rvc||{})[t],r=rvDueT(t);if(c&&r&&c.due==r.due&&c.rd)return full;return rvErrBox(t)+full})}})(V.rev);
+// 18/11: correção pedida — apaga os 2 registros de 6.2 (18:43 e 18:46), passa as 5 de 19:00 para 7.1 e reabre a revisão de 6.2
+function fix1811(){var ch=0,t='2026-11-18';S.tomb=S.tomb||[];
+ ['xuhp6tf','dlgddju'].forEach(function(id){var i=S.logs.findIndex?S.logs.findIndex(function(l){return l.id==id}):-1;if(i>=0){S.logs.splice(i,1);ch=1}if(S.tomb.indexOf(id)<0){S.tomb.push(id);ch=1}});
+ var k=-1;S.logs.forEach(function(l,i){if(l.id=='a7um3t9')k=i});if(k>=0){var l=JSON.parse(JSON.stringify(S.logs[k]));l.id='a7um3t9d';l.sid='dhum';l.tid='dhum-0';l.u=Date.now();S.logs[k]=l;if(S.tomb.indexOf('a7um3t9')<0)S.tomb.push('a7um3t9');ch=1}
+ var tr=(S.tr||{})['pple-4'];if(tr&&tr.last==t&&tr.h=='er,ok'){S.tr['pple-4']={s:1,n:1,lp:1,cs:0,h:'er',nx:t,rs:1,res:'er',last:'2026-11-16',src:'sim',u:Date.now()};ch=1}
+ if(S.rvd){var n=S.rvd.length;S.rvd=S.rvd.filter(function(r){return r.id!='v33r9a0q'});if(S.rvd.length!=n){ch=1;if(S.tomb.indexOf('v33r9a0q')<0)S.tomb.push('v33r9a0q')}}
+ var c=(S.rvc||{})['pple-4'];if(c&&c.due==t&&c.ok){S.rvc['pple-4']={due:t,e:0,q:0,ac:0,er:0,dv:0,ch:0,u:Date.now()};ch=1}
+ return ch}
+try{if(fix1811()){S.at=Date.now();MEM=S;try{localStorage.setItem(K,JSON.stringify(slim()))}catch(x){};try{rvRecount()}catch(x){}}}catch(x){}
+inflate=(function(b){return function(o){var n=b(o),s0=S;try{S=n;fix1811()}catch(x){}finally{S=s0}return n}})(inflate);
+// cronômetro: mostra em destaque onde as questões e o tempo vão ser gravados
+function tmDest(){var r=TM&&TM.tid&&findT(TM.tid),s=TM&&TM.sid&&sub(TM.sid);if(!s)return '';return '<div style="border:2px solid #e8a317;border-radius:10px;padding:8px 10px;margin:8px 0;font-size:13.5px">Vai gravar em: <b>'+e(SN(s))+(r?' · '+e(r.t.n):'')+'</b><br><span class="mu">Se as questões forem de outro assunto, troque a matéria e o assunto acima antes de salvar.</span></div>'}
+V.cron=(function(b){return function(){var h=b(),i=h.indexOf('onclick="tmSaveLog()');if(i<0)return h;var j=h.lastIndexOf('<button',i);return j<0?h:h.slice(0,j)+tmDest()+h.slice(j)}})(V.cron);
 
 // ===== versão do amigo: sem as personalizações do dono; plano pelas escolhas dele
 var AMIGO=1;RSET={};PL0='0000';MVX.d='0000';
