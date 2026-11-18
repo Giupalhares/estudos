@@ -2595,7 +2595,7 @@ Vqst=(function(b){return function(){var c;try{c=qmCard()}catch(x){c='<div class=
 merge=(function(b){return function(a,c){var r=b(a,c),M={};(a.qb||[]).concat(c.qb||[]).forEach(function(x){if(!x)return;var y=M[x.id];if(!y||(x.u||0)>(y.u||0))M[x.id]=x});r.qb=(r.qb||[]).map(function(x){return M[x.id]&&(M[x.id].u||0)>(x.u||0)?M[x.id]:x});return r}})(merge);
 (function(){try{var c=document.createElement('style');c.textContent='.qmr{align-items:flex-start}.qmb{display:flex;gap:6px;align-items:center;flex-shrink:0}.qme{border:1px dashed var(--bd);border-radius:8px;padding:10px;margin:4px 0 10px}.qme textarea{width:100%}.qme textarea.qal{min-height:42px;height:42px}';document.head.appendChild(c)}catch(x){}})();
 
-var APPV='17/11 09:19';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
+var APPV='17/11 23:11';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
 R=(function(b){return function(){b.apply(this,arguments);try{var m=document.getElementById('app')||document.body,v=document.getElementById('appv');if(!v){v=document.createElement('div');v.id='appv';document.body.appendChild(v)}v.textContent='versão '+APPV}catch(x){}}})(R);
 // banco por assunto: só questões do próprio assunto (sem completar com outros temas)
 qbTopic=function(tid){qbLoad().then(function(){var r=findT(tid),A=qbAll(),own=qShuf(A.filter(function(q){return (q.t||[]).indexOf(tid)>=0})).sort(function(a,b){return qRank(a)-qRank(b)}),ids=own.slice(0,10).map(function(q){return q.id});
@@ -3389,6 +3389,29 @@ V.rev=(function(b){return function(){return b().replace(' revisões de assunto p
 function legQAll(){if(!QBI||QBI._legn===QBI.length)return;QBI.forEach(function(q){if(!q._lg){q._lg=1;legQ(q)}});QBI._legn=QBI.length}
 qbAll=(function(b){return function(){legQAll();return b.apply(this,arguments)}})(qbAll);
 if(typeof qbMap=='function')qbMap=(function(b){return function(){legQAll();return b.apply(this,arguments)}})(qbMap);
+
+// ===== mod40 (17/11): cronômetro e Registrar com Certeza, Dúvida, Chute e Errei; ao marcar Errei, os motivos (A–F)
+var TQK=[['cz','✅ Certeza'],['dv','🟡 Dúvida'],['ch','🟣 Chute'],['er','❌ Errei']];
+function tmQ(k,v){TM[k]=Math.max(0,parseInt(v)||0);if(TM.cz==null&&k!='cz')TM.cz=0;TM.ac=(TM.cz||0)+(TM.dv||0)+(TM.ch||0);tmSv()}
+function tmMo(i,v){TM.mo=TM.mo||[0,0,0,0,0,0];TM.mo[i]=Math.max(0,parseInt(v)||0);tmSv()}
+function tmQBox(){if(TM.cz==null&&(TM.ac||0)>0)TM.cz=TM.ac;
+ var h=TQK.map(function(k){return '<div><label>'+k[1]+'</label><input type="number" min="0" inputmode="numeric" value="'+(TM[k[0]]||0)+'" oninput="tmQ(\''+k[0]+'\',this.value)"'+(k[0]=='er'?' onchange="tmQ(\'er\',this.value);R()"':'')+'></div>'}).join('');
+ if((TM.er||0)>0){var mo=TM.mo||[0,0,0,0,0,0],s=mo.reduce(function(a,b){return a+b},0);
+  h+='</div><div class="tmmo" style="margin:6px 0 4px"><label>Motivo das '+TM.er+' erradas <span class="mu">(quantas de cada'+(s&&s!=TM.er?'; somam '+s+' de '+TM.er:'')+')</span></label><div class="f">'+MOTN.map(function(m,i){return '<div><label title="'+e(m)+'">'+e(m)+'</label><input type="number" min="0" inputmode="numeric" value="'+(mo[i]||0)+'" oninput="tmMo('+i+',this.value)"></div>'}).join('')+'</div>'}
+ return h}
+var TQRE=/<div><label>(?:Questões certas|Certas)<\/label><input[^>]*><\/div><div><label>(?:Questões erradas|Erradas)<\/label><input[^>]*><\/div>/;
+V.cron=(function(b){return function(){return b().replace(TQRE,function(){return tmQBox()})}})(V.cron);
+cronCard=(function(b){return function(){return b.apply(this,arguments).replace(TQRE,function(){return tmQBox()})}})(cronCard);
+tmSaveLog=(function(b){return function(){var cz=TM.cz,dv=TM.dv||0,ch=TM.ch||0,mo=(TM.mo||[]).slice(),n=S.logs.length;if(cz!=null)TM.ac=(cz||0)+dv+ch;var r=b.apply(this,arguments);
+ if(S.logs.length>n){var l=S.logs[S.logs.length-1];if(cz!=null&&(cz||dv||ch)){l.cz=cz||0;l.dv=dv;l.ch=ch}if(mo.some(function(x){return x>0}))l.mots=mo.slice(0,6);TM.cz=null;TM.dv=0;TM.ch=0;TM.mo=null;tmSv();save()}return r}})(tmSaveLog);
+// Registrar: acertos divididos em Certeza, Dúvida e Chute; erros com motivos
+function rgSum(){var g=function(i){return Math.max(0,parseInt((document.getElementById(i)||{}).value)||0)},a=document.getElementById('a');if(a)a.value=g('rg_cz')+g('rg_dv')+g('rg_ch')}
+function rgEr(v){var w=document.getElementById('rg_mw');if(w)w.style.display=(parseInt(v)||0)>0?'':'none'}
+V.reg=(function(b){return function(){return b().replace(/<div><label>Acertos<\/label><input type="number" id="a" min="0" value="0"><\/div><div><label>Erros<\/label><input type="number" id="r" min="0" value="0"><\/div>/,
+ '<input type="hidden" id="a" value="0">'+[['rg_cz','✅ Certeza'],['rg_dv','🟡 Dúvida'],['rg_ch','🟣 Chute']].map(function(k){return '<div><label>'+k[1]+'</label><input type="number" id="'+k[0]+'" min="0" value="0" oninput="rgSum()"></div>'}).join('')+
+ '<div><label>❌ Errei</label><input type="number" id="r" min="0" value="0" oninput="rgEr(this.value)"></div></div><div id="rg_mw" style="display:none;margin:6px 0"><label>Motivo das erradas <span class="mu">(quantas de cada)</span></label><div class="f">'+MOTN.map(function(m,i){return '<div><label>'+e(m)+'</label><input type="number" id="rg_m'+i+'" min="0" value="0"></div>'}).join('')+'</div></div><div class="f">')}})(V.reg);
+addLog=(function(b){return function(){var g=function(i){var el=document.getElementById(i);return el?Math.max(0,parseInt(el.value)||0):0},cz=g('rg_cz'),dv=g('rg_dv'),ch=g('rg_ch'),mo=[0,1,2,3,4,5].map(function(i){return g('rg_m'+i)}),has=!!document.getElementById('rg_cz'),n=S.logs.length;rgSum();var r=b.apply(this,arguments);
+ if(has&&S.logs.length>n){var l=S.logs[S.logs.length-1];if(cz||dv||ch){l.cz=cz;l.dv=dv;l.ch=ch}if(mo.some(function(x){return x>0}))l.mots=mo;save()}return r}})(addLog);
 
 mig4();R();tmInit();cloud();
 </script>
