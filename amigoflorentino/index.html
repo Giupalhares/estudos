@@ -2596,7 +2596,7 @@ Vqst=(function(b){return function(){var c;try{c=qmCard()}catch(x){c='<div class=
 merge=(function(b){return function(a,c){var r=b(a,c),M={};(a.qb||[]).concat(c.qb||[]).forEach(function(x){if(!x)return;var y=M[x.id];if(!y||(x.u||0)>(y.u||0))M[x.id]=x});r.qb=(r.qb||[]).map(function(x){return M[x.id]&&(M[x.id].u||0)>(x.u||0)?M[x.id]:x});return r}})(merge);
 (function(){try{var c=document.createElement('style');c.textContent='.qmr{align-items:flex-start}.qmb{display:flex;gap:6px;align-items:center;flex-shrink:0}.qme{border:1px dashed var(--bd);border-radius:8px;padding:10px;margin:4px 0 10px}.qme textarea{width:100%}.qme textarea.qal{min-height:42px;height:42px}';document.head.appendChild(c)}catch(x){}})();
 
-var APPV='18/11 09:48';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
+var APPV='18/11 09:53';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
 R=(function(b){return function(){b.apply(this,arguments);try{var m=document.getElementById('app')||document.body,v=document.getElementById('appv');if(!v){v=document.createElement('div');v.id='appv';document.body.appendChild(v)}v.textContent='versão '+APPV}catch(x){}}})(R);
 // banco por assunto: só questões do próprio assunto (sem completar com outros temas)
 qbTopic=function(tid){qbLoad().then(function(){var r=findT(tid),A=qbAll(),own=qShuf(A.filter(function(q){return (q.t||[]).indexOf(tid)>=0})).sort(function(a,b){return qRank(a)-qRank(b)}),ids=own.slice(0,10).map(function(q){return q.id});
@@ -3066,7 +3066,7 @@ revs=(function(b){var C={v0:null,d:'',k:'',v:null};return function(){var v0=b(),
  v0.forEach(function(x){
   if(x.kind=='T'){var r=findT(x.tid);if(!r)return;if(LEGR[x.tid])return;
    if(RSET[x.tid]){if(!r.t.d||((S.u||{})[x.tid]||0)<=RSAT)return;var tr=S.tr[x.tid];if(!(tr&&tr.nx&&(tr.u||0)>RSAT)){var y={};for(var k in x)y[k]=x[k];y.due=addD(r.t.dt||t,1);y.stg=0;y.n=1;y.res='';x=y}}
-   else if(!r.t.d&&!SL[x.tid]&&!ppOf(x.tid))return;
+   else if(!r.t.d)return;
    T.push(x);return}
   if(/^e/.test(x.k||'')){var id=x.k.slice(1).split(':')[0],er=(S.er||[]).filter(function(z){return z.id==id})[0];if(er&&er.tid&&findT(er.tid))return;O.push(x);return}
   if(/^L/.test(x.k||'')){var i=x.k.slice(1).split(':')[0];if(own[i]&&own[i].length)return;var y2={};for(var k2 in x)y2[k2]=x[k2];var dw=S.dpw==7?0:6,dd=y2.due;while(new Date(dd+'T12:00:00').getDay()!=dw)dd=addD(dd,1);y2.due=dd;y2.t=String(y2.t||'').replace(' [lei seca]',' [lei seca – revisão semanal]');O.push(y2);return}
@@ -3446,6 +3446,13 @@ var LMB=0;R=(function(b){return function(){if(!LMB){LMB=1;try{if(logMerge()){PLC
 // 18/11: Lei Orgânica sai de hoje e só volta em 23/11; no lugar entra Constitucional (prioridade combinada)
 (function(){S.rad=S.rad||{};var U=1795000000000;if(!S.rad['lopc-4']||(S.rad['lopc-4'].u||0)<U){S.rad['lopc-4']={d:'2026-11-23',u:U}}})();
 MVX={tid:'lopc-4',d:'2026-11-18',pref:'dcon'};
+// revisões: sempre 5 questões; se a anterior teve erro, dúvida ou chute, primeiro a leitura da teoria e depois as 5 questões
+rvN=function(tid){return 5};
+function rvHard(tid){var tr=(S.tr||{})[tid];if(!tr||!tr.res||tr.res=='ok')return false;if(RSET[tid]&&(tr.u||0)<=RSAT)return false;return /^(er|ch|dv)$/.test(tr.res)}
+function rvLeit(tid){var c=rvcGet(tid);if(!c)return;c.rd=c.rd?0:1;c.e=c.rd;rvcPut(tid,c);R()}
+rvcPut=(function(b){return function(tid,c){if(c&&rvHard(tid)&&!c.rd&&c.q){var c2={};for(var k in c)c2[k]=c[k];c2.q=0;c2.e=0;var r=b(tid,c2);S.rvc[tid].q=1;S.rvc[tid].ac=c.ac;S.rvc[tid].er=c.er;save();setTimeout(function(){toast('Questões lançadas. Marque “Leitura da teoria” para concluir a revisão.')},900);return r}return b(tid,c)}})(rvcPut);
+V.rev=(function(b){return function(){var h=b();return h.replace(/(<button class="rvk[^"]*" onclick="rvQ\('([^']+)'\)">)/g,function(a,full,t){if(!rvHard(t))return full;var c=(S.rvc||{})[t],r=rvDueT(t),rd=c&&r&&c.due==r.due&&c.rd;var tr=S.tr[t]||{},w=tr.res=='er'?'errou':tr.res=='ch'?'chutou':'teve dúvida';
+ return '<button class="rvk'+(rd?' on':'')+'" onclick="rvLeit(\''+t+'\')" title="Na revisão anterior você '+w+': leia primeiro a teoria do ponto, depois faça as questões">'+(rd?'☑':'☐')+' 1º Leitura da teoria (anterior: '+w+')</button>'+full.replace('">','">2º ')}).replace(/2º ☐ /g,'☐ 2º ')}})(V.rev);
 
 // ===== versão do amigo: sem as personalizações do dono; plano pelas escolhas dele
 var AMIGO=1;RSET={};PL0='0000';MVX.d='0000';
