@@ -2596,7 +2596,7 @@ Vqst=(function(b){return function(){var c;try{c=qmCard()}catch(x){c='<div class=
 merge=(function(b){return function(a,c){var r=b(a,c),M={};(a.qb||[]).concat(c.qb||[]).forEach(function(x){if(!x)return;var y=M[x.id];if(!y||(x.u||0)>(y.u||0))M[x.id]=x});r.qb=(r.qb||[]).map(function(x){return M[x.id]&&(M[x.id].u||0)>(x.u||0)?M[x.id]:x});return r}})(merge);
 (function(){try{var c=document.createElement('style');c.textContent='.qmr{align-items:flex-start}.qmb{display:flex;gap:6px;align-items:center;flex-shrink:0}.qme{border:1px dashed var(--bd);border-radius:8px;padding:10px;margin:4px 0 10px}.qme textarea{width:100%}.qme textarea.qal{min-height:42px;height:42px}';document.head.appendChild(c)}catch(x){}})();
 
-var APPV='18/11 10:02';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
+var APPV='18/11 18:53';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
 R=(function(b){return function(){b.apply(this,arguments);try{var m=document.getElementById('app')||document.body,v=document.getElementById('appv');if(!v){v=document.createElement('div');v.id='appv';document.body.appendChild(v)}v.textContent='versão '+APPV}catch(x){}}})(R);
 // banco por assunto: só questões do próprio assunto (sem completar com outros temas)
 qbTopic=function(tid){qbLoad().then(function(){var r=findT(tid),A=qbAll(),own=qShuf(A.filter(function(q){return (q.t||[]).indexOf(tid)>=0})).sort(function(a,b){return qRank(a)-qRank(b)}),ids=own.slice(0,10).map(function(q){return q.id});
@@ -3442,7 +3442,13 @@ function logMerge(){var L=S.logs,out=[],dead=[],last=null;for(var i=0;i<L.length
   ['min','ac','er','br','cz','dv','ch'].forEach(function(k){if(l[k]!=null||last[k]!=null)last[k]=(+last[k]||0)+(+l[k]||0)});if(l.mots){last.mots=(last.mots||[0,0,0,0,0,0]).map(function(v,j){return v+(+l.mots[j]||0)})}last.u=Date.now();dead.push(l.id);continue}
  out.push(l);last=l}
  if(!dead.length)return 0;S.logs=out;S.tomb=(S.tomb||[]).concat(dead);return dead.length}
-var LMB=0;R=(function(b){return function(){if(!LMB){LMB=1;try{if(logMerge()){PLC.k='';save()}}catch(x){}LMB=0}return b.apply(this,arguments)}})(R);
+// juntar só ao abrir o app (nunca no meio de um lançamento, para não atrapalhar a contagem das revisões)
+try{if(logMerge()){MEM=S;try{localStorage.setItem(K,JSON.stringify(slim()))}catch(x){}}}catch(x){}
+// recontagem das revisões de hoje pelos registros do dia (corrige contagens perdidas)
+function rvRecount(){var t=today(),ch=0;revs().forEach(function(x){if(x.kind!='T'||x.due>t)return;var c=rvcGet(x.tid);if(!c)return;var M=(x.bm&&x.bm.length?x.bm:[x.tid]),a=0,er=0,dv=0,chh=0;
+ S.logs.forEach(function(l){if(l.date!=t||M.indexOf(l.tid)<0)return;a+=+l.ac||0;er+=+l.er||0;dv+=+l.dv||0;chh+=+l.ch||0});
+ if(a+er>(c.ac||0)+(c.er||0)){c.ac=a;c.er=er;c.dv=Math.max(c.dv||0,dv);c.ch=Math.max(c.ch||0,chh);c.need=rvNeed(x.tid);if(a+er>=c.need)c.q=1;rvcPut(x.tid,c);ch=1}});return ch}
+try{rvRecount()}catch(x){}
 // 18/11: Lei Orgânica sai de hoje e só volta em 23/11; no lugar entra Constitucional (prioridade combinada)
 (function(){S.rad=S.rad||{};var U=1795000000000;if(!S.rad['lopc-4']||(S.rad['lopc-4'].u||0)<U){S.rad['lopc-4']={d:'2026-11-23',u:U}}})();
 MVX={tid:'lopc-4',d:'2026-11-18',pref:'dcon'};
@@ -3463,6 +3469,17 @@ inflate=(function(b){return function(o){var n=b(o),s0=S;try{S=n;dupFix()}catch(x
 trailOf=(function(b){return function(sid,ph){var L=b(sid,ph);return sid=='dpen'?L.filter(function(x){return !DUPR[x.t.id]}):L}})(trailOf);
 revs=(function(b){var C={v0:null,v:null};return function(){var v0=b();if(C.v0===v0&&C.v)return C.v;var v=v0.filter(function(x){return !(x.kind=='T'&&(DUPR[x.tid]||(x.bm&&x.bm.length&&x.bm.every(function(t){return DUPR[t]}))))});C={v0:v0,v:v};return v}})(revs);
 qtPend=(function(b){return function(){return b().filter(function(x){return !DUPR[x.tid]})}})(qtPend);
+// revisão pelo cronômetro: salvar como "parcial" não desmarca um assunto já estudado
+tmSaveLog=(function(b){return function(){var tid=TM&&TM.tid,r0=tid&&findT(tid),was=r0&&r0.t.d,dt=r0&&r0.t.dt,n0=S.logs.length;var r=b.apply(this,arguments);try{if(was){var r1=findT(tid);if(r1&&!r1.t.d){setDone(tid,true,dt);S.pp=S.pp||{};S.pp[tid]={ok:1,w:null,u:Date.now()};S.at=Date.now();PLC.k='';if(S.logs.length>n0)rvSweep(n0,false);save()}}}catch(x){}return r}})(tmSaveLog);
+// leitura da teoria: mostra o que você errou na revisão anterior
+function rvErrBox(lead){var x=revs().filter(function(z){return z.tid==lead})[0],M=x&&x.bm&&x.bm.length?x.bm:[lead],tr=(S.tr||{})[lead]||{},since=tr.last||'0000',L=[],nums={};
+ (S.er||[]).forEach(function(z){if(M.indexOf(z.tid)>=0&&z.date>=since)L.push(z)});
+ S.logs.forEach(function(l){if(M.indexOf(l.tid)<0||l.date<since||!(+l.er))return;var o=nums[l.tid]||(nums[l.tid]={n:0,m:[0,0,0,0,0,0]});o.n+=+l.er;(l.mots||[]).forEach(function(v,i){o.m[i]+=+v||0})});
+ var h=L.slice(0,6).map(function(z){var r=findT(z.tid),t=String(z.nt||'').replace(/\s+/g,' '),g=(t.match(/Gabarito:\s*([A-E])/)||[])[1],en=t.replace(/Gabarito:[\s\S]*$/,'').slice(0,160);return '<li><b>'+e(r?sqShort(r.t):'')+'</b> · '+e(MOTN[motIx(z.mot)])+'<br><span class="mu">'+e(en)+(en.length>=160?'…':'')+(g?' · gabarito '+g:'')+'</span></li>'}).join('');
+ var semTxt=Object.keys(nums).map(function(t){var o=nums[t],r=findT(t),q=L.filter(function(z){return z.tid==t}).length,n=o.n-q;if(n<=0)return '';var mm=o.m.map(function(v,i){return v?MOTN[i].charAt(0)+'×'+v:''}).filter(Boolean).join(', ');return '<li><b>'+e(r?sqShort(r.t):t)+'</b>: '+n+' erro'+(n>1?'s':'')+' lançado'+(n>1?'s':'')+' só como número'+(mm?' (motivos '+mm+')':'')+' — releia este assunto.</li>'}).join('');
+ if(!h&&!semTxt)return '<div class="mu" style="font-size:12px;width:100%;margin:2px 0 6px">Não achei as questões erradas da revisão anterior (lançadas sem texto). Releia os assuntos da lista abaixo com acerto mais baixo.</div>';
+ return '<div style="font-size:12.5px;width:100%;margin:2px 0 6px"><b>O que você errou na revisão anterior ('+since.split('-').reverse().slice(0,2).join('/')+') — leia isto:</b><ul style="margin:4px 0 0 18px;padding:0">'+h+semTxt+'</ul><span class="mu">Texto completo e comentário no Caderno de erros.</span></div>'}
+V.rev=(function(b){return function(){return b().replace(/(<button class="rvk[^"]*" onclick="rvLeit\('([^']+)'\)")/g,function(a,full,t){var c=(S.rvc||{})[t],r=rvDueT(t);if(c&&r&&c.due==r.due&&c.rd)return full;return rvErrBox(t)+full})}})(V.rev);
 
 // ===== versão do amigo: sem as personalizações do dono; plano pelas escolhas dele
 var AMIGO=1;RSET={};PL0='0000';MVX.d='0000';
