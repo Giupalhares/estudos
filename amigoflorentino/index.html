@@ -2596,7 +2596,7 @@ Vqst=(function(b){return function(){var c;try{c=qmCard()}catch(x){c='<div class=
 merge=(function(b){return function(a,c){var r=b(a,c),M={};(a.qb||[]).concat(c.qb||[]).forEach(function(x){if(!x)return;var y=M[x.id];if(!y||(x.u||0)>(y.u||0))M[x.id]=x});r.qb=(r.qb||[]).map(function(x){return M[x.id]&&(M[x.id].u||0)>(x.u||0)?M[x.id]:x});return r}})(merge);
 (function(){try{var c=document.createElement('style');c.textContent='.qmr{align-items:flex-start}.qmb{display:flex;gap:6px;align-items:center;flex-shrink:0}.qme{border:1px dashed var(--bd);border-radius:8px;padding:10px;margin:4px 0 10px}.qme textarea{width:100%}.qme textarea.qal{min-height:42px;height:42px}';document.head.appendChild(c)}catch(x){}})();
 
-var APPV='18/11 19:20';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
+var APPV='19/11 09:43';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
 R=(function(b){return function(){b.apply(this,arguments);try{var m=document.getElementById('app')||document.body,v=document.getElementById('appv');if(!v){v=document.createElement('div');v.id='appv';document.body.appendChild(v)}v.textContent='versão '+APPV}catch(x){}}})(R);
 // banco por assunto: só questões do próprio assunto (sem completar com outros temas)
 qbTopic=function(tid){qbLoad().then(function(){var r=findT(tid),A=qbAll(),own=qShuf(A.filter(function(q){return (q.t||[]).indexOf(tid)>=0})).sort(function(a,b){return qRank(a)-qRank(b)}),ids=own.slice(0,10).map(function(q){return q.id});
@@ -3504,6 +3504,48 @@ function fix1811d(){var x=(S.tr||{})['pple-4'];if(!x||x.last!='2026-11-16'||x.h!
  S.tr['pple-4']={s:1,n:2,lp:1,cs:0,h:'er,ok',nx:'2026-12-11',rs:1,res:'ok',last:'2026-11-18',src:'sim',u:Date.now()};return 1}
 try{if(fix1811d()|fix1811b()){S.at=Date.now();MEM=S;try{localStorage.setItem(K,JSON.stringify(slim()))}catch(x){}}fix1811c()}catch(x){}
 inflate=(function(b){return function(o){var n=b(o),s0=S;try{S=n;fix1811d()}catch(x){}finally{S=s0}return n}})(inflate);
+
+// ===== mod42: editar a matéria/assunto em "Minhas questões" leva o resultado junto (registro, histórico, estatística, gráficos, caderno de erros)
+// liga cada questão colada ao registro em que foi contada
+pqSave=(function(b){return function(){var n=S.logs.length,nq=(S.qb||[]).length,r=b.apply(this,arguments);try{var L=S.logs.slice(n);if(L.length){var ch=0;(S.qb||[]).slice(nq).forEach(function(q){var h=(S.qh||{})[q.id];if(!h)return;var lg=L.filter(function(l){return l.bc==q.bc})[0]||L[0];h.lg=lg.id;ch=1});if(ch)save()}}catch(x){}return r}})(pqSave);
+function qmRes(id){var h=(S.qh||{})[id]||{};if(h.r=='er')return 'er';if(h.r=='ok')return h.c||'ok';return ''}
+// acha o registro em que a questão foi contada
+function qmLogOf(q,s0,t0){var h=(S.qh||{})[q.id]||{},r=qmRes(q.id);if(!r)return null;var f=r=='er'?'er':'ac',d=h.d||q.dt;
+ var L=S.logs.filter(function(l){return l.ts=='Questões'&&l.sid==s0&&(+l[f]||0)>0&&(r=='dv'||r=='ch'?(+l[r]||0)>0:1)});
+ if(h.lg){var x=L.filter(function(l){return l.id==h.lg})[0];if(x)return x}
+ L=L.filter(function(l){return l.date==d});if(!L.length)return null;
+ var sc=function(l){return (l.tid==t0?4:0)+(l.bc==q.bc?2:0)+(q.cg&&l.cg==q.cg?1:0)};L.sort(function(a,b){return sc(b)-sc(a)});return L[0]}
+// tira a questão do registro antigo e lança no assunto novo
+function qmMove(q,s0,t0,s1,t1,nid){var r=qmRes(q.id),now=Date.now(),moved=0;if(!r)return 0;
+ // prova montada / simulado do banco
+ (S.sim||[]).forEach(function(m){(m.q||[]).forEach(function(x){if(x.qid!=q.id||x.sid!=s0)return;x.sid=s1;x.tid=t1;var w0=(m.rows||[]).filter(function(w){return w.sid==s0})[0],w1=(m.rows||[]).filter(function(w){return w.sid==s1})[0];if(w0){var f=x.r=='er'?'er':'ac';w0[f]=Math.max(0,(+w0[f]||0)-1);if(!w1){w1={sid:s1,ac:0,er:0,br:0};m.rows.push(w1)}w1[f]=(+w1[f]||0)+1}m.u=now;moved=1})});
+ if(!moved){var lg=qmLogOf(q,s0,t0);if(lg){var n=(+lg.ac||0)+(+lg.er||0);
+  if(n<=1){lg.sid=s1;lg.tid=t1;lg.u=now}
+  else{var x={};for(var p in lg)x[p]=lg[p];x.id=nid||uid();x.sid=s1;x.tid=t1;x.ac=0;x.er=0;x.dv=0;x.ch=0;x.cz=0;x.min=Math.round((+lg.min||0)/n);lg.min=Math.max(0,(+lg.min||0)-x.min);delete x.mots;delete x.pr;x.pr='';x.au=0;x.pg=0;
+   if(r=='er'){lg.er--;x.er=1}else{lg.ac--;x.ac=1;if(r=='dv'||r=='ch'){lg[r]--;x[r]=1}else if(lg.cz){lg.cz--;x.cz=1}}
+   lg.u=now;x.u=now;S.logs.push(x);lg=x}
+  var h=S.qh[q.id];if(h){h.lg=lg.id;h.u=now}moved=1}}
+ // caderno de erros
+ (S.er||[]).forEach(function(x){if(x.qid==q.id){x.sid=s1;x.tid=t1;x.u=now}});
+ return moved}
+qmSave=(function(b){return function(id){var q=qmFind(id);if(!q)return b(id);
+ var g=function(i){var el=document.getElementById(i);return el?String(el.value||'').trim():''},s0=q.s,t0=(q.t||[])[0]||'',s1=g('qe_s')||s0,t1=g('qe_t');
+ var ok=g('qe_e')&&['A','B','C','D','E'].filter(function(l){return g('qe_'+l)}).length>=2;
+ var mv=0;if(ok&&(s1!=s0||t1!=t0))mv=qmMove(q,s0,t0,s1,t1);
+ b(id);if(mv){S.at=Date.now();save();R();toast('Questão movida para '+SN(sub(s1))+(t1&&findT(t1)?' · '+findT(t1).t.n.slice(0,50):'')+': registro, histórico, estatística e caderno atualizados.')}
+ else if(ok&&(s1!=s0||t1!=t0)&&qmRes(id)){toast('Assunto trocado. Não achei o registro original dessa questão para mover a contagem.')}}})(qmSave);
+// 19/11: a questão FGV do MP-GO (Município… lei) foi lançada em Constitucional e editada para Administrativo 1.1.3 — move a contagem
+function fix1911(){var ch=0;(S.qb||[]).forEach(function(q){if(q.mv1911||q.s!='adm'||q.dt!='2026-11-19'||!/Determinado Munic/i.test(q.e||''))return;var h=(S.qh||{})[q.id];if(!h)return;
+  var t1=(q.t||[])[0]||'',lg=null;['dcon'].forEach(function(s0){if(!lg)lg=qmLogOf(q,s0,'')});if(!lg)return;
+  if(qmMove(q,lg.sid,lg.tid,'adm',t1,'mv'+q.id)){q.mv1911=1;q.u=Date.now();ch=1}});return ch}
+try{if(fix1911()){S.at=Date.now();MEM=S;try{localStorage.setItem(K,JSON.stringify(slim()))}catch(x){}}}catch(x){}
+inflate=(function(b){return function(o){var n=b(o),s0=S;try{S=n;fix1911()}catch(x){}finally{S=s0}return n}})(inflate);
+// cronômetro: destino do registro numa linha discreta, acima dos botões
+tmDest=function(){return ''};
+function tmDest2(){var r=TM&&TM.tid&&findT(TM.tid),s=TM&&TM.sid&&sub(TM.sid);if(!s)return '';return '<div class="cwdest" title="Se as questões forem de outro assunto, troque a matéria e o assunto acima antes de salvar."><span class="cwdl">Grava em</span><span class="cwdv"><b>'+e(SN(s))+'</b>'+(r?' › '+e(r.t.n):' › <i>sem assunto</i>')+'</span></div>'}
+V.cron=(function(b){return function(){var h=b(),i=h.indexOf('<div class="cwbt">');if(i<0)return h;
+  return h.slice(0,i)+tmDest2()+h.slice(i)}})(V.cron);
+(function(){try{var c=document.createElement('style');c.textContent='.cwdest{display:flex;align-items:baseline;gap:8px;margin:10px 0 8px;padding:8px 12px;border-radius:10px;background:var(--ac2);color:var(--tx);font-size:13px;line-height:1.35}.cwdl{flex:none;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ac)}.cwdv{min-width:0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}.cwdv b{color:var(--ac)}';document.head.appendChild(c)}catch(x){}})();
 
 // ===== versão do amigo: sem as personalizações do dono; plano pelas escolhas dele
 var AMIGO=1;RSET={};PL0='0000';MVX.d='0000';
