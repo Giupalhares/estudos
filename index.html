@@ -2595,7 +2595,7 @@ Vqst=(function(b){return function(){var c;try{c=qmCard()}catch(x){c='<div class=
 merge=(function(b){return function(a,c){var r=b(a,c),M={};(a.qb||[]).concat(c.qb||[]).forEach(function(x){if(!x)return;var y=M[x.id];if(!y||(x.u||0)>(y.u||0))M[x.id]=x});r.qb=(r.qb||[]).map(function(x){return M[x.id]&&(M[x.id].u||0)>(x.u||0)?M[x.id]:x});return r}})(merge);
 (function(){try{var c=document.createElement('style');c.textContent='.qmr{align-items:flex-start}.qmb{display:flex;gap:6px;align-items:center;flex-shrink:0}.qme{border:1px dashed var(--bd);border-radius:8px;padding:10px;margin:4px 0 10px}.qme textarea{width:100%}.qme textarea.qal{min-height:42px;height:42px}';document.head.appendChild(c)}catch(x){}})();
 
-var APPV='19/11 11:47';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
+var APPV='19/11 11:51';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
 R=(function(b){return function(){b.apply(this,arguments);try{var m=document.getElementById('app')||document.body,v=document.getElementById('appv');if(!v){v=document.createElement('div');v.id='appv';document.body.appendChild(v)}v.textContent='versão '+APPV}catch(x){}}})(R);
 // banco por assunto: só questões do próprio assunto (sem completar com outros temas)
 qbTopic=function(tid){qbLoad().then(function(){var r=findT(tid),A=qbAll(),own=qShuf(A.filter(function(q){return (q.t||[]).indexOf(tid)>=0})).sort(function(a,b){return qRank(a)-qRank(b)}),ids=own.slice(0,10).map(function(q){return q.id});
@@ -3553,6 +3553,11 @@ rvAdd=(function(b){return function(tid,ac,er,dv,ch,study){if(study){var L=rvLead
 function rvLeitFix(){var t=today(),ch=0;revs().forEach(function(x){if(x.kind!='T'||x.due>t||!rvHard(x.tid))return;var c=rvcGet(x.tid);if(!c||c.ok||c.rd)return;var M=(x.bm&&x.bm.length?x.bm:[x.tid]);if(!rvStudyToday(M))return;c.rd=1;c.e=1;rvcPut(x.tid,c);ch=1});return ch}
 try{rvRecount();if(rvLeitFix()){S.at=Date.now();save()}}catch(x){}
 cloud=(function(b){return function(){var r=b.apply(this,arguments);setTimeout(function(){try{rvRecount();if(rvLeitFix()){S.at=Date.now();save();R()}}catch(x){}},9000);return r}})(cloud);
+// 19/11: assunto marcado como estudado hoje ficava com a data de revisão antiga (de antes do reestudo) e já aparecia para revisar no mesmo dia — recomeça a contagem a partir do estudo
+function trStaleFix(){var ch=0;(S.subs||[]).forEach(function(s){(s.tp||[]).forEach(function(t){if(!t.d||!t.dt)return;var o=(S.tr||{})[t.id];if(!o||!o.nx||o.nx>=t.dt||(o.last&&o.last>=t.dt))return;S.tr[t.id]={s:0,n:0,lp:0,cs:0,h:'',u:Date.now()};ch=1})});return ch}
+try{if(trStaleFix()){S.at=Date.now();save()}}catch(x){}
+setDone=(function(b){return function(tid,on,d){var r=b.apply(this,arguments);try{if(on&&trStaleFix()){S.at=Date.now();save()}}catch(x){}return r}})(setDone);
+cloud=(function(b){return function(){var r=b.apply(this,arguments);setTimeout(function(){try{if(trStaleFix()){S.at=Date.now();save();R()}}catch(x){}},9500);return r}})(cloud);
 
 mig4();R();tmInit();cloud();
 </script>
