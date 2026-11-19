@@ -2595,7 +2595,7 @@ Vqst=(function(b){return function(){var c;try{c=qmCard()}catch(x){c='<div class=
 merge=(function(b){return function(a,c){var r=b(a,c),M={};(a.qb||[]).concat(c.qb||[]).forEach(function(x){if(!x)return;var y=M[x.id];if(!y||(x.u||0)>(y.u||0))M[x.id]=x});r.qb=(r.qb||[]).map(function(x){return M[x.id]&&(M[x.id].u||0)>(x.u||0)?M[x.id]:x});return r}})(merge);
 (function(){try{var c=document.createElement('style');c.textContent='.qmr{align-items:flex-start}.qmb{display:flex;gap:6px;align-items:center;flex-shrink:0}.qme{border:1px dashed var(--bd);border-radius:8px;padding:10px;margin:4px 0 10px}.qme textarea{width:100%}.qme textarea.qal{min-height:42px;height:42px}';document.head.appendChild(c)}catch(x){}})();
 
-var APPV='19/11 11:51';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
+var APPV='19/11 20:32';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
 R=(function(b){return function(){b.apply(this,arguments);try{var m=document.getElementById('app')||document.body,v=document.getElementById('appv');if(!v){v=document.createElement('div');v.id='appv';document.body.appendChild(v)}v.textContent='versão '+APPV}catch(x){}}})(R);
 // banco por assunto: só questões do próprio assunto (sem completar com outros temas)
 qbTopic=function(tid){qbLoad().then(function(){var r=findT(tid),A=qbAll(),own=qShuf(A.filter(function(q){return (q.t||[]).indexOf(tid)>=0})).sort(function(a,b){return qRank(a)-qRank(b)}),ids=own.slice(0,10).map(function(q){return q.id});
@@ -3558,6 +3558,16 @@ function trStaleFix(){var ch=0;(S.subs||[]).forEach(function(s){(s.tp||[]).forEa
 try{if(trStaleFix()){S.at=Date.now();save()}}catch(x){}
 setDone=(function(b){return function(tid,on,d){var r=b.apply(this,arguments);try{if(on&&trStaleFix()){S.at=Date.now();save()}}catch(x){}return r}})(setDone);
 cloud=(function(b){return function(){var r=b.apply(this,arguments);setTimeout(function(){try{if(trStaleFix()){S.at=Date.now();save();R()}}catch(x){}},9500);return r}})(cloud);
+// 19/11: tarefa de questões de um tema com subitens (ex.: 3.7) — o tema inteiro vira opção de assunto, já selecionada; a tarefa conta também as questões dos subitens
+function tpOptWhole(sid,tid){var r=findT(tid);if(!r||r.s.id!=sid)return '';return '<option value="'+tid+'" selected>'+e(r.t.n.slice(0,80))+' (tema inteiro)</option>'}
+function optAddSel(h,sid,tid){if(!tid||h.indexOf('value="'+tid+'"')>=0)return h;var o=tpOptWhole(sid,tid);if(!o)return h;h=h.replace(/ selected/g,'');var i=h.indexOf('</option>');return i<0?o+h:h.slice(0,i+9)+o+h.slice(i+9)}
+pqTopOpts=(function(b){return function(sid,sel){return optAddSel(b(sid,sel),sid,sel)}})(pqTopOpts);
+qfFill=(function(b){return function(){b();try{if(QFP&&QFP.tid){var el=document.getElementById('qft'),se=document.getElementById('qfs');if(el&&se&&se.value==QFP.sid){el.innerHTML=optAddSel(el.innerHTML,QFP.sid,QFP.tid);el.value=QFP.tid}}}catch(x){}}})(qfFill);
+qmCard=(function(b){return function(){var h=b();try{if(QED){var q=qmFind(QED),tid=q&&(q.t||[])[0];var sd=QEDS||q.s;h=h.replace(/(<select id="qe_t">)([\s\S]*?)(<\/select>)/,function(a,o,x,c){if(tid)x=optAddSel(x,sd,tid);qtPend().forEach(function(y){if(y.s.id==sd&&x.indexOf('value="'+y.tid+'"')<0){var i=x.indexOf('</option>');x=x.slice(0,i+9)+'<option value="'+y.tid+'">'+e(y.t.n.slice(0,80))+' (tema inteiro)</option>'+x.slice(i+9)}});return o+x+c})}}catch(x){}return h}})(qmCard);
+qtProg=(function(b){return function(tid,d){var n=b(tid,d),r=findT(tid);if(!r||leaf(r.s,r.i))return n;descIdx(r.s,r.i).forEach(function(j){n+=b(r.s.tp[j].id,d)});return n}})(qtProg);
+// faixa da tarefa no topo do formulário de colar (e sem o "10")
+pqCard=(function(b){return function(){var h=b();var m=h.match(/<div class="qfp">[\s\S]*?<\/b><\/div>/);if(!m)return h;h=h.replace(m[0],'');var x=m[0].replace('>10 questões: ','>Questões do tema: ');var i=h.indexOf('<div class="f"><div><label>Matéria</label>');return i<0?h:h.slice(0,i)+x+h.slice(i)}})(pqCard);
+(function(){try{var c=document.createElement('style');c.textContent='.pq .qfp{margin:4px 0 12px}';document.head.appendChild(c)}catch(x){}})();
 
 mig4();R();tmInit();cloud();
 </script>
