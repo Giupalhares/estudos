@@ -2596,7 +2596,7 @@ Vqst=(function(b){return function(){var c;try{c=qmCard()}catch(x){c='<div class=
 merge=(function(b){return function(a,c){var r=b(a,c),M={};(a.qb||[]).concat(c.qb||[]).forEach(function(x){if(!x)return;var y=M[x.id];if(!y||(x.u||0)>(y.u||0))M[x.id]=x});r.qb=(r.qb||[]).map(function(x){return M[x.id]&&(M[x.id].u||0)>(x.u||0)?M[x.id]:x});return r}})(merge);
 (function(){try{var c=document.createElement('style');c.textContent='.qmr{align-items:flex-start}.qmb{display:flex;gap:6px;align-items:center;flex-shrink:0}.qme{border:1px dashed var(--bd);border-radius:8px;padding:10px;margin:4px 0 10px}.qme textarea{width:100%}.qme textarea.qal{min-height:42px;height:42px}';document.head.appendChild(c)}catch(x){}})();
 
-var APPV='19/11 23:54';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
+var APPV='20/11 14:24';(function(){try{var c=document.createElement('style');c.textContent='#appv{font-size:11px;color:var(--mu);text-align:center;margin:14px 0 4px}';document.head.appendChild(c)}catch(x){}})();
 R=(function(b){return function(){b.apply(this,arguments);try{var m=document.getElementById('app')||document.body,v=document.getElementById('appv');if(!v){v=document.createElement('div');v.id='appv';document.body.appendChild(v)}v.textContent='versão '+APPV}catch(x){}}})(R);
 // banco por assunto: só questões do próprio assunto (sem completar com outros temas)
 qbTopic=function(tid){qbLoad().then(function(){var r=findT(tid),A=qbAll(),own=qShuf(A.filter(function(q){return (q.t||[]).indexOf(tid)>=0})).sort(function(a,b){return qRank(a)-qRank(b)}),ids=own.slice(0,10).map(function(q){return q.id});
@@ -3580,6 +3580,13 @@ function fixCiv(){if(/amigoflorentino/.test(location.pathname||''))return 0;var 
  return ch}
 try{if(fixCiv()){S.at=Date.now();save()}}catch(x){}
 inflate=(function(b){return function(o){var n=b(o),s0=S;try{S=n;fixCiv()}catch(x){}finally{S=s0}return n}})(inflate);
+// 20/11: revisões feitas em 19/11 que voltaram no dia seguinte — empurradas para 27/11 (1.2 Adm, 6.1–6.4 PP, 3.1–3.2 Const, 9.1 Crim)
+function fix2011(){if(/amigoflorentino/.test(location.pathname||'')||today()>'2026-11-26')return 0;var ch=0,N='2026-11-27',now=Date.now(),P=[/^1\.2 Administração Pública/,/^6\.1–6\.4 /,/^3\.1–3\.2 /,/^9\.1 /];
+ Object.keys(BLK).forEach(function(k){var b=BLK[k];if(!P.some(function(r){return r.test(b.ti)}))return;if(!/^(adm|pple|dcon|crim)$/.test(b.sid))return;
+  b.t.forEach(function(tid){var r=findT(tid);if(!r||!r.t.d)return;var o=(S.tr||{})[tid];if(o&&o.nx&&o.nx>=N)return;
+   if(o&&o.nx){o.nx=N;o.u=now}else S.tr[tid]={s:1,n:1,lp:1,cs:0,h:'ok',res:'ok',last:'2026-11-19',nx:N,src:'sim',u:now};ch=1})});return ch}
+try{if(fix2011()){S.at=Date.now();save()}}catch(x){}
+inflate=(function(b){return function(o){var n=b(o),s0=S;try{S=n;fix2011()}catch(x){}finally{S=s0}return n}})(inflate);
 
 // ===== versão do amigo: sem as personalizações do dono; plano pelas escolhas dele
 var AMIGO=1;RSET={};PL0='0000';MVX.d='0000';
